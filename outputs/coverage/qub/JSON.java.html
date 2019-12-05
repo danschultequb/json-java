@@ -1,0 +1,503 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JSON.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCo Coverage Report</a> &gt; <a href="index.source.html" class="el_package">qub</a> &gt; <span class="el_source">JSON.java</span></div><h1>JSON.java</h1><pre class="source lang-java linenums">package qub;
+
+/**
+ * A collection of methods for interacting with JSON.
+ */
+public interface JSON
+{
+    /**
+     * Parse the provided text into a JSON document.
+     * @param text The text to parse.
+     * @return The parsed JSONDocument.
+     */
+    static JSONDocument parse(String text)
+    {
+<span class="fc" id="L15">        final StringIterator characters = new StringIterator(text);</span>
+<span class="fc" id="L16">        return parse(characters);</span>
+    }
+
+    static JSONDocument parse(String text, List&lt;Issue&gt; issues)
+    {
+<span class="fc" id="L21">        final StringIterator characters = new StringIterator(text);</span>
+<span class="fc" id="L22">        return parse(characters, issues);</span>
+    }
+
+    static JSONDocument parse(Iterator&lt;Character&gt; characters)
+    {
+<span class="fc" id="L27">        return parse(characters, null);</span>
+    }
+
+    static JSONDocument parse(Iterator&lt;Character&gt; characters, List&lt;Issue&gt; issues)
+    {
+<span class="fc" id="L32">        final List&lt;JSONSegment&gt; documentSegments = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L34">        final JSONTokenizer tokenizer = new JSONTokenizer(characters, issues);</span>
+<span class="fc" id="L35">        tokenizer.next();</span>
+
+<span class="fc" id="L37">        boolean foundRootSegment = false;</span>
+<span class="fc bfc" id="L38" title="All 2 branches covered.">        while (tokenizer.hasCurrent())</span>
+        {
+<span class="fc" id="L40">            final JSONSegment segment = parseSegment(tokenizer, issues);</span>
+<span class="fc" id="L41">            documentSegments.add(segment);</span>
+
+<span class="fc bfc" id="L43" title="All 4 branches covered.">            if (segment instanceof JSONObject || segment instanceof JSONArray)</span>
+            {
+<span class="fc bfc" id="L45" title="All 2 branches covered.">                if (!foundRootSegment)</span>
+                {
+<span class="fc" id="L47">                    foundRootSegment = true;</span>
+                }
+                else
+                {
+<span class="fc" id="L51">                    addIssue(issues, JSONIssues.expectedEndOfFile(segment.getSpan()));</span>
+                }
+            }
+            else {
+<span class="fc" id="L55">                final JSONToken token = (JSONToken)segment;</span>
+<span class="fc bfc" id="L56" title="All 2 branches covered.">                switch (token.getType())</span>
+                {
+                    case NewLine:
+                    case Whitespace:
+                    case LineComment:
+                    case BlockComment:
+<span class="fc" id="L62">                        break;</span>
+
+                    default:
+<span class="fc bfc" id="L65" title="All 2 branches covered.">                        if (!foundRootSegment)</span>
+                        {
+<span class="fc" id="L67">                            foundRootSegment = true;</span>
+                        }
+                        else
+                        {
+<span class="fc" id="L71">                            addIssue(issues, JSONIssues.expectedEndOfFile(token.getSpan()));</span>
+                        }
+                        break;
+                }
+            }
+<span class="fc" id="L76">        }</span>
+
+<span class="fc" id="L78">        return new JSONDocument(documentSegments);</span>
+    }
+
+    static JSONSegment parseSegment(JSONTokenizer tokenizer, List&lt;Issue&gt; issues)
+    {
+        JSONSegment result;
+
+<span class="fc bfc" id="L85" title="All 3 branches covered.">        switch (tokenizer.getCurrent().getType())</span>
+        {
+            case LeftCurlyBracket:
+<span class="fc" id="L88">                result = parseObject(tokenizer, issues);</span>
+<span class="fc" id="L89">                break;</span>
+
+            case LeftSquareBracket:
+<span class="fc" id="L92">                result = parseArray(tokenizer, issues);</span>
+<span class="fc" id="L93">                break;</span>
+
+            default:
+<span class="fc" id="L96">                result = tokenizer.takeCurrent();</span>
+                break;
+        }
+
+<span class="fc" id="L100">        return result;</span>
+    }
+
+    static JSONObject parseObject(String text)
+    {
+<span class="fc" id="L105">        return parseObject(text, 0);</span>
+    }
+
+    static JSONObject parseObject(String text, int firstTokenStartIndex)
+    {
+<span class="fc" id="L110">        JSONObject result = null;</span>
+
+<span class="fc" id="L112">        final JSONTokenizer tokenizer = new JSONTokenizer(text, firstTokenStartIndex);</span>
+<span class="pc bpc" id="L113" title="2 of 4 branches missed.">        if (tokenizer.next() &amp;&amp; tokenizer.getCurrent().getType() == JSONTokenType.LeftCurlyBracket)</span>
+        {
+<span class="fc" id="L115">            result = parseObject(tokenizer, null);</span>
+        };
+
+<span class="fc" id="L118">        return result;</span>
+    }
+
+    static JSONObject parseObject(JSONTokenizer tokenizer, List&lt;Issue&gt; issues)
+    {
+<span class="fc" id="L123">        final JSONToken leftCurlyBracket = tokenizer.takeCurrent();</span>
+<span class="fc" id="L124">        final List&lt;JSONSegment&gt; objectSegments = List.create(leftCurlyBracket);</span>
+
+<span class="fc" id="L126">        boolean foundRightCurlyBracket = false;</span>
+<span class="fc" id="L127">        boolean propertyNameAllowed = true;</span>
+<span class="fc" id="L128">        boolean commaAllowed = false;</span>
+<span class="fc" id="L129">        boolean rightCurlyBracketAllowed = true;</span>
+<span class="fc bfc" id="L130" title="All 4 branches covered.">        while (!foundRightCurlyBracket &amp;&amp; tokenizer.hasCurrent())</span>
+        {
+<span class="fc" id="L132">            final JSONToken token = tokenizer.getCurrent();</span>
+<span class="fc bfc" id="L133" title="All 5 branches covered.">            switch (token.getType())</span>
+            {
+                case QuotedString:
+<span class="fc bfc" id="L136" title="All 2 branches covered.">                    if (!propertyNameAllowed)</span>
+                    {
+<span class="fc" id="L138">                        addIssue(issues, JSONIssues.expectedCommaOrClosingRightCurlyBracket(token.getSpan()));</span>
+                    }
+
+<span class="fc" id="L141">                    objectSegments.add(parseProperty(tokenizer, issues));</span>
+
+<span class="fc" id="L143">                    propertyNameAllowed = false;</span>
+<span class="fc" id="L144">                    commaAllowed = true;</span>
+<span class="fc" id="L145">                    rightCurlyBracketAllowed = true;</span>
+<span class="fc" id="L146">                    break;</span>
+
+                case RightCurlyBracket:
+<span class="fc" id="L149">                    objectSegments.add(token);</span>
+<span class="fc" id="L150">                    foundRightCurlyBracket = true;</span>
+<span class="fc bfc" id="L151" title="All 2 branches covered.">                    if (!rightCurlyBracketAllowed)</span>
+                    {
+<span class="fc" id="L153">                        addIssue(issues, JSONIssues.expectedPropertyName(token.getSpan()));</span>
+                    }
+<span class="fc" id="L155">                    tokenizer.next();</span>
+<span class="fc" id="L156">                    break;</span>
+
+                case NewLine:
+                case Whitespace:
+                case LineComment:
+                case BlockComment:
+<span class="fc" id="L162">                    objectSegments.add(token);</span>
+<span class="fc" id="L163">                    tokenizer.next();</span>
+<span class="fc" id="L164">                    break;</span>
+
+                case Comma:
+<span class="fc" id="L167">                    objectSegments.add(token);</span>
+<span class="fc bfc" id="L168" title="All 2 branches covered.">                    if (!commaAllowed)</span>
+                    {
+<span class="fc bfc" id="L170" title="All 2 branches covered.">                        if (!rightCurlyBracketAllowed)</span>
+                        {
+<span class="fc" id="L172">                            addIssue(issues, JSONIssues.expectedPropertyName(token.getSpan()));</span>
+                        }
+                        else
+                        {
+<span class="fc" id="L176">                            addIssue(issues, JSONIssues.expectedPropertyNameOrClosingRightCurlyBracket(token.getSpan()));</span>
+                        }
+                    }
+<span class="fc" id="L179">                    propertyNameAllowed = true;</span>
+<span class="fc" id="L180">                    commaAllowed = false;</span>
+<span class="fc" id="L181">                    rightCurlyBracketAllowed = false;</span>
+<span class="fc" id="L182">                    tokenizer.next();</span>
+<span class="fc" id="L183">                    break;</span>
+
+                default:
+<span class="fc" id="L186">                    objectSegments.add(token);</span>
+<span class="fc bfc" id="L187" title="All 2 branches covered.">                    if (propertyNameAllowed)</span>
+                    {
+<span class="fc bfc" id="L189" title="All 2 branches covered.">                        if (rightCurlyBracketAllowed)</span>
+                        {
+<span class="fc" id="L191">                            addIssue(issues, JSONIssues.expectedPropertyNameOrClosingRightCurlyBracket(token.getSpan()));</span>
+                        }
+                        else
+                        {
+<span class="fc" id="L195">                            addIssue(issues, JSONIssues.expectedPropertyName(token.getSpan()));</span>
+
+                            // If I get an unexpected segment after a comma, then allow a right
+                            // curly bracket for the next segment.
+<span class="fc" id="L199">                            rightCurlyBracketAllowed = true;</span>
+                        }
+                    }
+                    else
+                    {
+<span class="fc" id="L204">                        addIssue(issues, JSONIssues.expectedCommaOrClosingRightCurlyBracket(token.getSpan()));</span>
+                    }
+<span class="fc" id="L206">                    tokenizer.next();</span>
+                    break;
+            }
+<span class="fc" id="L209">        }</span>
+
+<span class="fc bfc" id="L211" title="All 2 branches covered.">        if (!foundRightCurlyBracket)</span>
+        {
+<span class="fc" id="L213">            addIssue(issues, JSONIssues.missingClosingRightCurlyBracket(leftCurlyBracket.getSpan()));</span>
+        }
+
+<span class="fc" id="L216">        return new JSONObject(objectSegments);</span>
+    }
+
+    static JSONProperty parseProperty(String text)
+    {
+<span class="fc" id="L221">        return parseProperty(text, 0);</span>
+    }
+
+    static JSONProperty parseProperty(String text, int startIndex)
+    {
+<span class="fc" id="L226">        JSONProperty result = null;</span>
+
+<span class="fc" id="L228">        final JSONTokenizer tokenizer = new JSONTokenizer(text, startIndex);</span>
+<span class="pc bpc" id="L229" title="2 of 4 branches missed.">        if (tokenizer.next() &amp;&amp; tokenizer.getCurrent().getType() == JSONTokenType.QuotedString)</span>
+        {
+<span class="fc" id="L231">            result = parseProperty(tokenizer, null);</span>
+        }
+
+<span class="fc" id="L234">        return result;</span>
+    }
+
+    static JSONProperty parseProperty(JSONTokenizer tokenizer, List&lt;Issue&gt; issues)
+    {
+<span class="fc" id="L239">        final JSONToken propertyName = tokenizer.takeCurrent();</span>
+<span class="fc" id="L240">        final List&lt;JSONSegment&gt; propertySegments = List.create(propertyName);</span>
+
+<span class="fc" id="L242">        skipWhitespace(tokenizer, propertySegments);</span>
+
+<span class="fc bfc" id="L244" title="All 2 branches covered.">        if (!tokenizer.hasCurrent())</span>
+        {
+<span class="fc" id="L246">            addIssue(issues, JSONIssues.missingColon(propertyName.getSpan()));</span>
+        }
+        else
+        {
+<span class="fc" id="L250">            final JSONToken colon = tokenizer.getCurrent();</span>
+<span class="fc bfc" id="L251" title="All 2 branches covered.">            if (colon.getType() != JSONTokenType.Colon)</span>
+            {
+<span class="fc" id="L253">                addIssue(issues, JSONIssues.expectedColon(colon.getSpan()));</span>
+            }
+            else
+            {
+<span class="fc" id="L257">                propertySegments.add(colon);</span>
+<span class="fc" id="L258">                tokenizer.next();</span>
+
+<span class="fc" id="L260">                skipWhitespace(tokenizer, propertySegments);</span>
+
+<span class="fc bfc" id="L262" title="All 2 branches covered.">                if (!tokenizer.hasCurrent())</span>
+                {
+<span class="fc" id="L264">                    addIssue(issues, JSONIssues.missingPropertyValue(colon.getSpan()));</span>
+                }
+                else
+                {
+<span class="fc" id="L268">                    final JSONToken propertyValueFirstToken = tokenizer.getCurrent();</span>
+<span class="fc bfc" id="L269" title="All 4 branches covered.">                    switch (propertyValueFirstToken.getType())</span>
+                    {
+                        case Boolean:
+                        case Null:
+                        case QuotedString:
+                        case Number:
+                        case LineComment:
+                        case BlockComment:
+<span class="fc" id="L277">                            propertySegments.add(propertyValueFirstToken);</span>
+<span class="fc" id="L278">                            tokenizer.next();</span>
+<span class="fc" id="L279">                            break;</span>
+
+                        case LeftCurlyBracket:
+<span class="fc" id="L282">                            propertySegments.add(parseObject(tokenizer, issues));</span>
+<span class="fc" id="L283">                            break;</span>
+
+                        case LeftSquareBracket:
+<span class="fc" id="L286">                            propertySegments.add(parseArray(tokenizer, issues));</span>
+<span class="fc" id="L287">                            break;</span>
+
+                        default:
+<span class="fc" id="L290">                            addIssue(issues, JSONIssues.expectedPropertyValue(propertyValueFirstToken.getSpan()));</span>
+                            break;
+                    }
+                }
+            }
+        }
+
+<span class="fc" id="L297">        return new JSONProperty(propertySegments);</span>
+    }
+
+    static void skipWhitespace(JSONTokenizer tokenizer, List&lt;JSONSegment&gt; segments)
+    {
+<span class="fc bfc" id="L302" title="All 4 branches covered.">        while (tokenizer.hasCurrent() &amp;&amp; tokenizer.getCurrent().getType() == JSONTokenType.Whitespace)</span>
+        {
+<span class="fc" id="L304">            segments.add(tokenizer.takeCurrent());</span>
+        }
+<span class="fc" id="L306">    }</span>
+
+    static JSONArray parseArray(String text)
+    {
+<span class="fc" id="L310">        return parseArray(text, 0);</span>
+    }
+
+    static JSONArray parseArray(String text, int startIndex)
+    {
+<span class="fc" id="L315">        JSONArray result = null;</span>
+
+<span class="fc" id="L317">        final JSONTokenizer tokenizer = new JSONTokenizer(text, startIndex);</span>
+<span class="pc bpc" id="L318" title="2 of 4 branches missed.">        if (tokenizer.next() &amp;&amp; tokenizer.getCurrent().getType() == JSONTokenType.LeftSquareBracket)</span>
+        {
+<span class="fc" id="L320">            result = parseArray(tokenizer, null);</span>
+        }
+
+<span class="fc" id="L323">        return result;</span>
+    }
+
+    static JSONArray parseArray(JSONTokenizer tokenizer, List&lt;Issue&gt; issues)
+    {
+<span class="fc" id="L328">        final JSONToken leftSquareBracket = tokenizer.takeCurrent();</span>
+<span class="fc" id="L329">        final List&lt;JSONSegment&gt; arraySegments = List.create(leftSquareBracket);</span>
+
+<span class="fc" id="L331">        boolean foundRightSquareBracket = false;</span>
+<span class="fc" id="L332">        boolean rightSquareBracketAllowed = true;</span>
+<span class="fc" id="L333">        boolean elementAllowed = true;</span>
+<span class="fc" id="L334">        boolean commaAllowed = false;</span>
+<span class="fc bfc" id="L335" title="All 4 branches covered.">        while (!foundRightSquareBracket &amp;&amp; tokenizer.hasCurrent())</span>
+        {
+<span class="fc" id="L337">            final JSONToken token = tokenizer.getCurrent();</span>
+<span class="fc bfc" id="L338" title="All 7 branches covered.">            switch (token.getType())</span>
+            {
+                case Null:
+                case Boolean:
+                case QuotedString:
+                case Number:
+<span class="fc bfc" id="L344" title="All 2 branches covered.">                    if (!elementAllowed) {</span>
+<span class="fc" id="L345">                        addIssue(issues, JSONIssues.expectedCommaOrClosingRightSquareBracket(token.getSpan()));</span>
+                    }
+
+<span class="fc" id="L348">                    arraySegments.add(token);</span>
+<span class="fc" id="L349">                    tokenizer.next();</span>
+
+<span class="fc" id="L351">                    elementAllowed = false;</span>
+<span class="fc" id="L352">                    commaAllowed = true;</span>
+<span class="fc" id="L353">                    rightSquareBracketAllowed = true;</span>
+<span class="fc" id="L354">                    break;</span>
+
+                case LeftCurlyBracket:
+<span class="fc bfc" id="L357" title="All 2 branches covered.">                    if (!elementAllowed) {</span>
+<span class="fc" id="L358">                        addIssue(issues, JSONIssues.expectedCommaOrClosingRightSquareBracket(token.getSpan()));</span>
+                    }
+
+<span class="fc" id="L361">                    arraySegments.add(parseObject(tokenizer, issues));</span>
+
+<span class="fc" id="L363">                    elementAllowed = false;</span>
+<span class="fc" id="L364">                    commaAllowed = true;</span>
+<span class="fc" id="L365">                    rightSquareBracketAllowed = true;</span>
+<span class="fc" id="L366">                    break;</span>
+
+                case LeftSquareBracket:
+<span class="fc bfc" id="L369" title="All 2 branches covered.">                    if (!elementAllowed) {</span>
+<span class="fc" id="L370">                        addIssue(issues, JSONIssues.expectedCommaOrClosingRightSquareBracket(token.getSpan()));</span>
+                    }
+
+<span class="fc" id="L373">                    arraySegments.add(parseArray(tokenizer, issues));</span>
+
+<span class="fc" id="L375">                    elementAllowed = false;</span>
+<span class="fc" id="L376">                    commaAllowed = true;</span>
+<span class="fc" id="L377">                    rightSquareBracketAllowed = true;</span>
+<span class="fc" id="L378">                    break;</span>
+
+                case Comma:
+<span class="fc bfc" id="L381" title="All 2 branches covered.">                    if (!commaAllowed) {</span>
+<span class="fc bfc" id="L382" title="All 2 branches covered.">                        if (rightSquareBracketAllowed) {</span>
+<span class="fc" id="L383">                            addIssue(issues, JSONIssues.expectedArrayElementOrClosingRightSquareBracket(token.getSpan()));</span>
+                        }
+                        else {
+<span class="fc" id="L386">                            addIssue(issues, JSONIssues.expectedArrayElement(token.getSpan()));</span>
+                        }
+                    }
+
+<span class="fc" id="L390">                    arraySegments.add(token);</span>
+<span class="fc" id="L391">                    tokenizer.next();</span>
+
+<span class="fc" id="L393">                    elementAllowed = true;</span>
+<span class="fc" id="L394">                    commaAllowed = false;</span>
+<span class="fc" id="L395">                    rightSquareBracketAllowed = false;</span>
+<span class="fc" id="L396">                    break;</span>
+
+                case RightSquareBracket:
+<span class="fc bfc" id="L399" title="All 2 branches covered.">                    if (!rightSquareBracketAllowed) {</span>
+<span class="fc" id="L400">                        addIssue(issues, JSONIssues.expectedArrayElement(token.getSpan()));</span>
+                    }
+
+<span class="fc" id="L403">                    foundRightSquareBracket = true;</span>
+<span class="fc" id="L404">                    arraySegments.add(token);</span>
+<span class="fc" id="L405">                    tokenizer.next();</span>
+<span class="fc" id="L406">                    break;</span>
+
+                case NewLine:
+                case Whitespace:
+                case LineComment:
+                case BlockComment:
+<span class="fc" id="L412">                    arraySegments.add(token);</span>
+<span class="fc" id="L413">                    tokenizer.next();</span>
+<span class="fc" id="L414">                    break;</span>
+
+                default:
+<span class="fc bfc" id="L417" title="All 2 branches covered.">                    if (elementAllowed) {</span>
+<span class="fc bfc" id="L418" title="All 2 branches covered.">                        if (rightSquareBracketAllowed) {</span>
+<span class="fc" id="L419">                            addIssue(issues, JSONIssues.expectedArrayElementOrClosingRightSquareBracket(token.getSpan()));</span>
+                        }
+                        else {
+<span class="fc" id="L422">                            addIssue(issues, JSONIssues.expectedArrayElement(token.getSpan()));</span>
+                        }
+                    }
+                    else {
+<span class="fc" id="L426">                        addIssue(issues, JSONIssues.expectedCommaOrClosingRightSquareBracket(token.getSpan()));</span>
+                    }
+
+<span class="fc" id="L429">                    arraySegments.add(token);</span>
+<span class="fc" id="L430">                    tokenizer.next();</span>
+
+<span class="fc" id="L432">                    elementAllowed = false;</span>
+<span class="fc" id="L433">                    commaAllowed = true;</span>
+<span class="fc" id="L434">                    rightSquareBracketAllowed = true;</span>
+                    break;
+            }
+<span class="fc" id="L437">        }</span>
+
+<span class="fc bfc" id="L439" title="All 2 branches covered.">        if (!foundRightSquareBracket)</span>
+        {
+<span class="fc" id="L441">            addIssue(issues, JSONIssues.missingClosingRightSquareBracket(leftSquareBracket.getSpan()));</span>
+        }
+
+<span class="fc" id="L444">        return new JSONArray(arraySegments);</span>
+    }
+
+    static void addIssue(List&lt;Issue&gt; issues, Issue issue)
+    {
+<span class="fc bfc" id="L449" title="All 2 branches covered.">        if (issues != null)</span>
+        {
+<span class="fc" id="L451">            issues.add(issue);</span>
+        }
+<span class="fc" id="L453">    }</span>
+
+    static JSONObject object(Action1&lt;JSONObjectBuilder&gt; action)
+    {
+<span class="fc" id="L457">        PreCondition.assertNotNull(action, &quot;action&quot;);</span>
+
+<span class="fc" id="L459">        final InMemoryCharacterStream stream = new InMemoryCharacterStream();</span>
+<span class="fc" id="L460">        object(stream, action);</span>
+<span class="fc" id="L461">        final JSONObject result = parseObject(stream.getText().await());</span>
+
+<span class="fc" id="L463">        PostCondition.assertNotNull(result, &quot;result&quot;);</span>
+
+<span class="fc" id="L465">        return result;</span>
+    }
+
+    static void object(CharacterWriteStream writeStream, Action1&lt;JSONObjectBuilder&gt; action)
+    {
+<span class="fc" id="L470">        PreCondition.assertNotNull(writeStream, &quot;writeStream&quot;);</span>
+<span class="fc" id="L471">        PreCondition.assertFalse(writeStream.isDisposed(), &quot;writeStream.isDisposed()&quot;);</span>
+<span class="fc" id="L472">        PreCondition.assertNotNull(action, &quot;action&quot;);</span>
+
+<span class="fc" id="L474">        final JSONObjectBuilder objectBuilder = new JSONObjectBuilder(writeStream);</span>
+<span class="fc" id="L475">        action.run(objectBuilder);</span>
+<span class="fc" id="L476">        objectBuilder.dispose();</span>
+<span class="fc" id="L477">    }</span>
+
+    static JSONArray array(Action1&lt;JSONArrayBuilder&gt; action)
+    {
+<span class="fc" id="L481">        PreCondition.assertNotNull(action, &quot;action&quot;);</span>
+
+<span class="fc" id="L483">        final InMemoryCharacterStream stream = new InMemoryCharacterStream();</span>
+<span class="fc" id="L484">        array(stream, action);</span>
+<span class="fc" id="L485">        final JSONArray result = parseArray(stream.getText().await());</span>
+
+<span class="fc" id="L487">        PostCondition.assertNotNull(result, &quot;result&quot;);</span>
+
+<span class="fc" id="L489">        return result;</span>
+    }
+
+    static void array(CharacterWriteStream writeStream, Action1&lt;JSONArrayBuilder&gt; action)
+    {
+<span class="fc" id="L494">        PreCondition.assertNotNull(writeStream, &quot;writeStream&quot;);</span>
+<span class="fc" id="L495">        PreCondition.assertFalse(writeStream.isDisposed(), &quot;writeStream.isDisposed()&quot;);</span>
+<span class="fc" id="L496">        PreCondition.assertNotNull(action, &quot;action&quot;);</span>
+
+<span class="fc" id="L498">        final JSONArrayBuilder arrayBuilder = new JSONArrayBuilder(writeStream);</span>
+<span class="fc" id="L499">        action.run(arrayBuilder);</span>
+<span class="fc" id="L500">        arrayBuilder.dispose();</span>
+<span class="fc" id="L501">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

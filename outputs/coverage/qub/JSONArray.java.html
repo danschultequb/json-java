@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JSONArray.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCo Coverage Report</a> &gt; <a href="index.source.html" class="el_package">qub</a> &gt; <span class="el_source">JSONArray.java</span></div><h1>JSONArray.java</h1><pre class="source lang-java linenums">package qub;
+
+public class JSONArray extends JSONSegment
+{
+    private final Iterable&lt;JSONSegment&gt; segments;
+
+    public JSONArray(Iterable&lt;JSONSegment&gt; segments)
+<span class="fc" id="L8">    {</span>
+<span class="fc" id="L9">        this.segments = segments;</span>
+<span class="fc" id="L10">    }</span>
+
+    public JSONToken getLeftSquareBracket()
+    {
+<span class="fc" id="L14">        return (JSONToken)segments.first();</span>
+    }
+
+    public JSONToken getRightSquareBracket()
+    {
+<span class="fc" id="L19">        JSONToken result = null;</span>
+
+<span class="fc" id="L21">        final JSONSegment lastSegment = segments.last();</span>
+<span class="pc bpc" id="L22" title="1 of 2 branches missed.">        if (lastSegment instanceof JSONToken)</span>
+        {
+<span class="fc" id="L24">            final JSONToken lastToken = (JSONToken)lastSegment;</span>
+<span class="fc bfc" id="L25" title="All 2 branches covered.">            if (lastToken.getType() == JSONTokenType.RightSquareBracket)</span>
+            {
+<span class="fc" id="L27">                result = lastToken;</span>
+            }
+        }
+
+<span class="fc" id="L31">        return result;</span>
+    }
+
+    public Indexable&lt;JSONSegment&gt; getElements()
+    {
+<span class="fc" id="L36">        final List&lt;JSONSegment&gt; result = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L38">        Iterable&lt;JSONSegment&gt; innerSegments = segments.skip(1);</span>
+<span class="fc bfc" id="L39" title="All 2 branches covered.">        if (getRightSquareBracket() != null)</span>
+        {
+<span class="fc" id="L41">            innerSegments = innerSegments.skipLast(1);</span>
+        }
+
+<span class="fc" id="L44">        boolean expectingElement = true;</span>
+<span class="fc bfc" id="L45" title="All 2 branches covered.">        for (final JSONSegment segment : innerSegments)</span>
+        {
+<span class="fc bfc" id="L47" title="All 2 branches covered.">            if (segment instanceof JSONToken)</span>
+            {
+<span class="fc" id="L49">                final JSONToken token = (JSONToken)segment;</span>
+<span class="fc bfc" id="L50" title="All 3 branches covered.">                switch (token.getType())</span>
+                {
+                    case Boolean:
+                    case Null:
+                    case Number:
+                    case QuotedString:
+<span class="fc" id="L56">                        result.add(token);</span>
+<span class="fc" id="L57">                        expectingElement = false;</span>
+<span class="fc" id="L58">                        break;</span>
+
+                    case Comma:
+<span class="fc bfc" id="L61" title="All 2 branches covered.">                        if (expectingElement)</span>
+                        {
+<span class="fc" id="L63">                            result.add(null);</span>
+                        }
+                        else
+                        {
+<span class="fc" id="L67">                            expectingElement = true;</span>
+                        }
+                        break;
+                }
+<span class="fc" id="L71">            }</span>
+            else
+            {
+<span class="fc" id="L74">                result.add(segment);</span>
+<span class="fc" id="L75">                expectingElement = false;</span>
+            }
+<span class="fc" id="L77">        }</span>
+
+<span class="fc bfc" id="L79" title="All 4 branches covered.">        if (result.any() &amp;&amp; expectingElement)</span>
+        {
+<span class="fc" id="L81">            result.add(null);</span>
+        }
+
+<span class="fc" id="L84">        return result;</span>
+    }
+
+    public int getElementCount()
+    {
+<span class="fc" id="L89">        return getElements().getCount();</span>
+    }
+
+    /**
+     * Get the element at the provided index.
+     * @param index The index of the element to return.
+     * @return The element at the provided index.
+     */
+    public JSONSegment getElement(int index)
+    {
+<span class="fc" id="L99">        return getElements().get(index);</span>
+    }
+
+    /**
+     * Get the object value of the element at the provided index.
+     * @param index The index of the element to return.
+     * @return The object value of the element at the provided index.
+     */
+    public Result&lt;JSONObject&gt; getObjectElement(int index)
+    {
+<span class="nc" id="L109">        final JSONSegment element = getElement(index);</span>
+<span class="nc bnc" id="L110" title="All 2 branches missed.">        return element instanceof JSONObject</span>
+<span class="nc" id="L111">            ? Result.success((JSONObject)element)</span>
+<span class="nc" id="L112">            : Result.error(new WrongTypeException(&quot;Expected the value of the element at index &quot; + index + &quot; to be an object.&quot;));</span>
+    }
+
+    @Override
+    public boolean equals(Object rhs)
+    {
+<span class="pc bpc" id="L118" title="2 of 4 branches missed.">        return rhs instanceof JSONArray &amp;&amp; equals((JSONArray)rhs);</span>
+    }
+
+    public boolean equals(JSONArray rhs)
+    {
+<span class="pc bpc" id="L123" title="1 of 2 branches missed.">        return rhs != null &amp;&amp;</span>
+<span class="pc bpc" id="L124" title="1 of 2 branches missed.">            segments.equals(rhs.segments);</span>
+    }
+
+    @Override
+    public String toString()
+    {
+<span class="fc" id="L130">        return JSONSegment.getCombinedText(segments);</span>
+    }
+
+    @Override
+    public int getStartIndex()
+    {
+<span class="fc" id="L136">        return JSONSegment.getStartIndex(segments);</span>
+    }
+
+    @Override
+    public int getAfterEndIndex()
+    {
+<span class="fc" id="L142">        return JSONSegment.getAfterEndIndex(segments);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

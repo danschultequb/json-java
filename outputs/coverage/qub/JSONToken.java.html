@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JSONToken.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCo Coverage Report</a> &gt; <a href="index.source.html" class="el_package">qub</a> &gt; <span class="el_source">JSONToken.java</span></div><h1>JSONToken.java</h1><pre class="source lang-java linenums">package qub;
+
+public class JSONToken extends JSONSegment
+{
+    private final String text;
+    private final int startIndex;
+    private final JSONTokenType type;
+
+    public JSONToken(String text, int startIndex, JSONTokenType type)
+<span class="fc" id="L10">    {</span>
+<span class="fc" id="L11">        this.text = text;</span>
+<span class="fc" id="L12">        this.startIndex = startIndex;</span>
+<span class="fc" id="L13">        this.type = type;</span>
+<span class="fc" id="L14">    }</span>
+
+    @Override
+    public String toString()
+    {
+<span class="fc" id="L19">        return text;</span>
+    }
+
+    @Override
+    public boolean equals(Object rhs)
+    {
+<span class="pc bpc" id="L25" title="1 of 4 branches missed.">        return rhs instanceof JSONToken &amp;&amp; equals((JSONToken)rhs);</span>
+    }
+
+    public boolean equals(JSONToken rhs)
+    {
+<span class="pc bpc" id="L30" title="1 of 2 branches missed.">        return rhs != null &amp;&amp;</span>
+<span class="pc bpc" id="L31" title="2 of 6 branches missed.">            text.equals(rhs.text) &amp;&amp;</span>
+            startIndex == rhs.startIndex &amp;&amp;
+            type == rhs.type;
+    }
+
+    @Override
+    public int getStartIndex()
+    {
+<span class="fc" id="L39">        return startIndex;</span>
+    }
+
+    @Override
+    public int getLength()
+    {
+<span class="pc bpc" id="L45" title="1 of 2 branches missed.">        return text == null ? 0 : text.length();</span>
+    }
+
+    @Override
+    public int getAfterEndIndex()
+    {
+<span class="fc" id="L51">        return getStartIndex() + getLength();</span>
+    }
+
+    public JSONTokenType getType()
+    {
+<span class="fc" id="L56">        return type;</span>
+    }
+
+    public static JSONToken leftCurlyBracket(int startIndex)
+    {
+<span class="fc" id="L61">        return new JSONToken(&quot;{&quot;, startIndex, JSONTokenType.LeftCurlyBracket);</span>
+    }
+
+    public static JSONToken rightCurlyBracket(int startIndex)
+    {
+<span class="fc" id="L66">        return new JSONToken(&quot;}&quot;, startIndex, JSONTokenType.RightCurlyBracket);</span>
+    }
+
+    public static JSONToken leftSquareBracket(int startIndex)
+    {
+<span class="fc" id="L71">        return new JSONToken(&quot;[&quot;, startIndex, JSONTokenType.LeftSquareBracket);</span>
+    }
+
+    public static JSONToken rightSquareBracket(int startIndex)
+    {
+<span class="fc" id="L76">        return new JSONToken(&quot;]&quot;, startIndex, JSONTokenType.RightSquareBracket);</span>
+    }
+
+    public static JSONToken colon(int startIndex)
+    {
+<span class="fc" id="L81">        return new JSONToken(&quot;:&quot;, startIndex, JSONTokenType.Colon);</span>
+    }
+
+    public static JSONToken comma(int startIndex)
+    {
+<span class="fc" id="L86">        return new JSONToken(&quot;,&quot;, startIndex, JSONTokenType.Comma);</span>
+    }
+
+    public static JSONToken nullToken(String text, int startIndex)
+    {
+<span class="fc" id="L91">        return new JSONToken(text, startIndex, JSONTokenType.Null);</span>
+    }
+
+    public static JSONToken newLine(String text, int startIndex)
+    {
+<span class="fc" id="L96">        return new JSONToken(text, startIndex, JSONTokenType.NewLine);</span>
+    }
+
+    public static JSONQuotedString quotedString(String text, int startIndex, boolean closed)
+    {
+<span class="fc" id="L101">        return new JSONQuotedString(text, startIndex, closed);</span>
+    }
+
+    public static JSONToken number(String text)
+    {
+<span class="fc" id="L106">        return number(text, 0);</span>
+    }
+
+    public static JSONToken number(String text, int startIndex)
+    {
+<span class="fc" id="L111">        return new JSONToken(text, startIndex, JSONTokenType.Number);</span>
+    }
+
+    public static JSONToken booleanToken(String text, int startIndex)
+    {
+<span class="fc" id="L116">        return new JSONToken(text, startIndex, JSONTokenType.Boolean);</span>
+    }
+
+    public static JSONToken booleanToken(String text)
+    {
+<span class="nc" id="L121">        return booleanToken(text, 0);</span>
+    }
+
+    public static JSONToken whitespace(String text, int startIndex)
+    {
+<span class="fc" id="L126">        return new JSONToken(text, startIndex, JSONTokenType.Whitespace);</span>
+    }
+
+    public static JSONToken lineComment(String text, int startIndex)
+    {
+<span class="fc" id="L131">        return new JSONToken(text, startIndex, JSONTokenType.LineComment);</span>
+    }
+
+    public static JSONCloseableToken blockComment(String text, int startIndex, boolean closed)
+    {
+<span class="fc" id="L136">        return new JSONCloseableToken(text, startIndex, JSONTokenType.BlockComment, closed);</span>
+    }
+
+    public static JSONToken unrecognized(String text, int startIndex)
+    {
+<span class="fc" id="L141">        return new JSONToken(text, startIndex, JSONTokenType.Unrecognized);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

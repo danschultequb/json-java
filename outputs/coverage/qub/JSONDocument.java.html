@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JSONDocument.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCo Coverage Report</a> &gt; <a href="index.source.html" class="el_package">qub</a> &gt; <span class="el_source">JSONDocument.java</span></div><h1>JSONDocument.java</h1><pre class="source lang-java linenums">package qub;
+
+/**
+ * The parsed segements of a JSON document. This object includes all of the textual details of the
+ * original document, such as where each segment was located (character offset).
+ */
+public class JSONDocument
+{
+    private final Iterable&lt;JSONSegment&gt; segments;
+
+    /**
+     * Create a new JSONDocument from the provided JSONSegments.
+     * @param segments The parsed JSONSegments of the original document.
+     */
+    public JSONDocument(Iterable&lt;JSONSegment&gt; segments)
+<span class="fc" id="L16">    {</span>
+<span class="fc" id="L17">        this.segments = segments;</span>
+<span class="fc" id="L18">    }</span>
+
+    /**
+     * Get the parsed JSONSegments from the original document.
+     * @return The parsed JSONSegments from the original document.
+     */
+    public Iterable&lt;JSONSegment&gt; getSegments()
+    {
+<span class="fc" id="L26">        return segments;</span>
+    }
+
+    /**
+     * Get the root of this JSON document.
+     * @return The root of this JSON document.
+     */
+    public Result&lt;JSONSegment&gt; getRoot()
+    {
+<span class="fc" id="L35">        final JSONSegment rootSegment = segments.first((JSONSegment segment) -&gt;</span>
+        {
+<span class="fc bfc" id="L37" title="All 4 branches covered.">            return segment instanceof JSONObject || segment instanceof JSONArray;</span>
+        });
+<span class="fc bfc" id="L39" title="All 2 branches covered.">        return rootSegment != null</span>
+<span class="fc" id="L40">            ? Result.success(rootSegment)</span>
+<span class="fc" id="L41">            : Result.error(new NotFoundException(&quot;No root was found in the JSON document.&quot;));</span>
+    }
+
+    /**
+     * Get the root of this JSON document if it is a JSON array.
+     * @return The root of this JSON document if it is a JSON array.
+     */
+    public Result&lt;JSONArray&gt; getRootArray()
+    {
+<span class="fc" id="L50">        return getRoot()</span>
+<span class="fc" id="L51">            .then((JSONSegment root) -&gt;</span>
+            {
+<span class="fc bfc" id="L53" title="All 2 branches covered.">                if (!(root instanceof JSONArray))</span>
+                {
+<span class="fc" id="L55">                    throw new WrongTypeException(&quot;Expected the root of the JSON document to be an array.&quot;);</span>
+                }
+<span class="fc" id="L57">                return (JSONArray)root;</span>
+            });
+    }
+
+    /**
+     * Get the root of this JSON document if it is a JSON object.
+     * @return The root of this JSON document if it is a JSON object.
+     */
+    public Result&lt;JSONObject&gt; getRootObject()
+    {
+<span class="fc" id="L67">        return getRoot()</span>
+<span class="fc" id="L68">            .thenResult((JSONSegment root) -&gt;</span>
+            {
+<span class="fc bfc" id="L70" title="All 2 branches covered.">                return root instanceof JSONObject</span>
+<span class="fc" id="L71">                    ? Result.success((JSONObject)root)</span>
+<span class="fc" id="L72">                    : Result.error(new WrongTypeException(&quot;Expected the root of the JSON document to be an object.&quot;));</span>
+            });
+    }
+
+    @Override
+    public String toString()
+    {
+<span class="fc" id="L79">        return JSONSegment.getCombinedText(segments);</span>
+    }
+
+    /**
+     * Get the number of characters that made up the original document.
+     * @return The number of characters that made up the original document.
+     */
+    public int getLength()
+    {
+<span class="fc" id="L88">        return JSONSegment.getAfterEndIndex(segments);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>
