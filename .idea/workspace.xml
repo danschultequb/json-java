@@ -15,7 +15,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="last_opened_file_path" value="C:/qub/qub/qub-java/134/qub-java.sources.jar!/" />
+    <property name="last_opened_file_path" value="C:/qub/qub/qub-java/138/qub-java.sources.jar!/" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.0" />
@@ -43,17 +43,20 @@
     <servers />
   </component>
   <component name="WindowStateProjectService">
-    <state x="684" y="177" key="#com.intellij.openapi.roots.ui.configuration.libraryEditor.LibraryEditorDialog" timestamp="1575563910744">
-      <screen x="0" y="0" width="1707" height="920" />
+    <state x="513" y="115" key="#com.intellij.openapi.roots.ui.configuration.libraryEditor.LibraryEditorDialog" timestamp="1575994669043">
+      <screen x="0" y="0" width="1280" height="680" />
     </state>
+    <state x="513" y="115" key="#com.intellij.openapi.roots.ui.configuration.libraryEditor.LibraryEditorDialog/0.0.1280.680@0.0.1280.680" timestamp="1575994669043" />
     <state x="684" y="177" key="#com.intellij.openapi.roots.ui.configuration.libraryEditor.LibraryEditorDialog/0.0.1707.920@0.0.1707.920" timestamp="1575563910744" />
-    <state x="634" y="218" key="FileChooserDialogImpl" timestamp="1575563909451">
-      <screen x="0" y="0" width="1707" height="920" />
+    <state x="475" y="161" key="FileChooserDialogImpl" timestamp="1575994664618">
+      <screen x="0" y="0" width="1280" height="680" />
     </state>
+    <state x="475" y="161" key="FileChooserDialogImpl/0.0.1280.680@0.0.1280.680" timestamp="1575994664618" />
     <state x="634" y="218" key="FileChooserDialogImpl/0.0.1707.920@0.0.1707.920" timestamp="1575563909451" />
-    <state x="334" y="38" key="SettingsEditor" timestamp="1575563924041">
-      <screen x="0" y="0" width="1707" height="920" />
+    <state x="244" y="0" key="SettingsEditor" timestamp="1575994670720">
+      <screen x="0" y="0" width="1280" height="680" />
     </state>
+    <state x="244" y="0" key="SettingsEditor/0.0.1280.680@0.0.1280.680" timestamp="1575994670720" />
     <state x="334" y="38" key="SettingsEditor/0.0.1707.920@0.0.1707.920" timestamp="1575563924041" />
   </component>
 </project>
