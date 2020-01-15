@@ -90,7 +90,7 @@ public class JSONObject implements JSONSegment, MutableMap<String,JSONSegment>
             .convertError(NotFoundException.class, () -> new NotFoundException("No property found with the name: " + Strings.escapeAndQuote(propertyName)));
     }
 
-    private <T extends JSONSegment> Result<T> getTyped(String propertyName, java.lang.Class<T> propertyValueType)
+    public <T extends JSONSegment> Result<T> get(String propertyName, java.lang.Class<T> propertyValueType)
     {
         PreCondition.assertNotNullAndNotEmpty(propertyName, "propertyName");
 
@@ -111,7 +111,7 @@ public class JSONObject implements JSONSegment, MutableMap<String,JSONSegment>
         PreCondition.assertNotNullAndNotEmpty(propertyName, "propertyName");
         PreCondition.assertNotNull(propertyValueType, "propertyValueType");
 
-        return this.getTyped(propertyName, propertyValueType)
+        return this.get(propertyName, propertyValueType)
             .catchError(WrongTypeException.class, () -> this.getNull(propertyName).await())
             .convertError(WrongTypeException.class, () ->
                 new WrongTypeException(
@@ -123,7 +123,7 @@ public class JSONObject implements JSONSegment, MutableMap<String,JSONSegment>
 
     public Result<JSONObject> getObject(String propertyName)
     {
-        return this.getTyped(propertyName, JSONObject.class);
+        return this.get(propertyName, JSONObject.class);
     }
 
     public Result<JSONObject> getObjectOrNull(String propertyName)
@@ -133,7 +133,7 @@ public class JSONObject implements JSONSegment, MutableMap<String,JSONSegment>
 
     public Result<JSONArray> getArray(String propertyName)
     {
-        return this.getTyped(propertyName, JSONArray.class);
+        return this.get(propertyName, JSONArray.class);
     }
 
     public Result<JSONArray> getArrayOrNull(String propertyName)
@@ -143,7 +143,7 @@ public class JSONObject implements JSONSegment, MutableMap<String,JSONSegment>
 
     public Result<Boolean> getBoolean(String propertyName)
     {
-        return this.getTyped(propertyName, JSONBoolean.class)
+        return this.get(propertyName, JSONBoolean.class)
             .then(JSONBoolean::getValue);
     }
 
@@ -155,7 +155,7 @@ public class JSONObject implements JSONSegment, MutableMap<String,JSONSegment>
 
     public Result<String> getString(String propertyName)
     {
-        return this.getTyped(propertyName, JSONString.class)
+        return this.get(propertyName, JSONString.class)
             .then(JSONString::getValue);
     }
 
@@ -167,13 +167,13 @@ public class JSONObject implements JSONSegment, MutableMap<String,JSONSegment>
 
     public Result<Double> getNumber(String propertyName)
     {
-        return this.getTyped(propertyName, JSONNumber.class)
+        return this.get(propertyName, JSONNumber.class)
             .then(JSONNumber::getValue);
     }
 
     public Result<Void> getNull(String propertyName)
     {
-        return this.getTyped(propertyName, JSONNull.class)
+        return this.get(propertyName, JSONNull.class)
             .then(() -> null);
     }
 
