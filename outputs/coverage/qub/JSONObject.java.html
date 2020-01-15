@@ -1,272 +1,371 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JSONObject.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCo Coverage Report</a> &gt; <a href="index.source.html" class="el_package">qub</a> &gt; <span class="el_source">JSONObject.java</span></div><h1>JSONObject.java</h1><pre class="source lang-java linenums">package qub;
 
-public class JSONObject extends JSONSegment
+/**
+ * A JSON object.
+ */
+public class JSONObject implements JSONSegment, MutableMap&lt;String,JSONSegment&gt;
 {
-    private final Iterable&lt;JSONSegment&gt; segments;
+    private final MutableMap&lt;String,JSONSegment&gt; properties;
 
-    /**
-     * Create a new JSONObject from the provided parsed JSONSegments.
-     * @param segments The segments that make up the new JSONObject.
-     */
-    public JSONObject(Iterable&lt;JSONSegment&gt; segments)
-<span class="fc" id="L12">    {</span>
-<span class="fc" id="L13">        this.segments = segments;</span>
-<span class="fc" id="L14">    }</span>
+    private JSONObject(MutableMap&lt;String,JSONSegment&gt; properties)
+<span class="fc" id="L11">    {</span>
+<span class="fc" id="L12">        PreCondition.assertNotNull(properties, &quot;properties&quot;);</span>
 
-    /**
-     * Get the left curly bracket ('{') JSONToken of this object.
-     * @return The left curly bracket ('{') JSONToken of this object.
-     */
-    public JSONToken getLeftCurlyBracket()
+<span class="fc" id="L14">        this.properties = properties;</span>
+<span class="fc" id="L15">    }</span>
+
+    public static JSONObject create(JSONObjectProperty... properties)
     {
-<span class="fc" id="L22">        return (JSONToken)segments.first();</span>
+<span class="fc" id="L19">        PreCondition.assertNotNull(properties, &quot;properties&quot;);</span>
+
+<span class="fc" id="L21">        return JSONObject.create(Iterable.create(properties));</span>
+    }
+
+    public static JSONObject create(Iterable&lt;JSONObjectProperty&gt; properties)
+    {
+<span class="fc" id="L26">        PreCondition.assertNotNull(properties, &quot;properties&quot;);</span>
+
+<span class="fc" id="L28">        return JSONObject.create(properties.iterate());</span>
+    }
+
+    public static JSONObject create(Iterator&lt;JSONObjectProperty&gt; properties)
+    {
+<span class="fc" id="L33">        PreCondition.assertNotNull(properties, &quot;properties&quot;);</span>
+
+<span class="fc" id="L35">        return JSONObject.create(</span>
+<span class="fc" id="L36">            properties.toMap(</span>
+                JSONObjectProperty::getName,
+                JSONObjectProperty::getValue));
+    }
+
+    public static JSONObject create(Map&lt;String,JSONSegment&gt; properties)
+    {
+<span class="fc" id="L43">        PreCondition.assertNotNull(properties, &quot;properties&quot;);</span>
+
+<span class="fc" id="L45">        return new JSONObject(Map.create(properties));</span>
     }
 
     /**
-     * Get the right curly bracket ('}') JSONToken of this object.
-     * @return The right curly bracket ('}') JSONToken of this object.
-     */
-    public JSONToken getRightCurlyBracket()
-    {
-<span class="fc" id="L31">        JSONToken result = null;</span>
-
-<span class="fc" id="L33">        final JSONSegment lastSegment = segments.last();</span>
-<span class="fc bfc" id="L34" title="All 2 branches covered.">        if (lastSegment instanceof JSONToken)</span>
-        {
-<span class="fc" id="L36">            final JSONToken lastToken = (JSONToken)lastSegment;</span>
-<span class="fc bfc" id="L37" title="All 2 branches covered.">            if (lastToken.getType() == JSONTokenType.RightCurlyBracket)</span>
-            {
-<span class="fc" id="L39">                result = lastToken;</span>
-            }
-        }
-
-<span class="fc" id="L43">        return result;</span>
-    }
-
-    public Iterable&lt;JSONProperty&gt; getProperties()
-    {
-<span class="fc" id="L48">        return segments.instanceOf(JSONProperty.class);</span>
-    }
-
-    /**
-     * Get the property in this JSON object with the provided propertyName.
+     * Get whether or not this JSONObject contains a property with the provided name.
      * @param propertyName The name of the property to look for.
-     * @return The property in this JSON object with the provided propertyName.
+     * @return Whether or not this JSONObject contains a property with the provided name.
      */
-    public Result&lt;JSONProperty&gt; getProperty(String propertyName)
+    public boolean containsProperty(String propertyName)
     {
-<span class="fc" id="L58">        PreCondition.assertNotNullAndNotEmpty(propertyName, &quot;propertyName&quot;);</span>
+<span class="fc" id="L55">        PreCondition.assertNotNullAndNotEmpty(propertyName, &quot;propertyName&quot;);</span>
 
-<span class="fc" id="L60">        final JSONProperty property = getProperties().first((JSONProperty propertySegment) -&gt;</span>
-        {
-<span class="fc" id="L62">            return propertySegment.getNameSegment().toUnquotedString().equals(propertyName);</span>
-        });
-<span class="fc bfc" id="L64" title="All 2 branches covered.">        final Result&lt;JSONProperty&gt; result = property != null</span>
-<span class="fc" id="L65">            ? Result.success(property)</span>
-<span class="fc" id="L66">            : Result.error(new NotFoundException(&quot;No property was found with the name &quot; + Strings.escapeAndQuote(propertyName) + &quot;.&quot;));</span>
-
-<span class="fc" id="L68">        PostCondition.assertNotNull(result, &quot;result&quot;);</span>
-
-<span class="fc" id="L70">        return result;</span>
-    }
-
-    /**
-     * Get the value of the property in this JSON object with the provided propertyName.
-     * @param propertyName The name of the property to look for.
-     * @return The value of the property in this JSON object with the provided propertyName.
-     */
-    public Result&lt;JSONSegment&gt; getPropertyValue(String propertyName)
-    {
-<span class="fc" id="L80">        return getProperty(propertyName)</span>
-<span class="fc" id="L81">            .then(JSONProperty::getValueSegment);</span>
-    }
-
-    /**
-     * Get the quoted-string value of the property in this JSON object with the provided
-     * propertyName.
-     * @param propertyName The name of the property to look for.
-     * @return The quoted-string value of the property in this JSON object with the provided
-     * propertyName.
-     */
-    public Result&lt;JSONQuotedString&gt; getQuotedStringPropertyValue(String propertyName)
-    {
-<span class="fc" id="L93">        return this.getPropertyValue(propertyName)</span>
-<span class="fc" id="L94">            .thenResult((JSONSegment propertyValue) -&gt;</span>
-            {
-<span class="fc bfc" id="L96" title="All 2 branches covered.">                return propertyValue instanceof JSONQuotedString</span>
-<span class="fc" id="L97">                    ? Result.success((JSONQuotedString)propertyValue)</span>
-<span class="fc" id="L98">                    : Result.error(new WrongTypeException(&quot;Expected the value of the property named &quot; + Strings.escapeAndQuote(propertyName) + &quot; to be a quoted-string.&quot;));</span>
-            });
-    }
-
-    /**
-     * Get the un-quoted-string value of the property in this JSON object with the provided
-     * propertyName.
-     * @param propertyName The name of the property to look for.
-     * @return The un-quoted-string value of the property in this JSON object with the provided
-     * propertyName.
-     */
-    public Result&lt;String&gt; getStringPropertyValue(String propertyName)
-    {
-<span class="fc" id="L111">        return this.getQuotedStringPropertyValue(propertyName)</span>
-<span class="fc" id="L112">            .then(JSONQuotedString::toUnquotedString);</span>
-    }
-
-    /**
-     * Get the un-quoted-string value of the property in this JSON object with the provided
-     * propertyName.
-     * @param propertyName The name of the property to look for.
-     * @return The un-quoted-string value of the property in this JSON object with the provided
-     * propertyName.
-     */
-    public Result&lt;String&gt; getStringOrNullPropertyValue(String propertyName)
-    {
-<span class="fc" id="L124">        return Result.create(() -&gt;</span>
-        {
-            String result;
-<span class="fc" id="L127">            final JSONSegment propertyValue = this.getPropertyValue(propertyName).await();</span>
-<span class="fc bfc" id="L128" title="All 2 branches covered.">            if (propertyValue instanceof JSONQuotedString)</span>
-            {
-<span class="fc" id="L130">                result = ((JSONQuotedString)propertyValue).toUnquotedString();</span>
-            }
-<span class="fc bfc" id="L132" title="All 4 branches covered.">            else if (propertyValue instanceof JSONToken &amp;&amp; ((JSONToken)propertyValue).getType() == JSONTokenType.Null)</span>
-            {
-<span class="fc" id="L134">                result = null;</span>
-            }
-            else
-            {
-<span class="fc" id="L138">                throw new WrongTypeException(&quot;Expected the value of the property named &quot; + Strings.escapeAndQuote(propertyName) + &quot; to be a quoted-string.&quot;);</span>
-            }
-<span class="fc" id="L140">            return result;</span>
-        });
-    }
-
-    /**
-     * Get the object value of the property in this JSON object with the provided propertyName.
-     * @param propertyName The name of the property to look for.
-     * @return The object value of the property in this JSON object with the provided propertyName.
-     */
-    public Result&lt;JSONObject&gt; getObjectPropertyValue(String propertyName)
-    {
-<span class="fc" id="L151">        return getPropertyValue(propertyName)</span>
-<span class="fc" id="L152">                   .thenResult((JSONSegment propertyValue) -&gt;</span>
-                   {
-<span class="fc bfc" id="L154" title="All 2 branches covered.">                       return propertyValue instanceof JSONObject</span>
-<span class="fc" id="L155">                                  ? Result.success((JSONObject)propertyValue)</span>
-<span class="fc" id="L156">                                  : Result.error(new WrongTypeException(&quot;Expected the value of the property named &quot; + Strings.escapeAndQuote(propertyName) + &quot; to be an object.&quot;));</span>
-                   });
-    }
-
-    /**
-     * Get the array value of the property in this JSON object with the provided propertyName.
-     * @param propertyName The name of the property to look for.
-     * @return The array value of the property in this JSON object with the provided propertyName.
-     */
-    public Result&lt;JSONArray&gt; getArrayPropertyValue(String propertyName)
-    {
-<span class="fc" id="L167">        return getPropertyValue(propertyName)</span>
-<span class="fc" id="L168">                   .thenResult((JSONSegment propertyValue) -&gt;</span>
-                   {
-<span class="fc bfc" id="L170" title="All 2 branches covered.">                       return propertyValue instanceof JSONArray</span>
-<span class="fc" id="L171">                                  ? Result.success((JSONArray)propertyValue)</span>
-<span class="fc" id="L172">                                  : Result.error(new WrongTypeException(&quot;Expected the value of the property named &quot; + Strings.escapeAndQuote(propertyName) + &quot; to be an array.&quot;));</span>
-                   });
-    }
-
-    /**
-     * Get the number token of the property in this JSON object with the provided propertyName.
-     * @param propertyName The name of the property to look for.
-     * @return The number token of the property in this JSON object with the provided propertyName.
-     */
-    public Result&lt;JSONToken&gt; getNumberTokenPropertyValue(String propertyName)
-    {
-<span class="fc" id="L183">        return getPropertyValue(propertyName)</span>
-<span class="fc" id="L184">            .thenResult((JSONSegment propertyValue) -&gt;</span>
-            {
-<span class="fc" id="L186">                Result&lt;JSONToken&gt; result = null;</span>
-<span class="fc bfc" id="L187" title="All 2 branches covered.">                if (propertyValue instanceof JSONToken)</span>
-                {
-<span class="fc" id="L189">                    final JSONToken propertyValueToken = (JSONToken)propertyValue;</span>
-<span class="fc bfc" id="L190" title="All 2 branches covered.">                    if (propertyValueToken.getType() == JSONTokenType.Number)</span>
-                    {
-<span class="fc" id="L192">                        result = Result.success(propertyValueToken);</span>
-                    }
-                }
-<span class="fc bfc" id="L195" title="All 2 branches covered.">                if (result == null)</span>
-                {
-<span class="fc" id="L197">                    result = Result.error(new WrongTypeException(&quot;Expected the value of the property named &quot; + Strings.escapeAndQuote(propertyName) + &quot; to be a number.&quot;));</span>
-                }
-<span class="fc" id="L199">                return result;</span>
-            });
-    }
-
-    /**
-     * Get the number value of the property in this JSON object with the provided propertyName.
-     * @param propertyName The name of the property to look for.
-     * @return The number value of the property in this JSON object with the provided propertyName.
-     */
-    public Result&lt;Double&gt; getNumberPropertyValue(String propertyName)
-    {
-<span class="fc" id="L210">        return getNumberTokenPropertyValue(propertyName)</span>
-<span class="fc" id="L211">            .then((JSONToken numberToken) -&gt; java.lang.Double.valueOf(numberToken.toString()));</span>
-    }
-
-    public Result&lt;JSONToken&gt; getBooleanTokenPropertyValue(String propertyName)
-    {
-<span class="fc" id="L216">        return getPropertyValue(propertyName)</span>
-<span class="fc" id="L217">            .thenResult((JSONSegment propertyValue) -&gt;</span>
-            {
-<span class="fc" id="L219">                Result&lt;JSONToken&gt; result = null;</span>
-<span class="fc bfc" id="L220" title="All 2 branches covered.">                if (propertyValue instanceof JSONToken)</span>
-                {
-<span class="fc" id="L222">                    final JSONToken propertyValueToken = (JSONToken)propertyValue;</span>
-<span class="fc bfc" id="L223" title="All 2 branches covered.">                    if (propertyValueToken.getType() == JSONTokenType.Boolean)</span>
-                    {
-<span class="fc" id="L225">                        result = Result.success(propertyValueToken);</span>
-                    }
-                }
-<span class="fc bfc" id="L228" title="All 2 branches covered.">                if (result == null)</span>
-                {
-<span class="fc" id="L230">                    result = Result.error(new WrongTypeException(&quot;Expected the value of the property named &quot; + Strings.escapeAndQuote(propertyName) + &quot; to be a boolean.&quot;));</span>
-                }
-<span class="fc" id="L232">                return result;</span>
-            });
-    }
-
-    public Result&lt;Boolean&gt; getBooleanPropertyValue(String propertyName)
-    {
-<span class="fc" id="L238">        return getBooleanTokenPropertyValue(propertyName)</span>
-<span class="fc" id="L239">            .then((JSONToken booleanToken) -&gt; Booleans.parse(booleanToken.toString(), false).await());</span>
+<span class="fc" id="L57">        return this.properties.containsKey(propertyName);</span>
     }
 
     @Override
-    public boolean equals(Object rhs)
+    public boolean containsKey(String propertyName)
     {
-<span class="fc bfc" id="L245" title="All 4 branches covered.">        return rhs instanceof JSONObject &amp;&amp; equals((JSONObject)rhs);</span>
+<span class="fc" id="L63">        return this.containsProperty(propertyName);</span>
     }
 
-    public boolean equals(JSONObject rhs)
+    private static String getWrongTypeExceptionMessage(String propertyName, String expectedTypeName, JSONSegment actualObject)
     {
-<span class="fc bfc" id="L250" title="All 2 branches covered.">        return rhs != null &amp;&amp;</span>
-<span class="fc bfc" id="L251" title="All 2 branches covered.">            segments.equals(rhs.segments);</span>
+<span class="fc" id="L68">        PreCondition.assertNotNullAndNotEmpty(propertyName, &quot;propertyName&quot;);</span>
+<span class="fc" id="L69">        PreCondition.assertNotNullAndNotEmpty(expectedTypeName, &quot;expectedTypeName&quot;);</span>
+<span class="fc" id="L70">        PreCondition.assertNotNull(actualObject, &quot;actualObject&quot;);</span>
+
+<span class="fc" id="L72">        return &quot;Expected the property named &quot; + Strings.escapeAndQuote(propertyName) + &quot; to be a &quot; + expectedTypeName + &quot;, but was a &quot; + Types.getTypeName(actualObject) + &quot; instead.&quot;;</span>
+    }
+
+    private static &lt;T extends JSONSegment&gt; String getWrongTypeExceptionMessage(String propertyName, java.lang.Class&lt;T&gt; expectedType, JSONSegment actualObject)
+    {
+<span class="fc" id="L77">        PreCondition.assertNotNullAndNotEmpty(propertyName, &quot;propertyName&quot;);</span>
+<span class="fc" id="L78">        PreCondition.assertNotNull(expectedType, &quot;expectedType&quot;);</span>
+<span class="fc" id="L79">        PreCondition.assertNotNull(actualObject, &quot;actualObject&quot;);</span>
+
+<span class="fc" id="L81">        return JSONObject.getWrongTypeExceptionMessage(propertyName, Types.getTypeName(expectedType), actualObject);</span>
+    }
+
+    @Override
+    public Result&lt;JSONSegment&gt; get(String propertyName)
+    {
+<span class="fc" id="L87">        PreCondition.assertNotNullAndNotEmpty(propertyName, &quot;propertyName&quot;);</span>
+
+<span class="fc" id="L89">        return this.properties.get(propertyName)</span>
+<span class="fc" id="L90">            .convertError(NotFoundException.class, () -&gt; new NotFoundException(&quot;No property found with the name: &quot; + Strings.escapeAndQuote(propertyName)));</span>
+    }
+
+    private &lt;T extends JSONSegment&gt; Result&lt;T&gt; getTyped(String propertyName, java.lang.Class&lt;T&gt; propertyValueType)
+    {
+<span class="fc" id="L95">        PreCondition.assertNotNullAndNotEmpty(propertyName, &quot;propertyName&quot;);</span>
+
+<span class="fc" id="L97">        return Result.create(() -&gt;</span>
+        {
+<span class="fc" id="L99">            final JSONSegment propertyValueSegment = this.get(propertyName).await();</span>
+<span class="fc" id="L100">            final T result = Types.as(propertyValueSegment, propertyValueType);</span>
+<span class="fc bfc" id="L101" title="All 2 branches covered.">            if (result == null)</span>
+            {
+<span class="fc" id="L103">                throw new WrongTypeException(JSONObject.getWrongTypeExceptionMessage(propertyName, propertyValueType, propertyValueSegment));</span>
+            }
+<span class="fc" id="L105">            return result;</span>
+        });
+    }
+
+    private &lt;T extends JSONSegment&gt; Result&lt;T&gt; getTypedOrNull(String propertyName, java.lang.Class&lt;T&gt; propertyValueType)
+    {
+<span class="fc" id="L111">        PreCondition.assertNotNullAndNotEmpty(propertyName, &quot;propertyName&quot;);</span>
+<span class="fc" id="L112">        PreCondition.assertNotNull(propertyValueType, &quot;propertyValueType&quot;);</span>
+
+<span class="fc" id="L114">        return this.getTyped(propertyName, propertyValueType)</span>
+<span class="fc" id="L115">            .catchError(WrongTypeException.class, () -&gt; this.getNull(propertyName).await())</span>
+<span class="fc" id="L116">            .convertError(WrongTypeException.class, () -&gt;</span>
+<span class="fc" id="L117">                new WrongTypeException(</span>
+<span class="fc" id="L118">                    JSONObject.getWrongTypeExceptionMessage(</span>
+                        propertyName,
+<span class="fc" id="L120">                        Types.getTypeName(propertyValueType) + &quot; or &quot; + Types.getTypeName(JSONNull.class),</span>
+<span class="fc" id="L121">                        this.get(propertyName).await())));</span>
+    }
+
+    public Result&lt;JSONObject&gt; getObject(String propertyName)
+    {
+<span class="fc" id="L126">        return this.getTyped(propertyName, JSONObject.class);</span>
+    }
+
+    public Result&lt;JSONObject&gt; getObjectOrNull(String propertyName)
+    {
+<span class="fc" id="L131">        return this.getTypedOrNull(propertyName, JSONObject.class);</span>
+    }
+
+    public Result&lt;JSONArray&gt; getArray(String propertyName)
+    {
+<span class="fc" id="L136">        return this.getTyped(propertyName, JSONArray.class);</span>
+    }
+
+    public Result&lt;JSONArray&gt; getArrayOrNull(String propertyName)
+    {
+<span class="nc" id="L141">        return this.getTypedOrNull(propertyName, JSONArray.class);</span>
+    }
+
+    public Result&lt;Boolean&gt; getBoolean(String propertyName)
+    {
+<span class="fc" id="L146">        return this.getTyped(propertyName, JSONBoolean.class)</span>
+<span class="fc" id="L147">            .then(JSONBoolean::getValue);</span>
+    }
+
+    public Result&lt;Boolean&gt; getBooleanOrNull(String propertyName)
+    {
+<span class="nc" id="L152">        return this.getTypedOrNull(propertyName, JSONBoolean.class)</span>
+<span class="nc bnc" id="L153" title="All 2 branches missed.">            .then((JSONBoolean value) -&gt; value == null ? null : value.getValue());</span>
+    }
+
+    public Result&lt;String&gt; getString(String propertyName)
+    {
+<span class="fc" id="L158">        return this.getTyped(propertyName, JSONString.class)</span>
+<span class="fc" id="L159">            .then(JSONString::getValue);</span>
+    }
+
+    public Result&lt;String&gt; getStringOrNull(String propertyName)
+    {
+<span class="fc" id="L164">        return this.getTypedOrNull(propertyName, JSONString.class)</span>
+<span class="fc bfc" id="L165" title="All 2 branches covered.">            .then((JSONString string) -&gt; string == null ? null : string.getValue());</span>
+    }
+
+    public Result&lt;Double&gt; getNumber(String propertyName)
+    {
+<span class="fc" id="L170">        return this.getTyped(propertyName, JSONNumber.class)</span>
+<span class="fc" id="L171">            .then(JSONNumber::getValue);</span>
+    }
+
+    public Result&lt;Void&gt; getNull(String propertyName)
+    {
+<span class="fc" id="L176">        return this.getTyped(propertyName, JSONNull.class)</span>
+<span class="fc" id="L177">            .then(() -&gt; null);</span>
+    }
+
+    public Result&lt;JSONObjectProperty&gt; getProperty(String propertyName)
+    {
+<span class="fc" id="L182">        PreCondition.assertNotNullAndNotEmpty(propertyName, &quot;propertyName&quot;);</span>
+
+<span class="fc" id="L184">        return this.get(propertyName)</span>
+<span class="fc" id="L185">            .then((JSONSegment propertyValue) -&gt; JSONObjectProperty.create(propertyName, propertyValue));</span>
+    }
+
+    /**
+     * Get the names of the properties in this JSONObject.
+     * @return The names of the properties in this JSONObject.
+     */
+    public Iterable&lt;String&gt; getPropertyNames()
+    {
+<span class="fc" id="L194">        return this.properties.getKeys();</span>
+    }
+
+    @Override
+    public Iterable&lt;String&gt; getKeys()
+    {
+<span class="fc" id="L200">        return this.getPropertyNames();</span>
+    }
+
+    /**
+     * Get the values of the properties in this JSONObject.
+     * @return The values of the properties in this JSONObject.
+     */
+    public Iterable&lt;JSONSegment&gt; getPropertyValues()
+    {
+<span class="fc" id="L209">        return this.properties.getValues();</span>
+    }
+
+    @Override
+    public Iterable&lt;JSONSegment&gt; getValues()
+    {
+<span class="fc" id="L215">        return this.getPropertyValues();</span>
+    }
+
+    /**
+     * Get the properties in this JSONObject.
+     * @return The properties in this JSONObject.
+     */
+    public Iterable&lt;JSONObjectProperty&gt; getProperties()
+    {
+<span class="fc" id="L224">        return this.properties.map((MapEntry&lt;String,JSONSegment&gt; entry) -&gt; JSONObjectProperty.create(entry.getKey(), entry.getValue()));</span>
+    }
+
+    @Override
+    public Iterator&lt;MapEntry&lt;String,JSONSegment&gt;&gt; iterate()
+    {
+<span class="nc" id="L230">        return this.properties.iterate();</span>
+    }
+
+    @Override
+    public JSONObject clear()
+    {
+<span class="nc" id="L236">        this.properties.clear();</span>
+<span class="nc" id="L237">        return this;</span>
+    }
+
+    public JSONObject setProperty(JSONObjectProperty property)
+    {
+<span class="fc" id="L242">        PreCondition.assertNotNull(property, &quot;property&quot;);</span>
+
+<span class="fc" id="L244">        return this.set(property.getName(), property.getValue());</span>
+    }
+
+    public JSONObject setBoolean(String propertyName, boolean propertyValue)
+    {
+<span class="fc" id="L249">        return this.set(propertyName, JSONBoolean.get(propertyValue));</span>
+    }
+
+    public JSONObject setBooleanOrNull(String propertyName, Boolean propertyValue)
+    {
+<span class="nc bnc" id="L254" title="All 2 branches missed.">        return this.set(propertyName, propertyValue == null ? JSONNull.segment : JSONBoolean.get(propertyValue));</span>
+    }
+
+    public JSONObject setNumber(String propertyName, long propertyValue)
+    {
+<span class="fc" id="L259">        return this.set(propertyName, JSONNumber.get(propertyValue));</span>
+    }
+
+    public JSONObject setNumber(String propertyName, double propertyValue)
+    {
+<span class="fc" id="L264">        return this.set(propertyName, JSONNumber.get(propertyValue));</span>
+    }
+
+    public JSONObject setNumberOrNull(String propertyName, Integer propertyValue)
+    {
+<span class="nc bnc" id="L269" title="All 2 branches missed.">        return this.set(propertyName, propertyValue == null ? JSONNull.segment : JSONNumber.get(propertyValue));</span>
+    }
+
+    public JSONObject setNumberOrNull(String propertyName, Long propertyValue)
+    {
+<span class="nc bnc" id="L274" title="All 2 branches missed.">        return this.set(propertyName, propertyValue == null ? JSONNull.segment : JSONNumber.get(propertyValue));</span>
+    }
+
+    public JSONObject setNumberOrNull(String propertyName, Float propertyValue)
+    {
+<span class="nc bnc" id="L279" title="All 2 branches missed.">        return this.set(propertyName, propertyValue == null ? JSONNull.segment : JSONNumber.get(propertyValue));</span>
+    }
+
+    public JSONObject setNumberOrNull(String propertyName, Double propertyValue)
+    {
+<span class="nc bnc" id="L284" title="All 2 branches missed.">        return this.set(propertyName, propertyValue == null ? JSONNull.segment : JSONNumber.get(propertyValue));</span>
+    }
+
+    public JSONObject setString(String propertyName, String propertyValue)
+    {
+<span class="fc" id="L289">        PreCondition.assertNotNullAndNotEmpty(propertyName, &quot;propertyName&quot;);</span>
+<span class="fc" id="L290">        PreCondition.assertNotNull(propertyValue, &quot;propertyValue&quot;);</span>
+
+<span class="fc" id="L292">        return this.set(propertyName, JSONString.get(propertyValue));</span>
+    }
+
+    public JSONObject setStringOrNull(String propertyName, String propertyValue)
+    {
+<span class="nc" id="L297">        PreCondition.assertNotNullAndNotEmpty(propertyName, &quot;propertyName&quot;);</span>
+
+<span class="nc bnc" id="L299" title="All 2 branches missed.">        return this.set(propertyName, propertyValue == null ? JSONNull.segment : JSONString.get(propertyValue));</span>
+    }
+
+    @Override
+    public JSONObject set(String propertyName, JSONSegment propertyValue)
+    {
+<span class="fc" id="L305">        PreCondition.assertNotNullAndNotEmpty(propertyName, &quot;propertyName&quot;);</span>
+<span class="fc" id="L306">        PreCondition.assertNotNull(propertyValue, &quot;propertyValue&quot;);</span>
+
+<span class="fc" id="L308">        this.properties.set(propertyName, propertyValue);</span>
+
+<span class="fc" id="L310">        return this;</span>
+    }
+
+    @Override
+    public Result&lt;JSONSegment&gt; remove(String propertyName)
+    {
+<span class="nc" id="L316">        PreCondition.assertNotNullAndNotEmpty(propertyName, &quot;propertyName&quot;);</span>
+
+<span class="nc" id="L318">        return this.properties.remove(propertyName);</span>
     }
 
     @Override
     public String toString()
     {
-<span class="fc" id="L257">        return getCombinedText(segments);</span>
+<span class="fc" id="L324">        return JSONSegment.toString(this);</span>
     }
 
     @Override
-    public int getStartIndex()
+    public Result&lt;Integer&gt; toString(IndentedCharacterWriteStream stream)
     {
-<span class="fc" id="L263">        return getStartIndex(segments);</span>
+<span class="fc" id="L330">        PreCondition.assertNotNull(stream, &quot;stream&quot;);</span>
+<span class="fc" id="L331">        PreCondition.assertNotDisposed(stream, &quot;stream&quot;);</span>
+
+<span class="fc" id="L333">        return Result.create(() -&gt;</span>
+        {
+<span class="fc" id="L335">            int result = 0;</span>
+
+<span class="fc" id="L337">            result += stream.write('{').await();</span>
+<span class="fc" id="L338">            boolean firstProperty = true;</span>
+<span class="fc bfc" id="L339" title="All 2 branches covered.">            for (final JSONObjectProperty property : this.getProperties())</span>
+            {
+<span class="fc bfc" id="L341" title="All 2 branches covered.">                if (firstProperty)</span>
+                {
+<span class="fc" id="L343">                    firstProperty = false;</span>
+                }
+                else
+                {
+<span class="fc" id="L347">                    result += stream.write(',').await();</span>
+                }
+<span class="fc" id="L349">                result += property.toString(stream).await();</span>
+<span class="fc" id="L350">            }</span>
+<span class="fc" id="L351">            result += stream.write('}').await();</span>
+
+<span class="fc" id="L353">            PostCondition.assertGreaterThanOrEqualTo(result, 2, &quot;result&quot;);</span>
+
+<span class="fc" id="L355">            return result;</span>
+        });
     }
 
     @Override
-    public int getAfterEndIndex()
+    public boolean equals(Object rhs)
     {
-<span class="fc" id="L269">        return getAfterEndIndex(segments);</span>
+<span class="fc bfc" id="L362" title="All 4 branches covered.">        return rhs instanceof JSONObject &amp;&amp; this.equals((JSONObject)rhs);</span>
+    }
+
+    public boolean equals(JSONObject rhs)
+    {
+<span class="fc bfc" id="L367" title="All 2 branches covered.">        return rhs != null &amp;&amp;</span>
+<span class="fc bfc" id="L368" title="All 2 branches covered.">            this.properties.equals(rhs.properties);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

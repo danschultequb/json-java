@@ -1,45 +1,37 @@
 package qub;
 
-public abstract class JSONSegment
+/**
+ * A segment within some JSON content.
+ */
+public interface JSONSegment
 {
-    public abstract String toString();
+    /**
+     * Write the String representation of this JSONSegment to the provided stream.
+     * @param stream The stream to write the String representation of this JSONSegment to.
+     * @return The number of characters that were written.
+     */
+    Result<Integer> toString(IndentedCharacterWriteStream stream);
 
-    public abstract int getStartIndex();
-
-    public abstract int getAfterEndIndex();
-
-    public int getLength()
+    /**
+     * Get the String representation of the provided JSONSegment.
+     * @param segment The JSONSegment to get the String representation of.
+     * @return The String representation of the provided JSONSegment.
+     */
+    static String toString(JSONSegment segment)
     {
-        return getAfterEndIndex() - getStartIndex();
+        return JSONSegment.toString((Function1<IndentedCharacterWriteStream,Result<Integer>>)segment::toString);
     }
 
-    public Span getSpan()
+    static String toString(Function1<IndentedCharacterWriteStream,Result<Integer>> toStringFunction)
     {
-        final int startIndex = getStartIndex();
-        final int afterEndIndex = getAfterEndIndex();
-        return new Span(startIndex, afterEndIndex - startIndex);
-    }
+        PreCondition.assertNotNull(toStringFunction, "toStringFunction");
 
-    @Override
-    public abstract boolean equals(Object rhs);
+        final InMemoryCharacterStream characterStream = new InMemoryCharacterStream();
+        toStringFunction.run(new IndentedCharacterWriteStream(characterStream)).await();
+        final String result = characterStream.getText().await();
 
-    protected static int getStartIndex(Iterable<JSONSegment> segments)
-    {
-        return segments.first().getStartIndex();
-    }
+        PostCondition.assertNotNullAndNotEmpty(result, "result");
 
-    protected static int getAfterEndIndex(Iterable<JSONSegment> segments)
-    {
-        return !segments.any() ? 0 : segments.last().getAfterEndIndex();
-    }
-
-    protected static String getCombinedText(Iterable<JSONSegment> segments)
-    {
-        final StringBuilder builder = new StringBuilder();
-        for (final JSONSegment segment : segments)
-        {
-            builder.append(segment.toString());
-        }
-        return builder.toString();
+        return result;
     }
 }

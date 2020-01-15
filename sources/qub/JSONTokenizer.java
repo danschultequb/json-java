@@ -1,368 +1,419 @@
 package qub;
 
+/**
+ * An object that converts a stream of characters into a stream of JSONTokens.
+ */
 public class JSONTokenizer implements Iterator<JSONToken>
 {
-    private final Lexer lexer;
-    private final int firstTokenStartIndex;
-    private final Action1<Issue> onIssue;
+    private static final Iterable<JSONToken> literalTokens = Iterable.create(JSONToken.nullToken, JSONToken.falseToken, JSONToken.trueToken);
+    private final Iterator<Character> characters;
+    private final CharacterList builder;
     private boolean hasStarted;
     private JSONToken current;
 
-    public JSONTokenizer(String text)
+    /**
+     * Create a new JSONTokenizer from the provided characters.
+     * @param characters The characters to convert to JSONTokens.
+     */
+    private JSONTokenizer(Iterator<Character> characters)
     {
-        this(text, 0);
+        PreCondition.assertNotNull(characters, "characters");
+
+        this.characters = characters;
+        this.builder = CharacterList.create();
     }
 
-    public JSONTokenizer(String text, int firstTokenStartIndex)
+    /**
+     * Create a new JSONTokenizer from the provided text.
+     * @param text The text to convert to JSONTokens.
+     * @return The new JSONTokenizer.
+     */
+    public static JSONTokenizer create(String text)
     {
-        this(text, firstTokenStartIndex, (Action1<Issue>)null);
+        PreCondition.assertNotNull(text, "text");
+
+        return JSONTokenizer.create(Strings.iterable(text));
     }
 
-    public JSONTokenizer(String text, List<Issue> issues)
+    /**
+     * Create a new JSONTokenizer from the provided characters.
+     * @param characters The characters to convert to JSONTokens.
+     * @return The new JSONTokenizer.
+     */
+    public static JSONTokenizer create(Iterable<Character> characters)
     {
-        this(text, 0, issues);
+        PreCondition.assertNotNull(characters, "characters");
+
+        return JSONTokenizer.create(characters.iterate());
     }
 
-    public JSONTokenizer(String text, int firstTokenStartIndex, final List<Issue> issues)
+    /**
+     * Create a new JSONTokenizer from the provided characters.
+     * @param characters The characters to convert to JSONTokens.
+     * @return The new JSONTokenizer.
+     */
+    public static JSONTokenizer create(Iterator<Character> characters)
     {
-        this(text, firstTokenStartIndex, getAddToListAction(issues));
-    }
+        PreCondition.assertNotNull(characters, "characters");
 
-    public JSONTokenizer(String text, int firstTokenStartIndex, Action1<Issue> onIssue)
-    {
-        this(new StringIterator(text), firstTokenStartIndex, onIssue);
-    }
-
-    public JSONTokenizer(Iterator<Character> characters, List<Issue> issues)
-    {
-        this(characters, 0, getAddToListAction(issues));
-    }
-
-    public JSONTokenizer(Iterator<Character> characters, int firstTokenStartIndex, Action1<Issue> onIssue)
-    {
-        this(new Lexer(characters), firstTokenStartIndex, onIssue);
-    }
-
-    public JSONTokenizer(Lexer lexer, int firstTokenStartIndex, Action1<Issue> onIssue)
-    {
-        this.lexer = lexer;
-        this.firstTokenStartIndex = firstTokenStartIndex;
-        this.onIssue = onIssue;
-    }
-
-    private void addIssue(Issue issue)
-    {
-        if (onIssue != null)
-        {
-            onIssue.run(issue);
-        }
+        return new JSONTokenizer(characters);
     }
 
     @Override
     public boolean hasStarted()
     {
-        return hasStarted;
+        return this.hasStarted;
     }
 
     @Override
     public boolean hasCurrent()
     {
-        return current != null;
+        return this.current != null;
     }
 
     @Override
     public JSONToken getCurrent()
     {
-        return current;
+        PreCondition.assertTrue(this.hasCurrent(), "this.hasCurrent()");
+
+        return this.current;
     }
 
     @Override
     public boolean next()
     {
-        if (!hasStarted)
-        {
-            hasStarted = true;
+        this.characters.ensureHasStarted();
+        this.hasStarted = true;
 
-            if (!lexer.hasStarted())
-            {
-                lexer.next();
-            }
+        if (!this.characters.hasCurrent())
+        {
+            this.current = null;
         }
-
-        if (lexer.hasCurrent())
+        else
         {
-            int tokenStartIndex = hasCurrent() ? getCurrent().getAfterEndIndex() : firstTokenStartIndex;
-            switch (lexer.getCurrent().getType())
+            switch (this.characters.getCurrent())
             {
-                case LeftCurlyBracket:
-                    current = JSONToken.leftCurlyBracket(tokenStartIndex);
-                    lexer.next();
+                case '{':
+                    this.current = JSONToken.leftCurlyBracket;
+                    this.characters.next();
                     break;
 
-                case RightCurlyBracket:
-                    current = JSONToken.rightCurlyBracket(tokenStartIndex);
-                    lexer.next();
+                case '}':
+                    this.current = JSONToken.rightCurlyBracket;
+                    this.characters.next();
                     break;
 
-                case LeftSquareBracket:
-                    current = JSONToken.leftSquareBracket(tokenStartIndex);
-                    lexer.next();
+                case '[':
+                    this.current = JSONToken.leftSquareBracket;
+                    this.characters.next();
                     break;
 
-                case RightSquareBracket:
-                    current = JSONToken.rightSquareBracket(tokenStartIndex);
-                    lexer.next();
+                case ']':
+                    this.current = JSONToken.rightSquareBracket;
+                    this.characters.next();
                     break;
 
-                case Colon:
-                    current = JSONToken.colon(tokenStartIndex);
-                    lexer.next();
+                case ':':
+                    this.current = JSONToken.colon;
+                    this.characters.next();
                     break;
 
-                case Comma:
-                    current = JSONToken.comma(tokenStartIndex);
-                    lexer.next();
+                case ',':
+                    this.current = JSONToken.comma;
+                    this.characters.next();
                     break;
 
-                case Letters:
-                    switch (lexer.getCurrent().toString().toLowerCase())
+                case '\n':
+                    this.current = JSONToken.newLine;
+                    this.characters.next();
+                    break;
+
+                case '\r':
+                    if (this.characters.next() && this.characters.getCurrent() == '\n')
                     {
-                        case "true":
-                            if (!lexer.getCurrent().toString().equals("true"))
-                            {
-                                addIssue(JSONIssues.shouldBeLowercased(tokenStartIndex, 4));
-                            }
-                            current = JSONToken.booleanToken(lexer.getCurrent().toString(), tokenStartIndex);
-                            break;
-
-                        case "false":
-                            if (!lexer.getCurrent().toString().equals("false"))
-                            {
-                                addIssue(JSONIssues.shouldBeLowercased(tokenStartIndex, 5));
-                            }
-                            current = JSONToken.booleanToken(lexer.getCurrent().toString(), tokenStartIndex);
-                            break;
-
-                        case "null":
-                            if (!lexer.getCurrent().toString().equals("null"))
-                            {
-                                addIssue(JSONIssues.shouldBeLowercased(tokenStartIndex, 4));
-                            }
-                            current = JSONToken.nullToken(lexer.getCurrent().toString(), tokenStartIndex);
-                            break;
-
-                        default:
-                            current = JSONToken.unrecognized(lexer.getCurrent().toString(), tokenStartIndex);
-                            break;
-                    }
-                    lexer.next();
-                    break;
-
-                case SingleQuote:
-                case DoubleQuote:
-                    final Lex startQuote = lexer.takeCurrent();
-                    final StringBuilder quotedStringText = new StringBuilder(startQuote.toString());
-
-                    boolean foundEndQuote = false;
-                    boolean escaped = false;
-
-                    while (!foundEndQuote && lexer.hasCurrent())
-                    {
-                        quotedStringText.append(lexer.getCurrent().toString());
-                        if (escaped)
-                        {
-                            escaped = false;
-                        }
-                        else if (lexer.getCurrent().getType() == LexType.Backslash)
-                        {
-                            escaped = true;
-                        }
-                        else if (lexer.getCurrent().getType() == startQuote.getType())
-                        {
-                            foundEndQuote = true;
-                        }
-                        lexer.next();
-                    }
-
-                    if (!foundEndQuote) {
-                        addIssue(JSONIssues.missingEndQuote(startQuote.toString(), tokenStartIndex, quotedStringText.length()));
-                    }
-
-                    current = JSONToken.quotedString(quotedStringText.toString(), tokenStartIndex, foundEndQuote);
-                    break;
-
-                case Space:
-                case Tab:
-                case CarriageReturn:
-                    final StringBuilder whitespaceText = new StringBuilder(lexer.takeCurrent().toString());
-                    while (lexer.hasCurrent() && lexer.getCurrent().isWhitespace())
-                    {
-                        whitespaceText.append(lexer.takeCurrent().toString());
-                    }
-                    current = JSONToken.whitespace(whitespaceText.toString(), tokenStartIndex);
-                    break;
-
-                case NewLine:
-                case CarriageReturnNewLine:
-                    current = JSONToken.newLine(lexer.takeCurrent().toString(), tokenStartIndex);
-                    break;
-
-                case Dash:
-                case Digits:
-                case Period:
-                    final StringBuilder numberText = new StringBuilder();
-
-                    if (lexer.getCurrent().getType() == LexType.Dash)
-                    {
-                        // Negative sign
-                        numberText.append(lexer.takeCurrent().toString());
-                    }
-
-                    if (!lexer.hasCurrent())
-                    {
-                        addIssue(JSONIssues.missingWholeNumberDigits(tokenStartIndex, numberText.length()));
-                    }
-                    else if (lexer.getCurrent().getType() != LexType.Digits)
-                    {
-                        addIssue(JSONIssues.expectedWholeNumberDigits(tokenStartIndex + numberText.length(), lexer.getCurrent().getLength()));
+                        this.current = JSONToken.carriageReturnNewLine;
+                        this.characters.next();
                     }
                     else
                     {
-                        numberText.append(lexer.takeCurrent().toString());
+                        this.current = JSONToken.carriageReturn;
                     }
-
-                    if (lexer.hasCurrent() && lexer.getCurrent().getType() == LexType.Period)
-                    {
-                        // Decimal point
-                        final int decimalPointStartIndex = tokenStartIndex + numberText.length();
-                        numberText.append(lexer.takeCurrent().toString());
-
-                        if (!lexer.hasCurrent())
-                        {
-                            addIssue(JSONIssues.missingFractionalNumberDigits(decimalPointStartIndex, 1));
-                        }
-                        else if (lexer.getCurrent().getType() != LexType.Digits)
-                        {
-                            addIssue(JSONIssues.expectedFractionalNumberDigits(lexer.getCurrent().getStartIndex(), lexer.getCurrent().getLength()));
-                        }
-                        else
-                        {
-                            // Fractional number digits
-                            numberText.append(lexer.takeCurrent().toString());
-                        }
-                    }
-
-                    if (lexer.hasCurrent() && lexer.getCurrent().toString().equalsIgnoreCase("e"))
-                    {
-                        // e
-                        final int eStartIndex = tokenStartIndex + numberText.length();
-                        if (lexer.getCurrent().toString().equals("E"))
-                        {
-                            addIssue(JSONIssues.shouldBeLowercased(eStartIndex, 1));
-                        }
-                        numberText.append(lexer.takeCurrent().toString());
-
-                        if (!lexer.hasCurrent())
-                        {
-                            addIssue(JSONIssues.missingExponentNumberDigits(eStartIndex, 1));
-                        }
-                        else
-                        {
-                            final int exponentSignOrDigitsStartIndex = tokenStartIndex + numberText.length();
-                            if (lexer.getCurrent().getType() == LexType.Dash || lexer.getCurrent().getType() == LexType.Plus)
-                            {
-                                // Exponent number sign
-                                numberText.append(lexer.takeCurrent().toString());
-                            }
-
-                            if (!lexer.hasCurrent())
-                            {
-                                addIssue(JSONIssues.missingExponentNumberDigits(exponentSignOrDigitsStartIndex, 1));
-                            }
-                            else if (lexer.getCurrent().getType() != LexType.Digits)
-                            {
-                                addIssue(JSONIssues.expectedExponentNumberDigits(tokenStartIndex + numberText.length(), lexer.getCurrent().getLength()));
-                            }
-                            else
-                            {
-                                // Exponent number digits
-                                numberText.append(lexer.takeCurrent().toString());
-                            }
-                        }
-                    }
-
-                    current = JSONToken.number(numberText.toString(), tokenStartIndex);
                     break;
 
-                case ForwardSlash:
-                    final StringBuilder commentText = new StringBuilder(lexer.takeCurrent().toString());
-                    if (!lexer.hasCurrent())
-                    {
-                        addIssue(JSONIssues.missingCommentSlashOrAsterisk(tokenStartIndex, 1));
-                        current = JSONToken.unrecognized(commentText.toString(), tokenStartIndex);
-                    }
-                    else
-                    {
-                        switch (lexer.getCurrent().getType())
-                        {
-                            case ForwardSlash:
-                                do
-                                {
-                                    commentText.append(lexer.takeCurrent().toString());
-                                }
-                                while (lexer.hasCurrent() && !lexer.getCurrent().isNewLine());
-                                current = JSONToken.lineComment(commentText.toString(), tokenStartIndex);
-                                break;
+                case '\'':
+                case '\"':
+                    this.current = JSONToken.quotedString(this.readQuotedString());
+                    break;
 
-                            case Asterisk:
-                                commentText.append(lexer.takeCurrent().toString());
-                                boolean previousCharacterWasAsterisk = false;
-                                boolean commentClosed = false;
-                                while (lexer.hasCurrent() && !commentClosed)
-                                {
-                                    switch (lexer.getCurrent().getType())
-                                    {
-                                        case Asterisk:
-                                            previousCharacterWasAsterisk = true;
-                                            break;
+                case ' ':
+                case '\t':
+                    this.current = JSONToken.whitespace(this.readWhitespace());
+                    break;
 
-                                        case ForwardSlash:
-                                            commentClosed = previousCharacterWasAsterisk;
-                                            break;
-
-                                        default:
-                                            previousCharacterWasAsterisk = false;
-                                            break;
-                                    }
-                                    commentText.append(lexer.takeCurrent().toString());
-                                }
-                                current = JSONToken.blockComment(commentText.toString(), tokenStartIndex, commentClosed);
-                                break;
-
-                            default:
-                                addIssue(JSONIssues.expectedCommentSlashOrAsterisk(lexer.getCurrent().getStartIndex(), lexer.getCurrent().getLength()));
-                                current = JSONToken.unrecognized(commentText.toString(), tokenStartIndex);
-                                break;
-                        }
-                    }
-
+                case '/':
+                    this.current = this.readCommentToken();
                     break;
 
                 default:
-                    current = JSONToken.unrecognized(lexer.takeCurrent().toString(), tokenStartIndex);
+                    if (JSONTokenizer.isLetter(this.characters.getCurrent()))
+                    {
+                        final String tokenText = this.readLiteral();
+                        this.current = JSONTokenizer.literalTokens.first((JSONToken token) -> token.getText().equals(tokenText));
+                        if (this.current == null)
+                        {
+                            throw new ParseException("Unrecognized JSONToken literal: " + tokenText);
+                        }
+                    }
+                    else if (this.characters.getCurrent() == '-' || JSONTokenizer.isDigit(this.characters.getCurrent()))
+                    {
+                        final String tokenText = this.readNumber();
+                        this.current = JSONToken.number(tokenText);
+                    }
+                    else
+                    {
+                        throw new ParseException("Unrecognized JSONToken start character: " + Strings.escapeAndQuote(this.characters.getCurrent()));
+                    }
+            }
+        }
+
+        return this.hasCurrent();
+    }
+
+    /**
+     * Get whether or not the provided character is a recognized JSON letter.
+     * @param character The character to check.
+     * @return Whether or not the provided character is a recognized JSON letter.
+     */
+    public static boolean isLetter(char character)
+    {
+        return ('a' <= character && character <= 'z') ||
+            ('A' <= character && character <= 'Z');
+    }
+
+    /**
+     * Get whether or not the provided character is a recognized JSON digit.
+     * @param character The character to check.
+     * @return Whether or not the provided character is a recognized JSON digit.
+     */
+    public static boolean isDigit(char character)
+    {
+        return '0' <= character && character <= '9';
+    }
+
+    /**
+     * Get whether or not the provided character is a recognized JSON whitespace character.
+     * @param character The character to check.
+     * @return Whether or not the provided character is a recognized JSON whitespace character.
+     */
+    public static boolean isWhitespace(char character)
+    {
+        return ' ' == character || '\t' == character;
+    }
+
+    private String readLiteral()
+    {
+        PreCondition.assertTrue(this.characters.hasCurrent(), "characters.hasCurrent()");
+        PreCondition.assertTrue(JSONTokenizer.isLetter(this.characters.getCurrent()), "JSONTokenizer.isLetter(this.characters.getCurrent())");
+
+        this.builder.add(this.characters.takeCurrent());
+        while (this.characters.hasCurrent() && JSONTokenizer.isLetter(this.characters.getCurrent()))
+        {
+            this.builder.add(this.characters.takeCurrent());
+        }
+
+        final String result = this.builder.toString(true);
+        this.builder.clear();
+
+        PostCondition.assertNotNullAndNotEmpty(result, "result");
+
+        return result;
+    }
+
+    private String readQuotedString()
+    {
+        PreCondition.assertTrue(this.characters.hasCurrent(), "this.characters.hasCurrent()");
+        PreCondition.assertOneOf(this.characters.getCurrent(), Iterable.create('\'', '\"'), "this.characters.getCurrent()");
+
+        final char startQuote = this.characters.takeCurrent();
+        this.builder.add(startQuote);
+        boolean escaped = false;
+        boolean foundCloseQuote = false;
+        while (this.characters.hasCurrent())
+        {
+            final char currentCharacter = this.characters.takeCurrent();
+            this.builder.add(currentCharacter);
+            if (escaped)
+            {
+                escaped = false;
+            }
+            else if (currentCharacter == '\\')
+            {
+                escaped = true;
+            }
+            else if (currentCharacter == startQuote)
+            {
+                foundCloseQuote = true;
+                break;
+            }
+        }
+
+        if (!foundCloseQuote)
+        {
+            throw new ParseException("Missing quoted-string closing quote: " + startQuote);
+        }
+
+        final String result = this.builder.toString(true);
+        this.builder.clear();
+
+        PostCondition.assertNotNullAndNotEmpty(result, "result");
+
+        return result;
+    }
+
+    private String readNumber()
+    {
+        PreCondition.assertTrue(this.characters.hasCurrent(), "this.characters.hasCurrent()");
+        PreCondition.assertOneOf(this.characters.getCurrent(), Iterable.create('-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'), "this.characters.getCurrent()");
+
+        if (this.characters.getCurrent() == '-')
+        {
+            this.builder.add(this.characters.takeCurrent());
+
+            if (!this.characters.hasCurrent() || !JSONTokenizer.isDigit(this.characters.getCurrent()))
+            {
+                throw new ParseException("Missing digits after number's negative sign: \"-\"");
+            }
+        }
+
+        while (this.characters.hasCurrent() && JSONTokenizer.isDigit(this.characters.getCurrent()))
+        {
+            this.builder.add(this.characters.takeCurrent());
+        }
+
+        if (this.characters.hasCurrent() && this.characters.getCurrent() == '.')
+        {
+            this.builder.add(this.characters.takeCurrent());
+            if (!this.characters.hasCurrent() || !JSONTokenizer.isDigit(this.characters.getCurrent()))
+            {
+                throw new ParseException("Missing digits after number's decimal point: " + Strings.escapeAndQuote(this.builder.toString(true)));
+            }
+
+            do
+            {
+                this.builder.add(this.characters.takeCurrent());
+            }
+            while (this.characters.hasCurrent() && JSONTokenizer.isDigit(this.characters.getCurrent()));
+        }
+
+        if (this.characters.hasCurrent() && (this.characters.getCurrent().equals('e') || this.characters.getCurrent().equals('E')))
+        {
+            this.builder.add(this.characters.takeCurrent());
+
+            if (!this.characters.hasCurrent() || !(this.characters.getCurrent().equals('-') || this.characters.getCurrent().equals('+') || JSONTokenizer.isDigit(this.characters.getCurrent())))
+            {
+                throw new ParseException("Missing digits after number's exponent character: " + Strings.escapeAndQuote(this.builder.toString(true)));
+            }
+            else
+            {
+                this.builder.add(this.characters.takeCurrent());
+                if ((this.builder.endsWith('-') || this.builder.endsWith('+')) &&
+                    (!this.characters.hasCurrent() || !JSONTokenizer.isDigit(this.characters.getCurrent())))
+                {
+                    throw new ParseException("Missing digits after number's exponent sign character: " + Strings.escapeAndQuote(this.builder.toString(true)));
+                }
+
+                while (this.characters.hasCurrent() && JSONTokenizer.isDigit(this.characters.getCurrent()))
+                {
+                    this.builder.add(this.characters.takeCurrent());
+                }
+            }
+        }
+
+        final String result = builder.toString(true);
+        builder.clear();
+
+        PostCondition.assertNotNullAndNotEmpty(result, "result");
+
+        return result;
+    }
+
+    private String readWhitespace()
+    {
+        PreCondition.assertTrue(this.characters.hasCurrent(), "this.characters.hasCurrent()");
+        PreCondition.assertTrue(JSONTokenizer.isWhitespace(this.characters.getCurrent()), "JSONTokenizer.isWhitespace(this.characters.getCurrent())");
+
+        do
+        {
+            builder.add(this.characters.takeCurrent());
+        }
+        while (this.characters.hasCurrent() && JSONTokenizer.isWhitespace(this.characters.getCurrent()));
+
+        final String result = builder.toString(true);
+        builder.clear();
+
+        PostCondition.assertNotNullAndNotEmpty(result, "result");
+
+        return result;
+    }
+
+    private JSONToken readCommentToken()
+    {
+        PreCondition.assertTrue(this.characters.hasCurrent(), "this.characters.hasCurrent()");
+        PreCondition.assertEqual('/', this.characters.getCurrent(), "this.characters.getCurrent()");
+
+        if (!this.characters.next())
+        {
+            throw new ParseException("Missing comment start sequence second character.");
+        }
+
+        JSONTokenType resultType;
+        this.builder.add('/');
+        if (this.characters.getCurrent() == '/')
+        {
+            resultType = JSONTokenType.LineComment;
+            this.builder.add(this.characters.takeCurrent());
+            while (this.characters.hasCurrent() && this.characters.getCurrent() != '\r' && this.characters.getCurrent() != '\n')
+            {
+                this.builder.add(this.characters.takeCurrent());
+            }
+        }
+        else if (this.characters.getCurrent() == '*')
+        {
+            resultType = JSONTokenType.BlockComment;
+            this.builder.add(this.characters.takeCurrent());
+            boolean endSequenceStarted = false;
+            boolean ended = false;
+            while (this.characters.hasCurrent())
+            {
+                final char character = this.characters.takeCurrent();
+                this.builder.add(character);
+                if (endSequenceStarted && character == '/')
+                {
+                    ended = true;
                     break;
+                }
+                endSequenceStarted = (character == '*');
+            }
+
+            if (!ended)
+            {
+                throw new ParseException(endSequenceStarted
+                    ? "Missing block comment end sequence second character (\"/\")."
+                    : "Missing block comment end sequence (\"*/\").");
             }
         }
         else
         {
-            current = null;
+            throw new ParseException("Unrecognized comment start sequence second character: " + Strings.escapeAndQuote(this.characters.getCurrent()));
         }
 
-        return hasCurrent();
-    }
+        final String resultText = this.builder.toString(true);
+        this.builder.clear();
 
-    private static Action1<Issue> getAddToListAction(final List<Issue> issues)
-    {
-        return issues == null ? null : issues::add;
+        final JSONToken result = new JSONToken(resultText, resultType);
+
+        PostCondition.assertNotNull(result, "result");
+
+        return result;
     }
 }

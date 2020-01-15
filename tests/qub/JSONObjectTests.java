@@ -4,437 +4,678 @@ public interface JSONObjectTests
 {
     static void test(TestRunner runner)
     {
+        PreCondition.assertNotNull(runner, "runner");
+
         runner.testGroup(JSONObject.class, () ->
         {
-            runner.testGroup("constructor()", () ->
+            runner.testGroup("create(JSONObjectProperty...)", () ->
             {
-                final Action6<String,JSONToken,JSONProperty[],JSONToken,Integer,Integer> constructorTest = (String text, JSONToken leftCurlyBracket, JSONProperty[] propertySegments, JSONToken rightCurlyBracket, Integer afterEndIndex, Integer length) ->
+                runner.test("with no arguments", (Test test) ->
                 {
-                    runner.test("with " + Strings.escapeAndQuote(text), (Test test) ->
+                    final JSONObject object = JSONObject.create();
+                    test.assertNotNull(object);
+                    test.assertEqual(Iterable.create(), object.getProperties());
+                    test.assertEqual(Iterable.create(), object.getPropertyNames());
+                    test.assertEqual(Iterable.create(), object.getPropertyValues());
+                    test.assertEqual(object.getPropertyNames(), object.getKeys());
+                    test.assertEqual(object.getPropertyValues(), object.getValues());
+                    test.assertEqual("{}", object.toString());
+                });
+
+                runner.test("with one property", (Test test) ->
+                {
+                    final JSONObject object = JSONObject.create(JSONObjectProperty.create("hello", "there"));
+                    test.assertNotNull(object);
+                    test.assertEqual(JSONObject.create().setString("hello", "there"), object);
+                    test.assertEqual(Iterable.create(JSONObjectProperty.create("hello", "there")), object.getProperties());
+                    test.assertEqual(Iterable.create("hello"), object.getPropertyNames());
+                    test.assertEqual(Iterable.create(JSONString.get("there")), object.getPropertyValues());
+                    test.assertEqual(object.getPropertyNames(), object.getKeys());
+                    test.assertEqual(object.getPropertyValues(), object.getValues());
+                    test.assertEqual("{\"hello\":\"there\"}", object.toString());
+                });
+
+                runner.test("with multiple properties", (Test test) ->
+                {
+                    final JSONObject object = JSONObject.create(
+                        JSONObjectProperty.create("hello", "there"),
+                        JSONObjectProperty.create("fun", true),
+                        JSONObjectProperty.create("work", JSONNull.segment));
+                    test.assertNotNull(object);
+                    test.assertEqual(
+                        JSONObject.create()
+                            .setString("hello", "there")
+                            .setBoolean("fun", true)
+                            .set("work", JSONNull.segment),
+                        object);
+                    test.assertEqual(
+                        Iterable.create(
+                            JSONObjectProperty.create("hello", "there"),
+                            JSONObjectProperty.create("fun", true),
+                            JSONObjectProperty.create("work", JSONNull.segment)),
+                        object.getProperties());
+                    test.assertEqual(Iterable.create("hello", "fun", "work"), object.getPropertyNames());
+                    test.assertEqual(
+                        Iterable.create(
+                            JSONString.get("there"),
+                            JSONBoolean.trueSegment,
+                            JSONNull.segment),
+                        object.getPropertyValues());
+                    test.assertEqual(object.getPropertyNames(), object.getKeys());
+                    test.assertEqual(object.getPropertyValues(), object.getValues());
+                    test.assertEqual("{\"hello\":\"there\",\"fun\":true,\"work\":null}", object.toString());
+                });
+
+                runner.test("with null array", (Test test) ->
+                {
+                    test.assertThrows(() -> JSONObject.create((JSONObjectProperty[])null),
+                        new PreConditionFailure("properties cannot be null."));
+                });
+
+                runner.test("with empty array", (Test test) ->
+                {
+                    final JSONObject object = JSONObject.create(new JSONObjectProperty[0]);
+                    test.assertNotNull(object);
+                    test.assertEqual(JSONObject.create(), object);
+                    test.assertEqual("{}", object.toString());
+                });
+
+                runner.test("with one property array", (Test test) ->
+                {
+                    final JSONObject object = JSONObject.create(new JSONObjectProperty[] { JSONObjectProperty.create("hello", "there") });
+                    test.assertNotNull(object);
+                    test.assertEqual(JSONObject.create().setString("hello", "there"), object);
+                    test.assertEqual("{\"hello\":\"there\"}", object.toString());
+                });
+
+                runner.test("with multiple property array", (Test test) ->
+                {
+                    final JSONObject object = JSONObject.create(new JSONObjectProperty[]
                     {
-                        final JSONObject objectSegment = JSON.parseObject(text);
-                        test.assertEqual(leftCurlyBracket, objectSegment.getLeftCurlyBracket());
-                        test.assertEqual(rightCurlyBracket, objectSegment.getRightCurlyBracket());
-                        test.assertEqual(Array.create(propertySegments), objectSegment.getProperties());
-                        test.assertEqual(0, objectSegment.getStartIndex());
-                        test.assertEqual(afterEndIndex, objectSegment.getAfterEndIndex());
-                        test.assertEqual(length, objectSegment.getLength());
-                        test.assertEqual(text, objectSegment.toString());
+                        JSONObjectProperty.create("hello", "there"),
+                        JSONObjectProperty.create("fun", true),
+                        JSONObjectProperty.create("work", JSONNull.segment)
                     });
-                };
 
-                constructorTest.run("{",
-                    JSONToken.leftCurlyBracket(0),
-                    new JSONProperty[0],
-                    null,
-                    1,
-                    1);
+                    test.assertNotNull(object);
+                    test.assertEqual(
+                        JSONObject.create()
+                            .setString("hello", "there")
+                            .setBoolean("fun", true)
+                            .set("work", JSONNull.segment),
+                        object);
+                    test.assertEqual("{\"hello\":\"there\",\"fun\":true,\"work\":null}", object.toString());
+                });
+            });
 
-                constructorTest.run("{}",
-                    JSONToken.leftCurlyBracket(0),
-                    new JSONProperty[0],
-                    JSONToken.rightCurlyBracket(1),
-                    2,
-                    2);
+            runner.testGroup("create(Iterable<JSONObjectProperty>)", () ->
+            {
+                runner.test("with null", (Test test) ->
+                {
+                    test.assertThrows(() -> JSONObject.create((Iterable<JSONObjectProperty>)null),
+                        new PreConditionFailure("properties cannot be null."));
+                });
 
-                constructorTest.run("{\"a\":\"b\"",
-                    JSONToken.leftCurlyBracket(0),
-                    new JSONProperty[]
-                        {
-                            JSON.parseProperty("\"a\":\"b\"", 1)
-                        },
-                    null,
-                    8,
-                    8);
+                runner.test("with empty", (Test test) ->
+                {
+                    final JSONObject object = JSONObject.create(Iterable.create());
+                    test.assertNotNull(object);
+                    test.assertEqual(JSONObject.create(), object);
+                    test.assertEqual(Iterable.create(), object.getProperties());
+                    test.assertEqual("{}", object.toString());
+                });
 
-                constructorTest.run("{\"a\":\"b\"}",
-                    JSONToken.leftCurlyBracket(0),
-                    new JSONProperty[]
-                        {
-                            JSON.parseProperty("\"a\":\"b\"", 1)
-                        },
-                    JSONToken.rightCurlyBracket(8),
-                    9,
-                    9);
+                runner.test("with one property", (Test test) ->
+                {
+                    final JSONObject object = JSONObject.create(Iterable.create(JSONObjectProperty.create("hello", "there")));
+                    test.assertNotNull(object);
+                    test.assertEqual(JSONObject.create().setString("hello", "there"), object);
+                    test.assertEqual(Iterable.create(JSONObjectProperty.create("hello", "there")), object.getProperties());
+                    test.assertEqual("{\"hello\":\"there\"}", object.toString());
+                });
 
-                constructorTest.run("{\"1\":\"2\", \"3\":\"4\"}",
-                    JSONToken.leftCurlyBracket(0),
-                    new JSONProperty[]
-                        {
-                            JSON.parseProperty("\"1\":\"2\"", 1),
-                            JSON.parseProperty("\"3\":\"4\"", 10)
-                        },
-                    JSONToken.rightCurlyBracket(17),
-                    18,
-                    18);
+                runner.test("with multiple properties", (Test test) ->
+                {
+                    final JSONObject object = JSONObject.create(Iterable.create(
+                        JSONObjectProperty.create("hello", "there"),
+                        JSONObjectProperty.create("fun", true),
+                        JSONObjectProperty.create("work", JSONNull.segment)));
+                    test.assertNotNull(object);
+                    test.assertEqual(
+                        JSONObject.create()
+                            .setString("hello", "there")
+                            .setBoolean("fun", true)
+                            .set("work", JSONNull.segment),
+                        object);
+                    test.assertEqual(
+                        Iterable.create(
+                            JSONObjectProperty.create("hello", "there"),
+                            JSONObjectProperty.create("fun", true),
+                            JSONObjectProperty.create("work", JSONNull.segment)),
+                        object.getProperties());
+                    test.assertEqual("{\"hello\":\"there\",\"fun\":true,\"work\":null}", object.toString());
+                });
             });
 
             runner.testGroup("getProperty(String)", () ->
             {
-                runner.test("with " + Strings.escapeAndQuote("{}") + " and null", (Test test) ->
+                final Action3<JSONObject,String,Throwable> getPropertyErrorTest = (JSONObject object, String propertyName, Throwable expectedError) ->
                 {
-                    final JSONObject jsonObject = JSON.parseObject("{}");
-                    test.assertThrows(() -> jsonObject.getProperty(null), new PreConditionFailure("propertyName cannot be null."));
-                });
-
-                runner.test("with " + Strings.escapeAndQuote("{}") + " and " + Strings.escapeAndQuote(""), (Test test) ->
-                {
-                    final JSONObject jsonObject = JSON.parseObject("{}");
-                    test.assertThrows(() -> jsonObject.getProperty(""), new PreConditionFailure("propertyName cannot be empty."));
-                });
-
-                final Action4<String,String,JSONProperty,Throwable> getPropertyTest = (String objectText, String propertyName, JSONProperty expectedProperty, Throwable expectedError) ->
-                {
-                    runner.test("with " + Strings.escapeAndQuote(objectText) + " and " + Strings.escapeAndQuote(propertyName), (Test test) ->
+                    runner.test("with " + object + " and " + Strings.escapeAndQuote(propertyName), (Test test) ->
                     {
-                        final JSONObject jsonObject = JSON.parseObject(objectText);
-                        final Result<JSONProperty> propertyResult = jsonObject.getProperty(propertyName);
-                        if (expectedError != null)
-                        {
-                            test.assertThrows(propertyResult::await, expectedError);
-                        }
-                        else
-                        {
-                            test.assertEqual(expectedProperty, propertyResult.await());
-                        }
+                        test.assertThrows(() -> object.getProperty(propertyName).await(), expectedError);
                     });
                 };
 
-                getPropertyTest.run("{ \"a\":1, \"b\": 2 }", "c", null, new NotFoundException("No property was found with the name \"c\"."));
-                getPropertyTest.run("{ \"a\":1, \"b\": 2 }", "\"c\"", null, new NotFoundException("No property was found with the name \"\\\"c\\\"\"."));
-                getPropertyTest.run("{ \"a\":1, \"b\": 2 }", "\"a\"", null, new NotFoundException("No property was found with the name \"\\\"a\\\"\"."));
-                getPropertyTest.run("{ \"a\":1, \"b\": 2 }", "a", JSON.parseProperty("\"a\":1", 2), null);
-                getPropertyTest.run("{ \"a\":1, \"b\": 2 }", "\"b\"", null, new NotFoundException("No property was found with the name \"\\\"b\\\"\"."));
-                getPropertyTest.run("{ \"a\":1, \"b\": 2 }", "b", JSON.parseProperty("\"b\": 2", 9), null);
-                getPropertyTest.run("{ \"a\":true }", "a", JSON.parseProperty("\"a\":true", 2), null);
+                getPropertyErrorTest.run(JSONObject.create(), null, new PreConditionFailure("propertyName cannot be null."));
+                getPropertyErrorTest.run(JSONObject.create(), "", new PreConditionFailure("propertyName cannot be empty."));
+                getPropertyErrorTest.run(JSONObject.create(), "a", new NotFoundException("No property found with the name: \"a\""));
+                getPropertyErrorTest.run(JSONObject.create().setNumber("A", 1), "a", new NotFoundException("No property found with the name: \"a\""));
+
+                final Action3<JSONObject,String,JSONObjectProperty> getPropertyTest = (JSONObject object, String propertyName, JSONObjectProperty expected) ->
+                {
+                    runner.test("with " + object + " and " + Strings.escapeAndQuote(propertyName), (Test test) ->
+                    {
+                        test.assertEqual(expected, object.getProperty(propertyName).await());
+                    });
+                };
+
+                getPropertyTest.run(JSONObject.create().setNumber("a", 1), "a", JSONObjectProperty.create("a", 1));
+                getPropertyTest.run(JSONObject.create().setString("bats", "hello"), "bats", JSONObjectProperty.create("bats", "hello"));
             });
 
-            runner.testGroup("getPropertyValue(String)", () ->
+            runner.testGroup("get(String)", () ->
             {
-                final Action4<String,String,JSONSegment,Throwable> getPropertyValueTest = (String objectText, String propertyName, JSONSegment expectedPropertyValue, Throwable expectedError) ->
+                final Action3<JSONObject,String,Throwable> getErrorTest = (JSONObject object, String propertyName, Throwable expectedError) ->
                 {
-                    runner.test("with " + Strings.escapeAndQuote(objectText) + " and " + Strings.escapeAndQuote(propertyName), (Test test) ->
+                    runner.test("with " + object + " and " + Strings.escapeAndQuote(propertyName), (Test test) ->
                     {
-                        final JSONObject jsonObject = JSON.parseObject(objectText);
-                        final Result<JSONSegment> result = jsonObject.getPropertyValue(propertyName);
-                        if (expectedError != null)
-                        {
-                            test.assertThrows(result::await, expectedError);
-                        }
-                        else
-                        {
-                            test.assertEqual(expectedPropertyValue, result.await());
-                        }
+                        test.assertThrows(() -> object.get(propertyName).await(), expectedError);
                     });
                 };
 
-                getPropertyValueTest.run("{ \"a\":1, \"b\": 2 }", "c", null, new NotFoundException("No property was found with the name \"c\"."));
-                getPropertyValueTest.run("{ \"a\":1, \"b\": 2 }", "\"c\"", null, new NotFoundException("No property was found with the name \"\\\"c\\\"\"."));
-                getPropertyValueTest.run("{ \"a\":1, \"b\": 2 }", "\"a\"", null, new NotFoundException("No property was found with the name \"\\\"a\\\"\"."));
-                getPropertyValueTest.run("{ \"a\":1, \"b\": 2 }", "a", JSONToken.number("1", 6), null);
-                getPropertyValueTest.run("{ \"a\":1, \"b\": 2 }", "\"b\"", null, new NotFoundException("No property was found with the name \"\\\"b\\\"\"."));
-                getPropertyValueTest.run("{ \"a\":1, \"b\": 2 }", "b", JSONToken.number("2", 14), null);
-                getPropertyValueTest.run("{ \"a\":true }", "a", JSONToken.booleanToken("true", 6), null);
+                getErrorTest.run(JSONObject.create(), null, new PreConditionFailure("propertyName cannot be null."));
+                getErrorTest.run(JSONObject.create(), "", new PreConditionFailure("propertyName cannot be empty."));
+                getErrorTest.run(JSONObject.create(), "a", new NotFoundException("No property found with the name: \"a\""));
+                getErrorTest.run(JSONObject.create().setNumber("A", 1), "a", new NotFoundException("No property found with the name: \"a\""));
+
+                final Action3<JSONObject,String,JSONSegment> getTest = (JSONObject object, String propertyName, JSONSegment expected) ->
+                {
+                    runner.test("with " + object + " and " + Strings.escapeAndQuote(propertyName), (Test test) ->
+                    {
+                        test.assertEqual(expected, object.get(propertyName).await());
+                    });
+                };
+
+                getTest.run(JSONObject.create().setNumber("a", 1), "a", JSONNumber.get(1));
+                getTest.run(JSONObject.create().setString("bats", "hello"), "bats", JSONString.get("hello"));
             });
 
-            runner.testGroup("getQuotedStringPropertyValue(String)", () ->
+            runner.testGroup("getObject(String)", () ->
             {
-                final Action4<String,String,JSONQuotedString,Throwable> getQuotedStringPropertyValueTest = (String objectText, String propertyName, JSONQuotedString expectedPropertyValue, Throwable expectedError) ->
+                final Action3<JSONObject,String,Throwable> getObjectErrorTest = (JSONObject object, String propertyName, Throwable expectedError) ->
                 {
-                    runner.test("with " + Strings.escapeAndQuote(objectText) + " and " + Strings.escapeAndQuote(propertyName), (Test test) ->
+                    runner.test("with " + object + " and " + Strings.escapeAndQuote(propertyName), (Test test) ->
                     {
-                        final JSONObject jsonObject = JSON.parseObject(objectText);
-                        final Result<JSONQuotedString> result = jsonObject.getQuotedStringPropertyValue(propertyName);
-                        if (expectedError != null)
-                        {
-                            test.assertThrows(result::await, expectedError);
-                        }
-                        else
-                        {
-                            test.assertEqual(expectedPropertyValue, result.await());
-                        }
+                        test.assertThrows(() -> object.getObject(propertyName).await(), expectedError);
                     });
                 };
 
-                getQuotedStringPropertyValueTest.run("{ \"a\":1, \"b\": \"2\" }", "c", null, new NotFoundException("No property was found with the name \"c\"."));
-                getQuotedStringPropertyValueTest.run("{ \"a\":1, \"b\": \"2\" }", "\"c\"", null, new NotFoundException("No property was found with the name \"\\\"c\\\"\"."));
-                getQuotedStringPropertyValueTest.run("{ \"a\":1, \"b\": \"2\" }", "\"a\"", null, new NotFoundException("No property was found with the name \"\\\"a\\\"\"."));
-                getQuotedStringPropertyValueTest.run("{ \"a\":1, \"b\": \"2\" }", "a", null, new WrongTypeException("Expected the value of the property named \"a\" to be a quoted-string."));
-                getQuotedStringPropertyValueTest.run("{ \"a\":1, \"b\": \"2\" }", "\"b\"", null, new NotFoundException("No property was found with the name \"\\\"b\\\"\"."));
-                getQuotedStringPropertyValueTest.run("{ \"a\":1, \"b\": \"2\" }", "b", JSONToken.quotedString("\"2\"", 14, true), null);
+                getObjectErrorTest.run(JSONObject.create(), null, new PreConditionFailure("propertyName cannot be null."));
+                getObjectErrorTest.run(JSONObject.create(), "", new PreConditionFailure("propertyName cannot be empty."));
+                getObjectErrorTest.run(JSONObject.create(), "a", new NotFoundException("No property found with the name: \"a\""));
+                getObjectErrorTest.run(JSONObject.create().setNumber("A", 1), "a", new NotFoundException("No property found with the name: \"a\""));
+                getObjectErrorTest.run(JSONObject.create().setNumber("a", 1), "a", new WrongTypeException("Expected the property named \"a\" to be a JSONObject, but was a JSONNumber instead."));
+                getObjectErrorTest.run(JSONObject.create().set("a", JSONArray.create()), "a", new WrongTypeException("Expected the property named \"a\" to be a JSONObject, but was a JSONArray instead."));
+                getObjectErrorTest.run(JSONObject.create().set("a", JSONNull.segment), "a", new WrongTypeException("Expected the property named \"a\" to be a JSONObject, but was a JSONNull instead."));
+
+                final Action3<JSONObject,String,JSONObject> getObjectTest = (JSONObject object, String propertyName, JSONObject expected) ->
+                {
+                    runner.test("with " + object + " and " + Strings.escapeAndQuote(propertyName), (Test test) ->
+                    {
+                        test.assertEqual(expected, object.getObject(propertyName).await());
+                    });
+                };
+
+                getObjectTest.run(JSONObject.create().set("a", JSONObject.create()), "a", JSONObject.create());
             });
 
-            runner.testGroup("getStringPropertyValue(String)", () ->
+            runner.testGroup("getObjectOrNull(String)", () ->
             {
-                final Action4<String,String,String,Throwable> getStringPropertyValueTest = (String objectText, String propertyName, String expectedPropertyValue, Throwable expectedError) ->
+                final Action3<JSONObject,String,Throwable> getObjectOrNullErrorTest = (JSONObject object, String propertyName, Throwable expectedError) ->
                 {
-                    runner.test("with " + Strings.escapeAndQuote(objectText) + " and " + Strings.escapeAndQuote(propertyName), (Test test) ->
+                    runner.test("with " + object + " and " + Strings.escapeAndQuote(propertyName), (Test test) ->
                     {
-                        final JSONObject jsonObject = JSON.parseObject(objectText);
-                        final Result<String> result = jsonObject.getStringPropertyValue(propertyName);
-                        if (expectedError != null)
-                        {
-                            test.assertThrows(result::await, expectedError);
-                        }
-                        else
-                        {
-                            test.assertEqual(expectedPropertyValue, result.await());
-                        }
+                        test.assertThrows(() -> object.getObjectOrNull(propertyName).await(), expectedError);
                     });
                 };
 
-                getStringPropertyValueTest.run("{ \"a\":1, \"b\": \"2\" }", "c", null, new NotFoundException("No property was found with the name \"c\"."));
-                getStringPropertyValueTest.run("{ \"a\":1, \"b\": \"2\" }", "\"c\"", null, new NotFoundException("No property was found with the name \"\\\"c\\\"\"."));
-                getStringPropertyValueTest.run("{ \"a\":1, \"b\": \"2\" }", "\"a\"", null, new NotFoundException("No property was found with the name \"\\\"a\\\"\"."));
-                getStringPropertyValueTest.run("{ \"a\":1, \"b\": \"2\" }", "a", null, new WrongTypeException("Expected the value of the property named \"a\" to be a quoted-string."));
-                getStringPropertyValueTest.run("{ \"a\":null, \"b\": \"2\" }", "a", null, new WrongTypeException("Expected the value of the property named \"a\" to be a quoted-string."));
-                getStringPropertyValueTest.run("{ \"a\":1, \"b\": \"2\" }", "\"b\"", null, new NotFoundException("No property was found with the name \"\\\"b\\\"\"."));
-                getStringPropertyValueTest.run("{ \"a\":1, \"b\": \"2\" }", "b", "2", null);
+                getObjectOrNullErrorTest.run(JSONObject.create(), null, new PreConditionFailure("propertyName cannot be null."));
+                getObjectOrNullErrorTest.run(JSONObject.create(), "", new PreConditionFailure("propertyName cannot be empty."));
+                getObjectOrNullErrorTest.run(JSONObject.create(), "a", new NotFoundException("No property found with the name: \"a\""));
+                getObjectOrNullErrorTest.run(JSONObject.create().setNumber("A", 1), "a", new NotFoundException("No property found with the name: \"a\""));
+                getObjectOrNullErrorTest.run(JSONObject.create().setNumber("a", 1), "a", new WrongTypeException("Expected the property named \"a\" to be a JSONObject or JSONNull, but was a JSONNumber instead."));
+                getObjectOrNullErrorTest.run(JSONObject.create().set("a", JSONArray.create()), "a", new WrongTypeException("Expected the property named \"a\" to be a JSONObject or JSONNull, but was a JSONArray instead."));
+
+                final Action3<JSONObject,String,JSONSegment> getObjectOrNullTest = (JSONObject object, String propertyName, JSONSegment expected) ->
+                {
+                    runner.test("with " + object + " and " + Strings.escapeAndQuote(propertyName), (Test test) ->
+                    {
+                        test.assertEqual(expected, object.getObjectOrNull(propertyName).await());
+                    });
+                };
+
+                getObjectOrNullTest.run(JSONObject.create().set("a", JSONObject.create()), "a", JSONObject.create());
+                getObjectOrNullTest.run(JSONObject.create().set("a", JSONNull.segment), "a", null);
             });
 
-            runner.testGroup("getStringOrNullPropertyValue(String)", () ->
+            runner.testGroup("getArray(String)", () ->
             {
-                final Action4<String,String,String,Throwable> getStringOrNullPropertyValueTest = (String objectText, String propertyName, String expectedPropertyValue, Throwable expectedError) ->
+                final Action3<JSONObject,String,Throwable> getArrayErrorTest = (JSONObject object, String propertyName, Throwable expectedError) ->
                 {
-                    runner.test("with " + Strings.escapeAndQuote(objectText) + " and " + Strings.escapeAndQuote(propertyName), (Test test) ->
+                    runner.test("with " + object + " and " + Strings.escapeAndQuote(propertyName), (Test test) ->
                     {
-                        final JSONObject jsonObject = JSON.parseObject(objectText);
-                        final Result<String> result = jsonObject.getStringOrNullPropertyValue(propertyName);
-                        if (expectedError != null)
-                        {
-                            test.assertThrows(result::await, expectedError);
-                        }
-                        else
-                        {
-                            test.assertEqual(expectedPropertyValue, result.await());
-                        }
+                        test.assertThrows(() -> object.getArray(propertyName).await(), expectedError);
                     });
                 };
 
-                getStringOrNullPropertyValueTest.run("{ \"a\":1, \"b\": \"2\" }", "c", null, new NotFoundException("No property was found with the name \"c\"."));
-                getStringOrNullPropertyValueTest.run("{ \"a\":1, \"b\": \"2\" }", "\"c\"", null, new NotFoundException("No property was found with the name \"\\\"c\\\"\"."));
-                getStringOrNullPropertyValueTest.run("{ \"a\":1, \"b\": \"2\" }", "\"a\"", null, new NotFoundException("No property was found with the name \"\\\"a\\\"\"."));
-                getStringOrNullPropertyValueTest.run("{ \"a\":1, \"b\": \"2\" }", "a", null, new WrongTypeException("Expected the value of the property named \"a\" to be a quoted-string."));
-                getStringOrNullPropertyValueTest.run("{ \"a\":false, \"b\": \"2\" }", "a", null, new WrongTypeException("Expected the value of the property named \"a\" to be a quoted-string."));
-                getStringOrNullPropertyValueTest.run("{ \"a\":[], \"b\": \"2\" }", "a", null, new WrongTypeException("Expected the value of the property named \"a\" to be a quoted-string."));
-                getStringOrNullPropertyValueTest.run("{ \"a\":null, \"b\": \"2\" }", "a", null, null);
-                getStringOrNullPropertyValueTest.run("{ \"a\":\"A\", \"b\": \"2\" }", "a", "A", null);
-                getStringOrNullPropertyValueTest.run("{ \"a\":1, \"b\": \"2\" }", "\"b\"", null, new NotFoundException("No property was found with the name \"\\\"b\\\"\"."));
-                getStringOrNullPropertyValueTest.run("{ \"a\":1, \"b\": \"2\" }", "b", "2", null);
+                getArrayErrorTest.run(JSONObject.create(), null, new PreConditionFailure("propertyName cannot be null."));
+                getArrayErrorTest.run(JSONObject.create(), "", new PreConditionFailure("propertyName cannot be empty."));
+                getArrayErrorTest.run(JSONObject.create(), "a", new NotFoundException("No property found with the name: \"a\""));
+                getArrayErrorTest.run(JSONObject.create().setNumber("A", 1), "a", new NotFoundException("No property found with the name: \"a\""));
+                getArrayErrorTest.run(JSONObject.create().setNumber("a", 1), "a", new WrongTypeException("Expected the property named \"a\" to be a JSONArray, but was a JSONNumber instead."));
+                getArrayErrorTest.run(JSONObject.create().set("a", JSONObject.create()), "a", new WrongTypeException("Expected the property named \"a\" to be a JSONArray, but was a JSONObject instead."));
+
+                final Action3<JSONObject,String,JSONArray> getArrayTest = (JSONObject object, String propertyName, JSONArray expected) ->
+                {
+                    runner.test("with " + object + " and " + Strings.escapeAndQuote(propertyName), (Test test) ->
+                    {
+                        test.assertEqual(expected, object.getArray(propertyName).await());
+                    });
+                };
+
+                getArrayTest.run(JSONObject.create().set("a", JSONArray.create()), "a", JSONArray.create());
             });
 
-            runner.testGroup("getObjectPropertyValue(String)", () ->
+            runner.testGroup("getBoolean(String)", () ->
             {
-                final Action4<String,String,JSONObject,Throwable> getObjectPropertyValueTest = (String objectText, String propertyName, JSONObject expectedPropertyValue, Throwable expectedError) ->
+                final Action3<JSONObject,String,Throwable> getBooleanErrorTest = (JSONObject object, String propertyName, Throwable expectedError) ->
                 {
-                    runner.test("with " + Strings.escapeAndQuote(objectText) + " and " + Strings.escapeAndQuote(propertyName), (Test test) ->
+                    runner.test("with " + object + " and " + Strings.escapeAndQuote(propertyName), (Test test) ->
                     {
-                        final JSONObject jsonObject = JSON.parseObject(objectText);
-                        final Result<JSONObject> result = jsonObject.getObjectPropertyValue(propertyName);
-                        if (expectedError != null)
-                        {
-                            test.assertThrows(result::await, expectedError);
-                        }
-                        else
-                        {
-                            test.assertEqual(expectedPropertyValue, result.await());
-                        }
+                        test.assertThrows(() -> object.getBoolean(propertyName).await(), expectedError);
                     });
                 };
 
-                getObjectPropertyValueTest.run("{ \"a\":1, \"b\": \"2\" }", "c", null, new NotFoundException("No property was found with the name \"c\"."));
-                getObjectPropertyValueTest.run("{ \"a\":1, \"b\": \"2\" }", "\"c\"", null, new NotFoundException("No property was found with the name \"\\\"c\\\"\"."));
-                getObjectPropertyValueTest.run("{ \"a\":1, \"b\": \"2\" }", "\"a\"", null, new NotFoundException("No property was found with the name \"\\\"a\\\"\"."));
-                getObjectPropertyValueTest.run("{ \"a\":1, \"b\": \"2\" }", "a", null, new WrongTypeException("Expected the value of the property named \"a\" to be an object."));
-                getObjectPropertyValueTest.run("{ \"a\":1, \"b\": {} }", "\"b\"", null, new NotFoundException("No property was found with the name \"\\\"b\\\"\"."));
-                getObjectPropertyValueTest.run("{ \"a\":1, \"b\": {} }", "b", JSON.parseObject("{}", 14), null);
+                getBooleanErrorTest.run(JSONObject.create(), null, new PreConditionFailure("propertyName cannot be null."));
+                getBooleanErrorTest.run(JSONObject.create(), "", new PreConditionFailure("propertyName cannot be empty."));
+                getBooleanErrorTest.run(JSONObject.create(), "a", new NotFoundException("No property found with the name: \"a\""));
+                getBooleanErrorTest.run(JSONObject.create().setNumber("A", 1), "a", new NotFoundException("No property found with the name: \"a\""));
+                getBooleanErrorTest.run(JSONObject.create().setNumber("a", 1), "a", new WrongTypeException("Expected the property named \"a\" to be a JSONBoolean, but was a JSONNumber instead."));
+                getBooleanErrorTest.run(JSONObject.create().set("a", JSONObject.create()), "a", new WrongTypeException("Expected the property named \"a\" to be a JSONBoolean, but was a JSONObject instead."));
+                getBooleanErrorTest.run(JSONObject.create().setString("a", "false"), "a", new WrongTypeException("Expected the property named \"a\" to be a JSONBoolean, but was a JSONString instead."));
+
+                final Action3<JSONObject,String,Boolean> getBooleanTest = (JSONObject object, String propertyName, Boolean expected) ->
+                {
+                    runner.test("with " + object + " and " + Strings.escapeAndQuote(propertyName), (Test test) ->
+                    {
+                        test.assertEqual(expected, object.getBoolean(propertyName).await());
+                    });
+                };
+
+                getBooleanTest.run(JSONObject.create().setBoolean("a", false), "a", false);
+                getBooleanTest.run(JSONObject.create().setBoolean("a", true), "a", true);
             });
 
-            runner.testGroup("getArrayPropertyValue(String)", () ->
+            runner.testGroup("getString(String)", () ->
             {
-                final Action4<String,String,JSONArray,Throwable> getArrayPropertyValueTest = (String objectText, String propertyName, JSONArray expectedPropertyValue, Throwable expectedError) ->
+                final Action3<JSONObject,String,Throwable> getStringErrorTest = (JSONObject object, String propertyName, Throwable expectedError) ->
                 {
-                    runner.test("with " + Strings.escapeAndQuote(objectText) + " and " + Strings.escapeAndQuote(propertyName), (Test test) ->
+                    runner.test("with " + object + " and " + Strings.escapeAndQuote(propertyName), (Test test) ->
                     {
-                        final JSONObject jsonObject = JSON.parseObject(objectText);
-                        final Result<JSONArray> result = jsonObject.getArrayPropertyValue(propertyName);
-                        if (expectedError != null)
-                        {
-                            test.assertThrows(result::await, expectedError);
-                        }
-                        else
-                        {
-                            test.assertEqual(expectedPropertyValue, result.await());
-                        }
+                        test.assertThrows(() -> object.getString(propertyName).await(), expectedError);
                     });
                 };
 
-                getArrayPropertyValueTest.run("{ \"a\":1, \"b\": \"2\" }", "c", null, new NotFoundException("No property was found with the name \"c\"."));
-                getArrayPropertyValueTest.run("{ \"a\":1, \"b\": \"2\" }", "\"c\"", null, new NotFoundException("No property was found with the name \"\\\"c\\\"\"."));
-                getArrayPropertyValueTest.run("{ \"a\":1, \"b\": \"2\" }", "\"a\"", null, new NotFoundException("No property was found with the name \"\\\"a\\\"\"."));
-                getArrayPropertyValueTest.run("{ \"a\":1, \"b\": \"2\" }", "a", null, new WrongTypeException("Expected the value of the property named \"a\" to be an array."));
-                getArrayPropertyValueTest.run("{ \"a\":1, \"b\": [] }", "\"b\"", null, new NotFoundException("No property was found with the name \"\\\"b\\\"\"."));
-                getArrayPropertyValueTest.run("{ \"a\":1, \"b\": [] }", "b", JSON.parseArray("[]", 14), null);
+                getStringErrorTest.run(JSONObject.create(), null, new PreConditionFailure("propertyName cannot be null."));
+                getStringErrorTest.run(JSONObject.create(), "", new PreConditionFailure("propertyName cannot be empty."));
+                getStringErrorTest.run(JSONObject.create(), "a", new NotFoundException("No property found with the name: \"a\""));
+                getStringErrorTest.run(JSONObject.create().setNumber("A", 1), "a", new NotFoundException("No property found with the name: \"a\""));
+                getStringErrorTest.run(JSONObject.create().setNumber("a", 1), "a", new WrongTypeException("Expected the property named \"a\" to be a JSONString, but was a JSONNumber instead."));
+                getStringErrorTest.run(JSONObject.create().set("a", JSONObject.create()), "a", new WrongTypeException("Expected the property named \"a\" to be a JSONString, but was a JSONObject instead."));
+                getStringErrorTest.run(JSONObject.create().set("a", JSONArray.create()), "a", new WrongTypeException("Expected the property named \"a\" to be a JSONString, but was a JSONArray instead."));
+                getStringErrorTest.run(JSONObject.create().setBoolean("a", false), "a", new WrongTypeException("Expected the property named \"a\" to be a JSONString, but was a JSONBoolean instead."));
+                getStringErrorTest.run(JSONObject.create().set("a", JSONNull.segment), "a", new WrongTypeException("Expected the property named \"a\" to be a JSONString, but was a JSONNull instead."));
+
+                final Action3<JSONObject,String,String> getStringTest = (JSONObject object, String propertyName, String expected) ->
+                {
+                    runner.test("with " + object + " and " + Strings.escapeAndQuote(propertyName), (Test test) ->
+                    {
+                        test.assertEqual(expected, object.getString(propertyName).await());
+                    });
+                };
+
+                getStringTest.run(JSONObject.create().setString("a", ""), "a", "");
+                getStringTest.run(JSONObject.create().setString("a", "hello"), "a", "hello");
             });
 
-            runner.testGroup("getNumberTokenPropertyValue(String)", () ->
+            runner.testGroup("getStringOrNull(String)", () ->
             {
-                final Action4<String,String,JSONToken,Throwable> getNumberPropertyValueTest = (String objectText, String propertyName, JSONToken expectedPropertyValue, Throwable expectedError) ->
+                final Action3<JSONObject,String,Throwable> getStringOrNullErrorTest = (JSONObject object, String propertyName, Throwable expectedError) ->
                 {
-                    runner.test("with " + Strings.escapeAndQuote(objectText) + " and " + Strings.escapeAndQuote(propertyName), (Test test) ->
+                    runner.test("with " + object + " and " + Strings.escapeAndQuote(propertyName), (Test test) ->
                     {
-                        final JSONObject jsonObject = JSON.parseObject(objectText);
-                        final Result<JSONToken> result = jsonObject.getNumberTokenPropertyValue(propertyName);
-                        if (expectedError != null)
-                        {
-                            test.assertThrows(result::await, expectedError);
-                        }
-                        else
-                        {
-                            test.assertEqual(expectedPropertyValue, result.await());
-                        }
+                        test.assertThrows(() -> object.getStringOrNull(propertyName).await(), expectedError);
                     });
                 };
 
-                getNumberPropertyValueTest.run("{ \"a\":\"1\", \"b\": 2 }", "c", null, new NotFoundException("No property was found with the name \"c\"."));
-                getNumberPropertyValueTest.run("{ \"a\":\"1\", \"b\": 2 }", "\"c\"", null, new NotFoundException("No property was found with the name \"\\\"c\\\"\"."));
-                getNumberPropertyValueTest.run("{ \"a\":\"1\", \"b\": 2 }", "\"a\"", null, new NotFoundException("No property was found with the name \"\\\"a\\\"\"."));
-                getNumberPropertyValueTest.run("{ \"a\":\"1\", \"b\": 2 }", "a", null, new WrongTypeException("Expected the value of the property named \"a\" to be a number."));
-                getNumberPropertyValueTest.run("{ \"a\":[], \"b\": 2 }", "a", null, new WrongTypeException("Expected the value of the property named \"a\" to be a number."));
-                getNumberPropertyValueTest.run("{ \"a\":\"1\", \"b\": 2 }", "\"b\"", null, new NotFoundException("No property was found with the name \"\\\"b\\\"\"."));
-                getNumberPropertyValueTest.run("{ \"a\":\"1\", \"b\": 2 }", "b", JSONToken.number("2", 16), null);
+                getStringOrNullErrorTest.run(JSONObject.create(), null, new PreConditionFailure("propertyName cannot be null."));
+                getStringOrNullErrorTest.run(JSONObject.create(), "", new PreConditionFailure("propertyName cannot be empty."));
+                getStringOrNullErrorTest.run(JSONObject.create(), "a", new NotFoundException("No property found with the name: \"a\""));
+                getStringOrNullErrorTest.run(JSONObject.create().setNumber("A", 1), "a", new NotFoundException("No property found with the name: \"a\""));
+                getStringOrNullErrorTest.run(JSONObject.create().setNumber("a", 1), "a", new WrongTypeException("Expected the property named \"a\" to be a JSONString or JSONNull, but was a JSONNumber instead."));
+                getStringOrNullErrorTest.run(JSONObject.create().set("a", JSONObject.create()), "a", new WrongTypeException("Expected the property named \"a\" to be a JSONString or JSONNull, but was a JSONObject instead."));
+                getStringOrNullErrorTest.run(JSONObject.create().set("a", JSONArray.create()), "a", new WrongTypeException("Expected the property named \"a\" to be a JSONString or JSONNull, but was a JSONArray instead."));
+                getStringOrNullErrorTest.run(JSONObject.create().setBoolean("a", false), "a", new WrongTypeException("Expected the property named \"a\" to be a JSONString or JSONNull, but was a JSONBoolean instead."));
+
+                final Action3<JSONObject,String,String> getStringOrNullTest = (JSONObject object, String propertyName, String expected) ->
+                {
+                    runner.test("with " + object + " and " + Strings.escapeAndQuote(propertyName), (Test test) ->
+                    {
+                        test.assertEqual(expected, object.getStringOrNull(propertyName).await());
+                    });
+                };
+
+                getStringOrNullTest.run(JSONObject.create().setString("a", ""), "a", "");
+                getStringOrNullTest.run(JSONObject.create().setString("a", "hello"), "a", "hello");
+                getStringOrNullTest.run(JSONObject.create().set("a", JSONNull.segment), "a", null);
             });
 
-            runner.testGroup("getNumberPropertyValue(String)", () ->
+            runner.testGroup("getNumber(String)", () ->
             {
-                final Action4<String,String,Double,Throwable> getNumberPropertyValueTest = (String objectText, String propertyName, Double expectedPropertyValue, Throwable expectedError) ->
+                final Action3<JSONObject,String,Throwable> getNumberErrorTest = (JSONObject object, String propertyName, Throwable expectedError) ->
                 {
-                    runner.test("with " + Strings.escapeAndQuote(objectText) + " and " + Strings.escapeAndQuote(propertyName), (Test test) ->
+                    runner.test("with " + object + " and " + Strings.escapeAndQuote(propertyName), (Test test) ->
                     {
-                        final JSONObject jsonObject = JSON.parseObject(objectText);
-                        final Result<Double> result = jsonObject.getNumberPropertyValue(propertyName);
-                        if (expectedError != null)
-                        {
-                            test.assertThrows(result::await, expectedError);
-                        }
-                        else
-                        {
-                            test.assertEqual(expectedPropertyValue, result.await());
-                        }
+                        test.assertThrows(() -> object.getNumber(propertyName).await(), expectedError);
                     });
                 };
 
-                getNumberPropertyValueTest.run("{ \"a\":\"1\", \"b\": 2 }", "c", null, new NotFoundException("No property was found with the name \"c\"."));
-                getNumberPropertyValueTest.run("{ \"a\":\"1\", \"b\": 2 }", "\"c\"", null, new NotFoundException("No property was found with the name \"\\\"c\\\"\"."));
-                getNumberPropertyValueTest.run("{ \"a\":\"1\", \"b\": 2 }", "\"a\"", null, new NotFoundException("No property was found with the name \"\\\"a\\\"\"."));
-                getNumberPropertyValueTest.run("{ \"a\":\"1\", \"b\": 2 }", "a", null, new WrongTypeException("Expected the value of the property named \"a\" to be a number."));
-                getNumberPropertyValueTest.run("{ \"a\":[], \"b\": 2 }", "a", null, new WrongTypeException("Expected the value of the property named \"a\" to be a number."));
-                getNumberPropertyValueTest.run("{ \"a\":\"1\", \"b\": 2 }", "\"b\"", null, new NotFoundException("No property was found with the name \"\\\"b\\\"\"."));
-                getNumberPropertyValueTest.run("{ \"a\":\"1\", \"b\": 2 }", "b", 2.0, null);
+                getNumberErrorTest.run(JSONObject.create(), null, new PreConditionFailure("propertyName cannot be null."));
+                getNumberErrorTest.run(JSONObject.create(), "", new PreConditionFailure("propertyName cannot be empty."));
+                getNumberErrorTest.run(JSONObject.create(), "a", new NotFoundException("No property found with the name: \"a\""));
+                getNumberErrorTest.run(JSONObject.create().setNumber("A", 1), "a", new NotFoundException("No property found with the name: \"a\""));
+                getNumberErrorTest.run(JSONObject.create().setString("a", "hello"), "a", new WrongTypeException("Expected the property named \"a\" to be a JSONNumber, but was a JSONString instead."));
+                getNumberErrorTest.run(JSONObject.create().set("a", JSONObject.create()), "a", new WrongTypeException("Expected the property named \"a\" to be a JSONNumber, but was a JSONObject instead."));
+                getNumberErrorTest.run(JSONObject.create().set("a", JSONArray.create()), "a", new WrongTypeException("Expected the property named \"a\" to be a JSONNumber, but was a JSONArray instead."));
+                getNumberErrorTest.run(JSONObject.create().setBoolean("a", false), "a", new WrongTypeException("Expected the property named \"a\" to be a JSONNumber, but was a JSONBoolean instead."));
+                getNumberErrorTest.run(JSONObject.create().set("a", JSONNull.segment), "a", new WrongTypeException("Expected the property named \"a\" to be a JSONNumber, but was a JSONNull instead."));
+
+                final Action3<JSONObject,String,Double> getNumberTest = (JSONObject object, String propertyName, Double expected) ->
+                {
+                    runner.test("with " + object + " and " + Strings.escapeAndQuote(propertyName), (Test test) ->
+                    {
+                        test.assertEqual(expected, object.getNumber(propertyName).await());
+                    });
+                };
+
+                getNumberTest.run(JSONObject.create().setNumber("a", 5), "a", 5.0);
+                getNumberTest.run(JSONObject.create().setNumber("a", -20), "a", -20.0);
             });
 
-            runner.testGroup("getBooleanTokenPropertyValue(String)", () ->
+            runner.testGroup("getNull(String)", () ->
             {
-                final Action4<String,String,JSONToken,Throwable> getBooleanTokenPropertyValueTest = (String objectText, String propertyName, JSONToken expectedPropertyValue, Throwable expectedError) ->
+                final Action3<JSONObject,String,Throwable> getNullErrorTest = (JSONObject object, String propertyName, Throwable expectedError) ->
                 {
-                    runner.test("with " + Strings.escapeAndQuote(objectText) + " and " + Strings.escapeAndQuote(propertyName), (Test test) ->
+                    runner.test("with " + object + " and " + Strings.escapeAndQuote(propertyName), (Test test) ->
                     {
-                        final JSONObject jsonObject = JSON.parseObject(objectText);
-                        final Result<JSONToken> result = jsonObject.getBooleanTokenPropertyValue(propertyName);
-                        if (expectedError != null)
-                        {
-                            test.assertThrows(result::await, expectedError);
-                        }
-                        else
-                        {
-                            test.assertEqual(expectedPropertyValue, result.await());
-                        }
+                        test.assertThrows(() -> object.getNull(propertyName).await(), expectedError);
                     });
                 };
 
-                getBooleanTokenPropertyValueTest.run("{ \"a\":\"1\", \"b\": true }", "c", null, new NotFoundException("No property was found with the name \"c\"."));
-                getBooleanTokenPropertyValueTest.run("{ \"a\":\"1\", \"b\": true }", "\"c\"", null, new NotFoundException("No property was found with the name \"\\\"c\\\"\"."));
-                getBooleanTokenPropertyValueTest.run("{ \"a\":\"1\", \"b\": true }", "\"a\"", null, new NotFoundException("No property was found with the name \"\\\"a\\\"\"."));
-                getBooleanTokenPropertyValueTest.run("{ \"a\":\"1\", \"b\": true }", "a", null, new WrongTypeException("Expected the value of the property named \"a\" to be a boolean."));
-                getBooleanTokenPropertyValueTest.run("{ \"a\":[], \"b\": true }", "a", null, new WrongTypeException("Expected the value of the property named \"a\" to be a boolean."));
-                getBooleanTokenPropertyValueTest.run("{ \"a\":\"1\", \"b\": true }", "\"b\"", null, new NotFoundException("No property was found with the name \"\\\"b\\\"\"."));
-                getBooleanTokenPropertyValueTest.run("{ \"a\":\"1\", \"b\": true }", "b", JSONToken.booleanToken("true", 16), null);
+                getNullErrorTest.run(JSONObject.create(), null, new PreConditionFailure("propertyName cannot be null."));
+                getNullErrorTest.run(JSONObject.create(), "", new PreConditionFailure("propertyName cannot be empty."));
+                getNullErrorTest.run(JSONObject.create(), "a", new NotFoundException("No property found with the name: \"a\""));
+                getNullErrorTest.run(JSONObject.create().setNumber("A", 1), "a", new NotFoundException("No property found with the name: \"a\""));
+                getNullErrorTest.run(JSONObject.create().setString("a", "hello"), "a", new WrongTypeException("Expected the property named \"a\" to be a JSONNull, but was a JSONString instead."));
+                getNullErrorTest.run(JSONObject.create().set("a", JSONObject.create()), "a", new WrongTypeException("Expected the property named \"a\" to be a JSONNull, but was a JSONObject instead."));
+                getNullErrorTest.run(JSONObject.create().set("a", JSONArray.create()), "a", new WrongTypeException("Expected the property named \"a\" to be a JSONNull, but was a JSONArray instead."));
+                getNullErrorTest.run(JSONObject.create().setBoolean("a", false), "a", new WrongTypeException("Expected the property named \"a\" to be a JSONNull, but was a JSONBoolean instead."));
+                getNullErrorTest.run(JSONObject.create().setNumber("a", 40), "a", new WrongTypeException("Expected the property named \"a\" to be a JSONNull, but was a JSONNumber instead."));
+
+                final Action3<JSONObject,String,Double> getNullTest = (JSONObject object, String propertyName, Double expected) ->
+                {
+                    runner.test("with " + object + " and " + Strings.escapeAndQuote(propertyName), (Test test) ->
+                    {
+                        test.assertEqual(expected, object.getNull(propertyName).await());
+                    });
+                };
+
+                getNullTest.run(JSONObject.create().set("a", JSONNull.segment), "a", null);
             });
 
-            runner.testGroup("getBooleanPropertyValue(String)", () ->
+            runner.testGroup("setProperty(JSONObjectProperty)", () ->
             {
-                final Action4<String,String,Boolean,Throwable> getBooleanPropertyValueTest = (String objectText, String propertyName, Boolean expectedPropertyValue, Throwable expectedError) ->
+                final Action3<JSONObject,JSONObjectProperty,Throwable> setPropertyErrorTest = (JSONObject object, JSONObjectProperty property, Throwable expected) ->
                 {
-                    runner.test("with " + Strings.escapeAndQuote(objectText) + " and " + Strings.escapeAndQuote(propertyName), (Test test) ->
+                    runner.test("with " + object + " and " + property, (Test test) ->
                     {
-                        final JSONObject jsonObject = JSON.parseObject(objectText);
-                        final Result<Boolean> result = jsonObject.getBooleanPropertyValue(propertyName);
-                        if (expectedError != null)
-                        {
-                            test.assertThrows(result::await, expectedError);
-                        }
-                        else
-                        {
-                            test.assertEqual(expectedPropertyValue, result.await());
-                        }
+                        test.assertThrows(() -> object.setProperty(property), expected);
                     });
                 };
 
-                getBooleanPropertyValueTest.run("{ \"a\":\"1\", \"b\": true }", "c", null, new NotFoundException("No property was found with the name \"c\"."));
-                getBooleanPropertyValueTest.run("{ \"a\":\"1\", \"b\": true }", "\"c\"", null, new NotFoundException("No property was found with the name \"\\\"c\\\"\"."));
-                getBooleanPropertyValueTest.run("{ \"a\":\"1\", \"b\": true }", "\"a\"", null, new NotFoundException("No property was found with the name \"\\\"a\\\"\"."));
-                getBooleanPropertyValueTest.run("{ \"a\":\"1\", \"b\": true }", "a", null, new WrongTypeException("Expected the value of the property named \"a\" to be a boolean."));
-                getBooleanPropertyValueTest.run("{ \"a\":[], \"b\": true }", "a", null, new WrongTypeException("Expected the value of the property named \"a\" to be a boolean."));
-                getBooleanPropertyValueTest.run("{ \"a\":\"1\", \"b\": true }", "\"b\"", null, new NotFoundException("No property was found with the name \"\\\"b\\\"\"."));
-                getBooleanPropertyValueTest.run("{ \"a\":\"1\", \"b\": true }", "b", true, null);
-                getBooleanPropertyValueTest.run("{ \"a\":\"1\", \"b\": false }", "b", false, null);
-                getBooleanPropertyValueTest.run("{ \"a\":\"1\", \"b\": TRUE }", "b", true, null);
-                getBooleanPropertyValueTest.run("{ \"a\":\"1\", \"b\": FalSE }", "b", false, null);
+                setPropertyErrorTest.run(JSONObject.create(), null, new PreConditionFailure("property cannot be null."));
+
+                final Action3<JSONObject,JSONObjectProperty,JSONObject> setPropertyTest = (JSONObject object, JSONObjectProperty property, JSONObject expected) ->
+                {
+                    runner.test("with " + object + " and " + property, (Test test) ->
+                    {
+                        final JSONObject setResult = object.setProperty(property);
+                        test.assertSame(object, setResult);
+                        test.assertEqual(expected, object);
+                        test.assertTrue(object.containsKey(property.getName()));
+                        test.assertTrue(object.containsProperty(property.getName()));
+                    });
+                };
+
+                setPropertyTest.run(JSONObject.create(), JSONObjectProperty.create("a", 1), JSONObject.create().setNumber("a", 1));
+                setPropertyTest.run(JSONObject.create().setNumber("a", 1), JSONObjectProperty.create("a", 2), JSONObject.create().setNumber("a", 2));
+                setPropertyTest.run(JSONObject.create().setNumber("a", 1), JSONObjectProperty.create("a", false), JSONObject.create().setBoolean("a", false));
+                setPropertyTest.run(JSONObject.create().setNumber("a", 1), JSONObjectProperty.create("a", JSONNull.segment), JSONObject.create().set("a", JSONNull.segment));
+            });
+
+            runner.testGroup("setBoolean(String,boolean)", () ->
+            {
+                final Action4<JSONObject,String,Boolean,Throwable> setBooleanErrorTest = (JSONObject object, String propertyName, Boolean propertyValue, Throwable expected) ->
+                {
+                    runner.test("with " + object + ", " + Strings.escapeAndQuote(propertyName) + ", and " + propertyValue, (Test test) ->
+                    {
+                        test.assertThrows(() -> object.setBoolean(propertyName, propertyValue), expected);
+                    });
+                };
+
+                setBooleanErrorTest.run(JSONObject.create(), null, false, new PreConditionFailure("propertyName cannot be null."));
+                setBooleanErrorTest.run(JSONObject.create(), "", false, new PreConditionFailure("propertyName cannot be empty."));
+
+                final Action4<JSONObject,String,Boolean,JSONObject> setBooleanTest = (JSONObject object, String propertyName, Boolean propertyValue, JSONObject expected) ->
+                {
+                    runner.test("with " + object + ", " + Strings.escapeAndQuote(propertyName) + ", and " + propertyValue, (Test test) ->
+                    {
+                        final JSONObject setResult = object.setBoolean(propertyName, propertyValue);
+                        test.assertSame(object, setResult);
+                        test.assertEqual(expected, object);
+                        test.assertTrue(object.containsKey(propertyName));
+                        test.assertTrue(object.containsProperty(propertyName));
+                    });
+                };
+
+                setBooleanTest.run(JSONObject.create(), "a", false, JSONObject.create().setBoolean("a", false));
+                setBooleanTest.run(JSONObject.create().setBoolean("a", false), "a", true, JSONObject.create().setBoolean("a", true));
+                setBooleanTest.run(JSONObject.create().setNumber("a", 1), "a", false, JSONObject.create().setBoolean("a", false));
+                setBooleanTest.run(JSONObject.create().setNumber("b", 1), "a", true, JSONObject.create().setBoolean("a", true).setNumber("b", 1));
+            });
+
+            runner.testGroup("setNumber(String,long)", () ->
+            {
+                final Action4<JSONObject,String,Long,Throwable> setNumberErrorTest = (JSONObject object, String propertyName, Long propertyValue, Throwable expected) ->
+                {
+                    runner.test("with " + object + ", " + Strings.escapeAndQuote(propertyName) + ", and " + propertyValue, (Test test) ->
+                    {
+                        test.assertThrows(() -> object.setNumber(propertyName, propertyValue), expected);
+                    });
+                };
+
+                setNumberErrorTest.run(JSONObject.create(), null, 1L, new PreConditionFailure("propertyName cannot be null."));
+                setNumberErrorTest.run(JSONObject.create(), "", 2L, new PreConditionFailure("propertyName cannot be empty."));
+
+                final Action4<JSONObject,String,Long,JSONObject> setNumberTest = (JSONObject object, String propertyName, Long propertyValue, JSONObject expected) ->
+                {
+                    runner.test("with " + object + ", " + Strings.escapeAndQuote(propertyName) + ", and " + propertyValue, (Test test) ->
+                    {
+                        final JSONObject setResult = object.setNumber(propertyName, propertyValue);
+                        test.assertSame(object, setResult);
+                        test.assertEqual(expected, object);
+                        test.assertTrue(object.containsKey(propertyName));
+                        test.assertTrue(object.containsProperty(propertyName));
+                    });
+                };
+
+                setNumberTest.run(JSONObject.create(), "a", 1L, JSONObject.create().setNumber("a", 1));
+                setNumberTest.run(JSONObject.create().setBoolean("a", false), "a", 2L, JSONObject.create().setNumber("a", 2));
+                setNumberTest.run(JSONObject.create().setNumber("a", 1), "a", 3L, JSONObject.create().setNumber("a", 3));
+                setNumberTest.run(JSONObject.create().setNumber("b", 1), "a", 4L, JSONObject.create().setNumber("a", 4).setNumber("b", 1));
+            });
+
+            runner.testGroup("setNumber(String,double)", () ->
+            {
+                final Action4<JSONObject,String,Double,Throwable> setNumberErrorTest = (JSONObject object, String propertyName, Double propertyValue, Throwable expected) ->
+                {
+                    runner.test("with " + object + ", " + Strings.escapeAndQuote(propertyName) + ", and " + propertyValue, (Test test) ->
+                    {
+                        test.assertThrows(() -> object.setNumber(propertyName, propertyValue), expected);
+                    });
+                };
+
+                setNumberErrorTest.run(JSONObject.create(), null, 1.2, new PreConditionFailure("propertyName cannot be null."));
+                setNumberErrorTest.run(JSONObject.create(), "", 3.4, new PreConditionFailure("propertyName cannot be empty."));
+
+                final Action4<JSONObject,String,Double,JSONObject> setNumberTest = (JSONObject object, String propertyName, Double propertyValue, JSONObject expected) ->
+                {
+                    runner.test("with " + object + ", " + Strings.escapeAndQuote(propertyName) + ", and " + propertyValue, (Test test) ->
+                    {
+                        final JSONObject setResult = object.setNumber(propertyName, propertyValue);
+                        test.assertSame(object, setResult);
+                        test.assertEqual(expected, object);
+                        test.assertTrue(object.containsKey(propertyName));
+                        test.assertTrue(object.containsProperty(propertyName));
+                    });
+                };
+
+                setNumberTest.run(JSONObject.create(), "a", 5.6, JSONObject.create().setNumber("a", 5.6));
+                setNumberTest.run(JSONObject.create().setBoolean("a", false), "a", 7.8, JSONObject.create().setNumber("a", 7.8));
+                setNumberTest.run(JSONObject.create().setNumber("a", 1), "a", 9.10, JSONObject.create().setNumber("a", 9.10));
+                setNumberTest.run(JSONObject.create().setNumber("b", 1), "a", 11.12, JSONObject.create().setNumber("a", 11.12).setNumber("b", 1));
             });
 
             runner.testGroup("equals(Object)", () ->
             {
-                final Action3<JSONObject,Object,Boolean> equalsTest = (JSONObject jsonObject, Object rhs, Boolean expected) ->
+                final Action3<JSONObject,Object,Boolean> equalsTest = (JSONObject object, Object rhs, Boolean expected) ->
                 {
-                    runner.test("with " + jsonObject + " and " + rhs, (Test test) ->
+                    runner.test("with " + object + " and " + rhs, (Test test) ->
                     {
-                        test.assertEqual(expected, jsonObject.equals(rhs));
+                        test.assertEqual(expected, object.equals(rhs));
                     });
                 };
 
-                equalsTest.run(JSON.parseObject("{\"hello\":\"there\"}"), null, false);
-                equalsTest.run(JSON.parseObject("{\"hello\":\"there\"}"), "hello", false);
-                equalsTest.run(JSON.parseObject("{\"hello\":\"there\"}"), JSON.parseObject("{}"), false);
-                equalsTest.run(JSON.parseObject("{\"hello\":\"there\"}"), JSON.parseObject("{\"a\":\"b\"}"), false);
-                equalsTest.run(JSON.parseObject("{\"hello\":\"there\"}"), JSON.parseObject("{\"hello\":\"b\"}"), false);
-                equalsTest.run(JSON.parseObject("{\"hello\":\"there\"}"), JSON.parseObject("{\"a\":\"there\"}"), false);
-                equalsTest.run(JSON.parseObject("{\"hello\":\"there\"}"), JSON.parseObject("{\"hello\":\"there\""), false);
-                equalsTest.run(JSON.parseObject("{\"hello\":\"there\"}"), JSON.parseObject("{\"hello\":\"there\",}"), false);
-                equalsTest.run(JSON.parseObject("{\"hello\":\"there\"}"), JSON.parseObject("{\"hello\":\"there\",\"a\":\"b\"}"), false);
-                equalsTest.run(JSON.parseObject("{\"hello\":\"there\"}"), JSON.parseObject("{\"hello\" : \"there\"}"), false);
-                equalsTest.run(JSON.parseObject("{\"hello\":\"there\"}"), JSON.parseObject("{\"hello\":\"there\"}"), true);
+                equalsTest.run(JSONObject.create(), null, false);
+                equalsTest.run(JSONObject.create(), "test", false);
+                equalsTest.run(JSONObject.create(), JSONObject.create(), true);
+                equalsTest.run(
+                    JSONObject.create(),
+                    JSONObject.create(
+                        JSONObjectProperty.create("a", "b")),
+                    false);
+                equalsTest.run(
+                    JSONObject.create(
+                        JSONObjectProperty.create("a", "b")),
+                    JSONObject.create(),
+                    false);
+                equalsTest.run(
+                    JSONObject.create(
+                        JSONObjectProperty.create("a", "c")),
+                    JSONObject.create(
+                        JSONObjectProperty.create("a", "b")),
+                    false);
+                equalsTest.run(
+                    JSONObject.create(
+                        JSONObjectProperty.create("a", "b")),
+                    JSONObject.create(
+                        JSONObjectProperty.create("a", "b")),
+                    true);
+                equalsTest.run(
+                    JSONObject.create(
+                        JSONObjectProperty.create("A", "b")),
+                    JSONObject.create(
+                        JSONObjectProperty.create("a", "b")),
+                    false);
+                equalsTest.run(
+                    JSONObject.create(
+                        JSONObjectProperty.create("a", 1),
+                        JSONObjectProperty.create("b", 2)),
+                    JSONObject.create(
+                        JSONObjectProperty.create("b", 2),
+                        JSONObjectProperty.create("a", 1)),
+                    true);
             });
 
             runner.testGroup("equals(JSONObject)", () ->
             {
-                final Action3<JSONObject,JSONObject,Boolean> equalsTest = (JSONObject jsonObject, JSONObject rhs, Boolean expected) ->
+                final Action3<JSONObject,JSONObject,Boolean> equalsTest = (JSONObject object, JSONObject rhs, Boolean expected) ->
                 {
-                    runner.test("with " + jsonObject + " and " + rhs, (Test test) ->
+                    runner.test("with " + object + " and " + rhs, (Test test) ->
                     {
-                        test.assertEqual(expected, jsonObject.equals(rhs));
+                        test.assertEqual(expected, object.equals(rhs));
                     });
                 };
 
-                equalsTest.run(JSON.parseObject("{\"hello\":\"there\"}"), null, false);
-                equalsTest.run(JSON.parseObject("{\"hello\":\"there\"}"), JSON.parseObject("{}"), false);
-                equalsTest.run(JSON.parseObject("{\"hello\":\"there\"}"), JSON.parseObject("{\"a\":\"b\"}"), false);
-                equalsTest.run(JSON.parseObject("{\"hello\":\"there\"}"), JSON.parseObject("{\"hello\":\"b\"}"), false);
-                equalsTest.run(JSON.parseObject("{\"hello\":\"there\"}"), JSON.parseObject("{\"a\":\"there\"}"), false);
-                equalsTest.run(JSON.parseObject("{\"hello\":\"there\"}"), JSON.parseObject("{\"hello\":\"there\""), false);
-                equalsTest.run(JSON.parseObject("{\"hello\":\"there\"}"), JSON.parseObject("{\"hello\":\"there\",}"), false);
-                equalsTest.run(JSON.parseObject("{\"hello\":\"there\"}"), JSON.parseObject("{\"hello\":\"there\",\"a\":\"b\"}"), false);
-                equalsTest.run(JSON.parseObject("{\"hello\":\"there\"}"), JSON.parseObject("{\"hello\" : \"there\"}"), false);
-                equalsTest.run(JSON.parseObject("{\"hello\":\"there\"}"), JSON.parseObject("{\"hello\":\"there\"}"), true);
+                equalsTest.run(JSONObject.create(), null, false);
+                equalsTest.run(JSONObject.create(), JSONObject.create(), true);
+                equalsTest.run(
+                    JSONObject.create(),
+                    JSONObject.create(
+                        JSONObjectProperty.create("a", "b")),
+                    false);
+                equalsTest.run(
+                    JSONObject.create(
+                        JSONObjectProperty.create("a", "b")),
+                    JSONObject.create(),
+                    false);
+                equalsTest.run(
+                    JSONObject.create(
+                        JSONObjectProperty.create("a", "c")),
+                    JSONObject.create(
+                        JSONObjectProperty.create("a", "b")),
+                    false);
+                equalsTest.run(
+                    JSONObject.create(
+                        JSONObjectProperty.create("a", "b")),
+                    JSONObject.create(
+                        JSONObjectProperty.create("a", "b")),
+                    true);
+                equalsTest.run(
+                    JSONObject.create(
+                        JSONObjectProperty.create("A", "b")),
+                    JSONObject.create(
+                        JSONObjectProperty.create("a", "b")),
+                    false);
+                equalsTest.run(
+                    JSONObject.create(
+                        JSONObjectProperty.create("a", 1),
+                        JSONObjectProperty.create("b", 2)),
+                    JSONObject.create(
+                        JSONObjectProperty.create("b", 2),
+                        JSONObjectProperty.create("a", 1)),
+                    true);
             });
         });
     }

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JSONString.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCo Coverage Report</a> &gt; <a href="index.source.html" class="el_package">qub</a> &gt; <span class="el_source">JSONString.java</span></div><h1>JSONString.java</h1><pre class="source lang-java linenums">package qub;
+
+public class JSONString implements JSONSegment
+{
+    private final String text;
+    private final char quote;
+
+    private JSONString(String text, char quote)
+<span class="fc" id="L9">    {</span>
+<span class="fc" id="L10">        PreCondition.assertNotNull(text, &quot;text&quot;);</span>
+
+<span class="fc" id="L12">        this.text = text;</span>
+<span class="fc" id="L13">        this.quote = quote;</span>
+<span class="fc" id="L14">    }</span>
+
+    public static JSONString getFromQuoted(String quotedText)
+    {
+<span class="fc" id="L18">        PreCondition.assertNotNullAndNotEmpty(quotedText, &quot;quotedText&quot;);</span>
+<span class="fc" id="L19">        PreCondition.assertTrue(Strings.isQuoted(quotedText), &quot;Strings.isQuoted(quotedText)&quot;);</span>
+
+<span class="fc" id="L21">        final char quote = quotedText.charAt(0);</span>
+<span class="fc" id="L22">        final String text = Strings.unquote(quotedText);</span>
+<span class="fc" id="L23">        return JSONString.get(text, quote);</span>
+    }
+
+    public static JSONString get(String text)
+    {
+<span class="fc" id="L28">        PreCondition.assertNotNull(text, &quot;text&quot;);</span>
+
+<span class="fc" id="L30">        return JSONString.get(text, '\&quot;');</span>
+    }
+
+    public static JSONString get(String text, char quote)
+    {
+<span class="fc" id="L35">        PreCondition.assertNotNull(text, &quot;unquotedText&quot;);</span>
+
+<span class="fc" id="L37">        return new JSONString(text, quote);</span>
+    }
+
+    public String getValue()
+    {
+<span class="fc" id="L42">        return this.text;</span>
+    }
+
+    public char getQuote()
+    {
+<span class="nc" id="L47">        return this.quote;</span>
+    }
+
+    @Override
+    public String toString()
+    {
+<span class="nc" id="L53">        return JSONSegment.toString(this);</span>
+    }
+
+    @Override
+    public Result&lt;Integer&gt; toString(IndentedCharacterWriteStream stream)
+    {
+<span class="fc" id="L59">        return Result.create(() -&gt;</span>
+        {
+<span class="fc" id="L61">            int result = 0;</span>
+
+<span class="fc" id="L63">            result += stream.write(this.quote).await();</span>
+<span class="fc" id="L64">            result += stream.write(this.text).await();</span>
+<span class="fc" id="L65">            result += stream.write(this.quote).await();</span>
+
+<span class="fc" id="L67">            return result;</span>
+        });
+    }
+
+    @Override
+    public boolean equals(Object rhs)
+    {
+<span class="pc bpc" id="L74" title="1 of 4 branches missed.">        return rhs instanceof JSONString &amp;&amp; this.equals((JSONString)rhs);</span>
+    }
+
+    public boolean equals(JSONString rhs)
+    {
+<span class="pc bpc" id="L79" title="1 of 2 branches missed.">        return rhs != null &amp;&amp;</span>
+<span class="pc bpc" id="L80" title="1 of 4 branches missed.">            this.text.equals(rhs.text) &amp;&amp;</span>
+            this.quote == rhs.quote;
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

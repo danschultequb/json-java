@@ -1,143 +1,188 @@
 package qub;
 
-public class JSONToken extends JSONSegment
+/**
+ * A token within JSON content.
+ */
+public class JSONToken
 {
     private final String text;
-    private final int startIndex;
     private final JSONTokenType type;
 
-    public JSONToken(String text, int startIndex, JSONTokenType type)
+    /**
+     * Create a new JSONToken object with the provided text and type.
+     * @param text The type that the JSONToken was parsed from.
+     * @param type The type of the JSONToken.
+     */
+    public JSONToken(String text, JSONTokenType type)
     {
+        PreCondition.assertNotNullAndNotEmpty(text, "text");
+        PreCondition.assertNotNull(type, "type");
+
         this.text = text;
-        this.startIndex = startIndex;
         this.type = type;
     }
 
-    @Override
-    public String toString()
+    /**
+     * Get the text of this JSONToken.
+     * @return The text of this JSONToken.
+     */
+    public String getText()
     {
-        return text;
+        return this.text;
+    }
+
+    /**
+     * Get the type of this JSONToken.
+     * @return The type of this JSONToken.
+     */
+    public JSONTokenType getType()
+    {
+        return this.type;
     }
 
     @Override
     public boolean equals(Object rhs)
     {
-        return rhs instanceof JSONToken && equals((JSONToken)rhs);
+        return rhs instanceof JSONToken && this.equals((JSONToken)rhs);
     }
 
+    /**
+     * Get whether or not this JSONToken is equal to the provided JSONToken.
+     * @param rhs The JSONToken to compare this JSONToken against.
+     * @return Whether or not this JSONToken is equal to the provided JSONToken.
+     */
     public boolean equals(JSONToken rhs)
     {
         return rhs != null &&
-            text.equals(rhs.text) &&
-            startIndex == rhs.startIndex &&
-            type == rhs.type;
+            this.text.equals(rhs.text) &&
+            this.type == rhs.type;
     }
 
     @Override
-    public int getStartIndex()
+    public String toString()
     {
-        return startIndex;
+        return this.text;
     }
 
-    @Override
-    public int getLength()
+    /**
+     * A left curly bracket ('{') JSONToken.
+     */
+    public static final JSONToken leftCurlyBracket = new JSONToken("{", JSONTokenType.LeftCurlyBracket);
+    /**
+     * A right curly bracket ('}') JSONToken.
+     */
+    public static final JSONToken rightCurlyBracket = new JSONToken("}", JSONTokenType.RightCurlyBracket);
+    /**
+     * A left square bracket ('[') JSONToken.
+     */
+    public static final JSONToken leftSquareBracket = new JSONToken("[", JSONTokenType.LeftSquareBracket);
+    /**
+     * A right square bracket (']') JSONToken.
+     */
+    public static final JSONToken rightSquareBracket = new JSONToken("]", JSONTokenType.RightSquareBracket);
+    /**
+     * A colon (':') JSONToken.
+     */
+    public static final JSONToken colon = new JSONToken(":", JSONTokenType.Colon);
+    /**
+     * A comma (',') JSONToken.
+     */
+    public static final JSONToken comma = new JSONToken(",", JSONTokenType.Comma);
+    /**
+     * A null ("null") JSONToken.
+     */
+    public static final JSONToken nullToken = new JSONToken("null", JSONTokenType.Null);
+    /**
+     * A newline ('\n') JSONToken.
+     */
+    public static final JSONToken newLine = new JSONToken("\n", JSONTokenType.NewLine);
+    /**
+     * A carriage-return newline ("\r\n") JSONToken.
+     */
+    public static final JSONToken carriageReturnNewLine = new JSONToken("\r\n", JSONTokenType.NewLine);
+    /**
+     * A carriage-return ("\r") JSONToken.
+     */
+    public static final JSONToken carriageReturn = new JSONToken("\r", JSONTokenType.NewLine);
+    /**
+     * A whitespace JSONToken.
+     * @param text The text of the whitespace.
+     * @return The whitespace JSONToken.
+     */
+    public static JSONToken whitespace(String text)
     {
-        return text == null ? 0 : text.length();
+        return new JSONToken(text, JSONTokenType.Whitespace);
     }
-
-    @Override
-    public int getAfterEndIndex()
+    /**
+     * A quoted-string ("\"hello\"") JSONToken.
+     * @param quotedText The text of the quoted string (including the quotes).
+     * @return The quoted-string JSONToken.
+     */
+    public static JSONToken quotedString(String quotedText)
     {
-        return getStartIndex() + getLength();
+        return new JSONToken(quotedText, JSONTokenType.QuotedString);
     }
-
-    public JSONTokenType getType()
+    /**
+     * A boolean ("true" or "false") JSONToken.
+     */
+    public static JSONToken booleanToken(boolean value)
     {
-        return type;
+        return value ? JSONToken.trueToken : JSONToken.falseToken;
     }
-
-    public static JSONToken leftCurlyBracket(int startIndex)
-    {
-        return new JSONToken("{", startIndex, JSONTokenType.LeftCurlyBracket);
-    }
-
-    public static JSONToken rightCurlyBracket(int startIndex)
-    {
-        return new JSONToken("}", startIndex, JSONTokenType.RightCurlyBracket);
-    }
-
-    public static JSONToken leftSquareBracket(int startIndex)
-    {
-        return new JSONToken("[", startIndex, JSONTokenType.LeftSquareBracket);
-    }
-
-    public static JSONToken rightSquareBracket(int startIndex)
-    {
-        return new JSONToken("]", startIndex, JSONTokenType.RightSquareBracket);
-    }
-
-    public static JSONToken colon(int startIndex)
-    {
-        return new JSONToken(":", startIndex, JSONTokenType.Colon);
-    }
-
-    public static JSONToken comma(int startIndex)
-    {
-        return new JSONToken(",", startIndex, JSONTokenType.Comma);
-    }
-
-    public static JSONToken nullToken(String text, int startIndex)
-    {
-        return new JSONToken(text, startIndex, JSONTokenType.Null);
-    }
-
-    public static JSONToken newLine(String text, int startIndex)
-    {
-        return new JSONToken(text, startIndex, JSONTokenType.NewLine);
-    }
-
-    public static JSONQuotedString quotedString(String text, int startIndex, boolean closed)
-    {
-        return new JSONQuotedString(text, startIndex, closed);
-    }
-
+    /**
+     * A false ("false") JSONToken.
+     */
+    public static final JSONToken falseToken = new JSONToken("false", JSONTokenType.Boolean);
+    /**
+     * A true ("true") JSONToken.
+     */
+    public static final JSONToken trueToken = new JSONToken("true", JSONTokenType.Boolean);
+    /**
+     * A number ("12.345") JSONToken.
+     * @param text The text of the number.
+     * @return The number JSONToken.
+     */
     public static JSONToken number(String text)
     {
-        return number(text, 0);
+        return new JSONToken(text, JSONTokenType.Number);
+    }
+    /**
+     * A number ("12.345") JSONToken.
+     * @param value The value of the number.
+     * @return The number JSONToken.
+     */
+    public static JSONToken number(long value)
+    {
+        return JSONToken.number(Longs.toString(value));
+    }
+    /**
+     * A number ("12.345") JSONToken.
+     * @param value The value of the number.
+     * @return The number JSONToken.
+     */
+    public static JSONToken number(double value)
+    {
+        return JSONToken.number(Doubles.toString(value));
     }
 
-    public static JSONToken number(String text, int startIndex)
+    /**
+     * A line comment (// comment text) JSONToken.
+     * @param text The text of the line comment (not including the terminating newline or carriage
+     *             return).
+     * @return The line comment JSONToken.
+     */
+    public static JSONToken lineComment(String text)
     {
-        return new JSONToken(text, startIndex, JSONTokenType.Number);
+        return new JSONToken(text, JSONTokenType.LineComment);
     }
 
-    public static JSONToken booleanToken(String text, int startIndex)
+    /**
+     * A block comment JSONToken.
+     * @param text The text of the block comment.
+     * @return The block comment JSONToken.
+     */
+    public static JSONToken blockComment(String text)
     {
-        return new JSONToken(text, startIndex, JSONTokenType.Boolean);
-    }
-
-    public static JSONToken booleanToken(String text)
-    {
-        return booleanToken(text, 0);
-    }
-
-    public static JSONToken whitespace(String text, int startIndex)
-    {
-        return new JSONToken(text, startIndex, JSONTokenType.Whitespace);
-    }
-
-    public static JSONToken lineComment(String text, int startIndex)
-    {
-        return new JSONToken(text, startIndex, JSONTokenType.LineComment);
-    }
-
-    public static JSONCloseableToken blockComment(String text, int startIndex, boolean closed)
-    {
-        return new JSONCloseableToken(text, startIndex, JSONTokenType.BlockComment, closed);
-    }
-
-    public static JSONToken unrecognized(String text, int startIndex)
-    {
-        return new JSONToken(text, startIndex, JSONTokenType.Unrecognized);
+        return new JSONToken(text, JSONTokenType.BlockComment);
     }
 }

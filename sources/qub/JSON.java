@@ -1,502 +1,499 @@
 package qub;
 
 /**
- * A collection of methods for interacting with JSON.
+ * A collection of functions for interacting with JSON content.
  */
 public interface JSON
 {
     /**
-     * Parse the provided text into a JSON document.
-     * @param text The text to parse.
-     * @return The parsed JSONDocument.
+     * The default indentation String when formatting a JSON document.
      */
-    static JSONDocument parse(String text)
+    String defaultSingleIndent = "  ";
+
+    /**
+     * Parse a JSONSegment from the provided text.
+     * @param text The text to parse into a JSONSegment.
+     * @return The parsed JSONSegment.
+     */
+    static Result<JSONSegment> parse(String text)
     {
-        final StringIterator characters = new StringIterator(text);
-        return parse(characters);
+        PreCondition.assertNotNullAndNotEmpty(text, "text");
+
+        return JSON.parse(Strings.iterable(text));
     }
 
-    static JSONDocument parse(String text, List<Issue> issues)
+    /**
+     * Parse a JSONSegment from the provided characters.
+     * @param characters The characters to parse into a JSONSegment.
+     * @return The parsed JSONSegment.
+     */
+    static Result<JSONSegment> parse(Iterable<Character> characters)
     {
-        final StringIterator characters = new StringIterator(text);
-        return parse(characters, issues);
+        PreCondition.assertNotNullAndNotEmpty(characters, "characters");
+
+        return JSON.parse(characters.iterate());
     }
 
-    static JSONDocument parse(Iterator<Character> characters)
+    /**
+     * Parse a JSONSegment from the provided characters.
+     * @param characters The characters to parse into a JSONSegment.
+     * @return The parsed JSONSegment.
+     */
+    static Result<JSONSegment> parse(Iterator<Character> characters)
     {
-        return parse(characters, null);
+        PreCondition.assertNotNull(characters, "characters");
+
+        return JSON.parse(JSON.createTokenizer(characters));
     }
 
-    static JSONDocument parse(Iterator<Character> characters, List<Issue> issues)
+    /**
+     * Parse a JSONSegment from the provided JSONTokenizer.
+     * @param tokenizer The tokenizer that produces JSONTokens.
+     * @return The parsed JSONSegment.
+     */
+    static Result<JSONSegment> parse(JSONTokenizer tokenizer)
     {
-        final List<JSONSegment> documentSegments = new ArrayList<>();
+        PreCondition.assertNotNull(tokenizer, "tokenizer");
 
-        final JSONTokenizer tokenizer = new JSONTokenizer(characters, issues);
-        tokenizer.next();
-
-        boolean foundRootSegment = false;
-        while (tokenizer.hasCurrent())
+        return Result.create(() ->
         {
-            final JSONSegment segment = parseSegment(tokenizer, issues);
-            documentSegments.add(segment);
+            JSON.ensureHasStarted(tokenizer);
 
-            if (segment instanceof JSONObject || segment instanceof JSONArray)
+            if (!tokenizer.hasCurrent())
             {
-                if (!foundRootSegment)
-                {
-                    foundRootSegment = true;
-                }
-                else
-                {
-                    addIssue(issues, JSONIssues.expectedEndOfFile(segment.getSpan()));
-                }
+                throw new ParseException("No JSON tokens found.");
             }
-            else {
-                final JSONToken token = (JSONToken)segment;
-                switch (token.getType())
-                {
-                    case NewLine:
-                    case Whitespace:
-                    case LineComment:
-                    case BlockComment:
-                        break;
 
-                    default:
-                        if (!foundRootSegment)
-                        {
-                            foundRootSegment = true;
-                        }
-                        else
-                        {
-                            addIssue(issues, JSONIssues.expectedEndOfFile(token.getSpan()));
-                        }
-                        break;
-                }
-            }
-        }
-
-        return new JSONDocument(documentSegments);
-    }
-
-    static JSONSegment parseSegment(JSONTokenizer tokenizer, List<Issue> issues)
-    {
-        JSONSegment result;
-
-        switch (tokenizer.getCurrent().getType())
-        {
-            case LeftCurlyBracket:
-                result = parseObject(tokenizer, issues);
-                break;
-
-            case LeftSquareBracket:
-                result = parseArray(tokenizer, issues);
-                break;
-
-            default:
-                result = tokenizer.takeCurrent();
-                break;
-        }
-
-        return result;
-    }
-
-    static JSONObject parseObject(String text)
-    {
-        return parseObject(text, 0);
-    }
-
-    static JSONObject parseObject(String text, int firstTokenStartIndex)
-    {
-        JSONObject result = null;
-
-        final JSONTokenizer tokenizer = new JSONTokenizer(text, firstTokenStartIndex);
-        if (tokenizer.next() && tokenizer.getCurrent().getType() == JSONTokenType.LeftCurlyBracket)
-        {
-            result = parseObject(tokenizer, null);
-        };
-
-        return result;
-    }
-
-    static JSONObject parseObject(JSONTokenizer tokenizer, List<Issue> issues)
-    {
-        final JSONToken leftCurlyBracket = tokenizer.takeCurrent();
-        final List<JSONSegment> objectSegments = List.create(leftCurlyBracket);
-
-        boolean foundRightCurlyBracket = false;
-        boolean propertyNameAllowed = true;
-        boolean commaAllowed = false;
-        boolean rightCurlyBracketAllowed = true;
-        while (!foundRightCurlyBracket && tokenizer.hasCurrent())
-        {
-            final JSONToken token = tokenizer.getCurrent();
-            switch (token.getType())
+            JSONSegment result;
+            switch (tokenizer.getCurrent().getType())
             {
-                case QuotedString:
-                    if (!propertyNameAllowed)
-                    {
-                        addIssue(issues, JSONIssues.expectedCommaOrClosingRightCurlyBracket(token.getSpan()));
-                    }
-
-                    objectSegments.add(parseProperty(tokenizer, issues));
-
-                    propertyNameAllowed = false;
-                    commaAllowed = true;
-                    rightCurlyBracketAllowed = true;
-                    break;
-
-                case RightCurlyBracket:
-                    objectSegments.add(token);
-                    foundRightCurlyBracket = true;
-                    if (!rightCurlyBracketAllowed)
-                    {
-                        addIssue(issues, JSONIssues.expectedPropertyName(token.getSpan()));
-                    }
-                    tokenizer.next();
-                    break;
-
-                case NewLine:
-                case Whitespace:
-                case LineComment:
-                case BlockComment:
-                    objectSegments.add(token);
-                    tokenizer.next();
-                    break;
-
-                case Comma:
-                    objectSegments.add(token);
-                    if (!commaAllowed)
-                    {
-                        if (!rightCurlyBracketAllowed)
-                        {
-                            addIssue(issues, JSONIssues.expectedPropertyName(token.getSpan()));
-                        }
-                        else
-                        {
-                            addIssue(issues, JSONIssues.expectedPropertyNameOrClosingRightCurlyBracket(token.getSpan()));
-                        }
-                    }
-                    propertyNameAllowed = true;
-                    commaAllowed = false;
-                    rightCurlyBracketAllowed = false;
-                    tokenizer.next();
-                    break;
-
-                default:
-                    objectSegments.add(token);
-                    if (propertyNameAllowed)
-                    {
-                        if (rightCurlyBracketAllowed)
-                        {
-                            addIssue(issues, JSONIssues.expectedPropertyNameOrClosingRightCurlyBracket(token.getSpan()));
-                        }
-                        else
-                        {
-                            addIssue(issues, JSONIssues.expectedPropertyName(token.getSpan()));
-
-                            // If I get an unexpected segment after a comma, then allow a right
-                            // curly bracket for the next segment.
-                            rightCurlyBracketAllowed = true;
-                        }
-                    }
-                    else
-                    {
-                        addIssue(issues, JSONIssues.expectedCommaOrClosingRightCurlyBracket(token.getSpan()));
-                    }
-                    tokenizer.next();
-                    break;
-            }
-        }
-
-        if (!foundRightCurlyBracket)
-        {
-            addIssue(issues, JSONIssues.missingClosingRightCurlyBracket(leftCurlyBracket.getSpan()));
-        }
-
-        return new JSONObject(objectSegments);
-    }
-
-    static JSONProperty parseProperty(String text)
-    {
-        return parseProperty(text, 0);
-    }
-
-    static JSONProperty parseProperty(String text, int startIndex)
-    {
-        JSONProperty result = null;
-
-        final JSONTokenizer tokenizer = new JSONTokenizer(text, startIndex);
-        if (tokenizer.next() && tokenizer.getCurrent().getType() == JSONTokenType.QuotedString)
-        {
-            result = parseProperty(tokenizer, null);
-        }
-
-        return result;
-    }
-
-    static JSONProperty parseProperty(JSONTokenizer tokenizer, List<Issue> issues)
-    {
-        final JSONToken propertyName = tokenizer.takeCurrent();
-        final List<JSONSegment> propertySegments = List.create(propertyName);
-
-        skipWhitespace(tokenizer, propertySegments);
-
-        if (!tokenizer.hasCurrent())
-        {
-            addIssue(issues, JSONIssues.missingColon(propertyName.getSpan()));
-        }
-        else
-        {
-            final JSONToken colon = tokenizer.getCurrent();
-            if (colon.getType() != JSONTokenType.Colon)
-            {
-                addIssue(issues, JSONIssues.expectedColon(colon.getSpan()));
-            }
-            else
-            {
-                propertySegments.add(colon);
-                tokenizer.next();
-
-                skipWhitespace(tokenizer, propertySegments);
-
-                if (!tokenizer.hasCurrent())
-                {
-                    addIssue(issues, JSONIssues.missingPropertyValue(colon.getSpan()));
-                }
-                else
-                {
-                    final JSONToken propertyValueFirstToken = tokenizer.getCurrent();
-                    switch (propertyValueFirstToken.getType())
-                    {
-                        case Boolean:
-                        case Null:
-                        case QuotedString:
-                        case Number:
-                        case LineComment:
-                        case BlockComment:
-                            propertySegments.add(propertyValueFirstToken);
-                            tokenizer.next();
-                            break;
-
-                        case LeftCurlyBracket:
-                            propertySegments.add(parseObject(tokenizer, issues));
-                            break;
-
-                        case LeftSquareBracket:
-                            propertySegments.add(parseArray(tokenizer, issues));
-                            break;
-
-                        default:
-                            addIssue(issues, JSONIssues.expectedPropertyValue(propertyValueFirstToken.getSpan()));
-                            break;
-                    }
-                }
-            }
-        }
-
-        return new JSONProperty(propertySegments);
-    }
-
-    static void skipWhitespace(JSONTokenizer tokenizer, List<JSONSegment> segments)
-    {
-        while (tokenizer.hasCurrent() && tokenizer.getCurrent().getType() == JSONTokenType.Whitespace)
-        {
-            segments.add(tokenizer.takeCurrent());
-        }
-    }
-
-    static JSONArray parseArray(String text)
-    {
-        return parseArray(text, 0);
-    }
-
-    static JSONArray parseArray(String text, int startIndex)
-    {
-        JSONArray result = null;
-
-        final JSONTokenizer tokenizer = new JSONTokenizer(text, startIndex);
-        if (tokenizer.next() && tokenizer.getCurrent().getType() == JSONTokenType.LeftSquareBracket)
-        {
-            result = parseArray(tokenizer, null);
-        }
-
-        return result;
-    }
-
-    static JSONArray parseArray(JSONTokenizer tokenizer, List<Issue> issues)
-    {
-        final JSONToken leftSquareBracket = tokenizer.takeCurrent();
-        final List<JSONSegment> arraySegments = List.create(leftSquareBracket);
-
-        boolean foundRightSquareBracket = false;
-        boolean rightSquareBracketAllowed = true;
-        boolean elementAllowed = true;
-        boolean commaAllowed = false;
-        while (!foundRightSquareBracket && tokenizer.hasCurrent())
-        {
-            final JSONToken token = tokenizer.getCurrent();
-            switch (token.getType())
-            {
-                case Null:
-                case Boolean:
-                case QuotedString:
-                case Number:
-                    if (!elementAllowed) {
-                        addIssue(issues, JSONIssues.expectedCommaOrClosingRightSquareBracket(token.getSpan()));
-                    }
-
-                    arraySegments.add(token);
-                    tokenizer.next();
-
-                    elementAllowed = false;
-                    commaAllowed = true;
-                    rightSquareBracketAllowed = true;
-                    break;
-
                 case LeftCurlyBracket:
-                    if (!elementAllowed) {
-                        addIssue(issues, JSONIssues.expectedCommaOrClosingRightSquareBracket(token.getSpan()));
-                    }
-
-                    arraySegments.add(parseObject(tokenizer, issues));
-
-                    elementAllowed = false;
-                    commaAllowed = true;
-                    rightSquareBracketAllowed = true;
+                    result = JSON.parseObject(tokenizer).await();
                     break;
 
                 case LeftSquareBracket:
-                    if (!elementAllowed) {
-                        addIssue(issues, JSONIssues.expectedCommaOrClosingRightSquareBracket(token.getSpan()));
-                    }
-
-                    arraySegments.add(parseArray(tokenizer, issues));
-
-                    elementAllowed = false;
-                    commaAllowed = true;
-                    rightSquareBracketAllowed = true;
+                    result = JSON.parseArray(tokenizer).await();
                     break;
 
-                case Comma:
-                    if (!commaAllowed) {
-                        if (rightSquareBracketAllowed) {
-                            addIssue(issues, JSONIssues.expectedArrayElementOrClosingRightSquareBracket(token.getSpan()));
-                        }
-                        else {
-                            addIssue(issues, JSONIssues.expectedArrayElement(token.getSpan()));
-                        }
-                    }
-
-                    arraySegments.add(token);
-                    tokenizer.next();
-
-                    elementAllowed = true;
-                    commaAllowed = false;
-                    rightSquareBracketAllowed = false;
+                case Boolean:
+                    result = JSONBoolean.get(JSONToken.falseToken != JSON.takeCurrent(tokenizer));
                     break;
 
-                case RightSquareBracket:
-                    if (!rightSquareBracketAllowed) {
-                        addIssue(issues, JSONIssues.expectedArrayElement(token.getSpan()));
-                    }
-
-                    foundRightSquareBracket = true;
-                    arraySegments.add(token);
-                    tokenizer.next();
+                case Null:
+                    result = JSONNull.segment;
+                    JSON.next(tokenizer);
                     break;
 
-                case NewLine:
-                case Whitespace:
-                case LineComment:
-                case BlockComment:
-                    arraySegments.add(token);
-                    tokenizer.next();
+                case Number:
+                    result = JSONNumber.get(JSON.takeCurrent(tokenizer).getText());
+                    break;
+
+                case QuotedString:
+                    result = JSONString.getFromQuoted(JSON.takeCurrent(tokenizer).getText());
                     break;
 
                 default:
-                    if (elementAllowed) {
-                        if (rightSquareBracketAllowed) {
-                            addIssue(issues, JSONIssues.expectedArrayElementOrClosingRightSquareBracket(token.getSpan()));
-                        }
-                        else {
-                            addIssue(issues, JSONIssues.expectedArrayElement(token.getSpan()));
-                        }
-                    }
-                    else {
-                        addIssue(issues, JSONIssues.expectedCommaOrClosingRightSquareBracket(token.getSpan()));
-                    }
-
-                    arraySegments.add(token);
-                    tokenizer.next();
-
-                    elementAllowed = false;
-                    commaAllowed = true;
-                    rightSquareBracketAllowed = true;
-                    break;
+                    throw new ParseException("Unexpected JSON token: " + tokenizer.getCurrent());
             }
-        }
 
-        if (!foundRightSquareBracket)
-        {
-            addIssue(issues, JSONIssues.missingClosingRightSquareBracket(leftSquareBracket.getSpan()));
-        }
+            PostCondition.assertNotNull(result, "result");
 
-        return new JSONArray(arraySegments);
+            return result;
+        });
     }
 
-    static void addIssue(List<Issue> issues, Issue issue)
+    /**
+     * Parse a JSONObject from the provided text.
+     * @param text The text to parse into a JSONObject.
+     * @return The parsed JSONObject.
+     */
+    static Result<JSONObject> parseObject(String text)
     {
-        if (issues != null)
-        {
-            issues.add(issue);
-        }
+        PreCondition.assertNotNullAndNotEmpty(text, "text");
+
+        return JSON.parseObject(Strings.iterable(text));
     }
 
-    static JSONObject object(Action1<JSONObjectBuilder> action)
+    /**
+     * Parse a JSONObject from the provided characters.
+     * @param characters The characters to parse into a JSONObject.
+     * @return The parsed JSONObject.
+     */
+    static Result<JSONObject> parseObject(Iterable<Character> characters)
     {
-        PreCondition.assertNotNull(action, "action");
+        PreCondition.assertNotNullAndNotEmpty(characters, "characters");
 
-        final InMemoryCharacterStream stream = new InMemoryCharacterStream();
-        object(stream, action);
-        final JSONObject result = parseObject(stream.getText().await());
+        return JSON.parseObject(characters.iterate());
+    }
+
+    /**
+     * Parse a JSONObject from the provided characters.
+     * @param characters The characters to parse into a JSONObject.
+     * @return The parsed JSONObject.
+     */
+    static Result<JSONObject> parseObject(Iterator<Character> characters)
+    {
+        PreCondition.assertNotNull(characters, "characters");
+
+        return JSON.parseObject(JSON.createTokenizer(characters));
+    }
+
+    /**
+     * Parse a JSONObject from the provided JSONTokenizer.
+     * @param tokenizer The tokenizer that produces JSONTokens.
+     * @return The parsed JSONObject.
+     */
+    static Result<JSONObject> parseObject(JSONTokenizer tokenizer)
+    {
+        PreCondition.assertNotNull(tokenizer, "tokenizer");
+        PreCondition.assertTrue(tokenizer.hasCurrent(), "tokenizer.hasCurrent()");
+        PreCondition.assertEqual(JSONToken.leftCurlyBracket, tokenizer.getCurrent(), "tokenizer.getCurrent()");
+
+        return Result.create(() ->
+        {
+            final JSONToken leftCurlyBracket = JSON.takeCurrent(tokenizer);
+
+            final List<JSONObjectProperty> properties = List.create();
+            JSONToken rightCurlyBracket = null;
+            boolean expectProperty = true;
+            while (tokenizer.hasCurrent() && rightCurlyBracket == null)
+            {
+                switch (tokenizer.getCurrent().getType())
+                {
+                    case QuotedString:
+                        if (!expectProperty)
+                        {
+                            throw new ParseException("Expected object property separator (',') or right curly bracket ('}').");
+                        }
+                        properties.add(JSON.parseObjectProperty(tokenizer).await());
+                        expectProperty = false;
+                        break;
+
+                    case Comma:
+                        if (expectProperty)
+                        {
+                            if (properties.any())
+                            {
+                                throw new ParseException("Expected quoted-string object property name.");
+                            }
+                            else
+                            {
+                                throw new ParseException("Expected quoted-string object property name or right curly bracket ('}').");
+                            }
+                        }
+                        JSON.next(tokenizer);
+                        expectProperty = true;
+                        break;
+
+                    case RightCurlyBracket:
+                        if (properties.any() && expectProperty)
+                        {
+                            throw new ParseException("Expected quoted-string object property name.");
+                        }
+                        rightCurlyBracket = JSON.takeCurrent(tokenizer);
+                        break;
+
+                    default:
+                        if (properties.any())
+                        {
+                            if (expectProperty)
+                            {
+                                throw new ParseException("Expected quoted-string object property name.");
+                            }
+                            else
+                            {
+                                throw new ParseException("Expected object property separator (',') or right curly bracket ('}').");
+                            }
+                        }
+                        else
+                        {
+                            throw new ParseException("Expected quoted-string object property name or right curly bracket ('}').");
+                        }
+                }
+            }
+
+            if (properties.any() && expectProperty)
+            {
+                throw new ParseException("Missing object property.");
+            }
+            else if (rightCurlyBracket == null)
+            {
+                throw new ParseException("Missing object right curly bracket ('}').");
+            }
+
+            return JSONObject.create(properties);
+        });
+    }
+
+    /**
+     * Parse a JSONObjectProperty from the provided text.
+     * @param text The text to parse into a JSONObjectProperty.
+     * @return The parsed JSONObjectProperty.
+     */
+    static Result<JSONObjectProperty> parseObjectProperty(String text)
+    {
+        PreCondition.assertNotNullAndNotEmpty(text, "text");
+
+        return JSON.parseObjectProperty(Strings.iterable(text));
+    }
+
+    /**
+     * Parse a JSONObjectProperty from the provided characters.
+     * @param characters The characters to parse into a JSONObjectProperty.
+     * @return The parsed JSONObjectProperty.
+     */
+    static Result<JSONObjectProperty> parseObjectProperty(Iterable<Character> characters)
+    {
+        PreCondition.assertNotNullAndNotEmpty(characters, "characters");
+
+        return JSON.parseObjectProperty(characters.iterate());
+    }
+
+    /**
+     * Parse a JSONObjectProperty from the provided characters.
+     * @param characters The characters to parse into a JSONObjectProperty.
+     * @return The parsed JSONObjectProperty.
+     */
+    static Result<JSONObjectProperty> parseObjectProperty(Iterator<Character> characters)
+    {
+        PreCondition.assertNotNull(characters, "characters");
+
+        return JSON.parseObjectProperty(JSON.createTokenizer(characters));
+    }
+
+    /**
+     * Parse a JSONObjectProperty from the provided JSONTokenizer.
+     * @param tokenizer The tokenizer that produces JSONTokens.
+     * @return The parsed JSONObjectProperty.
+     */
+    static Result<JSONObjectProperty> parseObjectProperty(JSONTokenizer tokenizer)
+    {
+        PreCondition.assertNotNull(tokenizer, "tokenizer");
+        PreCondition.assertTrue(tokenizer.hasCurrent(), "tokenizer.hasCurrent()");
+        PreCondition.assertEqual(JSONTokenType.QuotedString, tokenizer.getCurrent().getType(), "tokenizer.getCurrent().getType()");
+
+        return Result.create(() ->
+        {
+            final String quotedPropertyName = JSON.takeCurrent(tokenizer).getText();
+            final String propertyName = quotedPropertyName.substring(1, quotedPropertyName.length() - 1);
+
+            if (!tokenizer.hasCurrent())
+            {
+                throw new ParseException("Missing object property name and value separator (':').");
+            }
+            else if (tokenizer.getCurrent().getType() != JSONTokenType.Colon)
+            {
+                throw new ParseException("Expected object property name and value separator (':').");
+            }
+
+            JSONSegment propertyValue;
+            if (!JSON.next(tokenizer))
+            {
+                throw new ParseException("Missing object property value.");
+            }
+            else
+            {
+                switch (tokenizer.getCurrent().getType())
+                {
+                    case Comma:
+                        throw new ParseException("Expected object property value.");
+
+                    case Boolean:
+                    case Null:
+                    case Number:
+                    case QuotedString:
+                    case LeftCurlyBracket:
+                    case LeftSquareBracket:
+                        propertyValue = JSON.parse(tokenizer).await();
+                        break;
+
+                    default:
+                        throw new ParseException("Unexpected object property value token: " + Strings.escapeAndQuote(tokenizer.getCurrent()));
+                }
+            }
+
+            return JSONObjectProperty.create(propertyName, propertyValue);
+        });
+    }
+
+    /**
+     * Parse a JSONArray from the provided text.
+     * @param text The text to parse into a JSONArray.
+     * @return The parsed JSONArray.
+     */
+    static Result<JSONArray> parseArray(String text)
+    {
+        PreCondition.assertNotNullAndNotEmpty(text, "text");
+
+        return JSON.parseArray(Strings.iterable(text));
+    }
+
+    /**
+     * Parse a JSONArray from the provided characters.
+     * @param characters The characters to parse into a JSONArray.
+     * @return The parsed JSONArray.
+     */
+    static Result<JSONArray> parseArray(Iterable<Character> characters)
+    {
+        PreCondition.assertNotNullAndNotEmpty(characters, "characters");
+
+        return JSON.parseArray(characters.iterate());
+    }
+
+    /**
+     * Parse a JSONArray from the provided characters.
+     * @param characters The characters to parse into a JSONArray.
+     * @return The parsed JSONArray.
+     */
+    static Result<JSONArray> parseArray(Iterator<Character> characters)
+    {
+        PreCondition.assertNotNull(characters, "characters");
+
+        return JSON.parseArray(JSON.createTokenizer(characters));
+    }
+
+    /**
+     * Parse a JSONArray from the provided JSONTokenizer.
+     * @param tokenizer The tokenizer that produces JSONTokens.
+     * @return The parsed JSONArray.
+     */
+    static Result<JSONArray> parseArray(JSONTokenizer tokenizer)
+    {
+        PreCondition.assertNotNull(tokenizer, "tokenizer");
+        PreCondition.assertTrue(tokenizer.hasCurrent(), "tokenizer.hasCurrent()");
+        PreCondition.assertEqual(JSONToken.leftSquareBracket, tokenizer.getCurrent(), "tokenizer.getCurrent()");
+
+        return Result.create(() ->
+        {
+            final JSONToken leftSquareBracket = JSON.takeCurrent(tokenizer);
+
+            final List<JSONSegment> elements = List.create();
+
+            JSONToken rightSquareBracket = null;
+            boolean expectElement = true;
+            while (tokenizer.hasCurrent() && rightSquareBracket == null)
+            {
+                switch (tokenizer.getCurrent().getType())
+                {
+                    case Boolean:
+                    case Null:
+                    case Number:
+                    case QuotedString:
+                    case LeftCurlyBracket:
+                    case LeftSquareBracket:
+                        if (!expectElement)
+                        {
+                            throw new ParseException("Expected array element separator (',') or right square bracket (']').");
+                        }
+                        elements.add(JSON.parse(tokenizer).await());
+                        expectElement = false;
+                        break;
+
+                    case Comma:
+                        if (expectElement)
+                        {
+                            throw new ParseException("Expected array element.");
+                        }
+                        JSON.next(tokenizer);
+                        expectElement = true;
+                        break;
+
+                    case RightSquareBracket:
+                        if (elements.any() && expectElement)
+                        {
+                            throw new ParseException("Expected array element.");
+                        }
+                        rightSquareBracket = JSON.takeCurrent(tokenizer);
+                        expectElement = false;
+                        break;
+
+                    default:
+                        throw new ParseException("Unexpected array element token: " + Strings.escapeAndQuote(tokenizer.getCurrent()));
+                }
+            }
+
+            if (elements.any() && expectElement)
+            {
+                throw new ParseException("Missing array element.");
+            }
+            else if (rightSquareBracket == null)
+            {
+                throw new ParseException("Missing array right square bracket (']').");
+            }
+
+            return JSONArray.create(elements);
+        });
+    }
+
+    static JSONTokenizer createTokenizer(Iterator<Character> characters)
+    {
+        PreCondition.assertNotNull(characters, "characters");
+
+        final JSONTokenizer result = JSONTokenizer.create(characters);
+        JSON.next(result);
 
         PostCondition.assertNotNull(result, "result");
+        PostCondition.assertTrue(result.hasStarted(), "result.hasStarted()");
 
         return result;
     }
 
-    static void object(CharacterWriteStream writeStream, Action1<JSONObjectBuilder> action)
+    static boolean shouldSkipCurrentToken(JSONTokenizer tokenizer)
     {
-        PreCondition.assertNotNull(writeStream, "writeStream");
-        PreCondition.assertFalse(writeStream.isDisposed(), "writeStream.isDisposed()");
-        PreCondition.assertNotNull(action, "action");
+        PreCondition.assertNotNull(tokenizer, "tokenizer");
+        PreCondition.assertTrue(tokenizer.hasCurrent(), "tokenizer.hasCurrent()");
 
-        final JSONObjectBuilder objectBuilder = new JSONObjectBuilder(writeStream);
-        action.run(objectBuilder);
-        objectBuilder.dispose();
-    }
+        boolean result;
+        switch (tokenizer.getCurrent().getType())
+        {
+            case BlockComment:
+            case LineComment:
+            case NewLine:
+            case Whitespace:
+                result = true;
+                break;
 
-    static JSONArray array(Action1<JSONArrayBuilder> action)
-    {
-        PreCondition.assertNotNull(action, "action");
-
-        final InMemoryCharacterStream stream = new InMemoryCharacterStream();
-        array(stream, action);
-        final JSONArray result = parseArray(stream.getText().await());
-
-        PostCondition.assertNotNull(result, "result");
+            default:
+                result = false;
+                break;
+        }
 
         return result;
     }
 
-    static void array(CharacterWriteStream writeStream, Action1<JSONArrayBuilder> action)
+    static boolean next(JSONTokenizer tokenizer)
     {
-        PreCondition.assertNotNull(writeStream, "writeStream");
-        PreCondition.assertFalse(writeStream.isDisposed(), "writeStream.isDisposed()");
-        PreCondition.assertNotNull(action, "action");
+        PreCondition.assertNotNull(tokenizer, "tokenizer");
 
-        final JSONArrayBuilder arrayBuilder = new JSONArrayBuilder(writeStream);
-        action.run(arrayBuilder);
-        arrayBuilder.dispose();
+        boolean result = tokenizer.next();
+        while (result && JSON.shouldSkipCurrentToken(tokenizer))
+        {
+            result = tokenizer.next();
+        }
+
+        return result;
+    }
+
+    static void ensureHasStarted(JSONTokenizer tokenizer)
+    {
+        PreCondition.assertNotNull(tokenizer, "tokenizer");
+
+        if (!tokenizer.hasStarted() || (tokenizer.hasCurrent() && JSON.shouldSkipCurrentToken(tokenizer)))
+        {
+            JSON.next(tokenizer);
+        }
+
+        PostCondition.assertTrue(tokenizer.hasStarted(), "tokenizer.hasStarted()");
+    }
+
+    static JSONToken takeCurrent(JSONTokenizer tokenizer)
+    {
+        PreCondition.assertNotNull(tokenizer, "tokenizer");
+        PreCondition.assertTrue(tokenizer.hasCurrent(), "tokenizer.hasCurrent()");
+
+        final JSONToken result = tokenizer.getCurrent();
+        JSON.next(tokenizer);
+
+        return result;
     }
 }

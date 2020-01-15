@@ -1,5 +1,8 @@
 package qub;
 
+/**
+ * The type of a JSONToken.
+ */
 public enum JSONTokenType
 {
     LeftCurlyBracket,
@@ -15,6 +18,5 @@ public enum JSONTokenType
     Number,
     Whitespace,
     LineComment,
-    BlockComment,
-    Unrecognized
+    BlockComment
 }

@@ -1,46 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JSONSegment.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCo Coverage Report</a> &gt; <a href="index.source.html" class="el_package">qub</a> &gt; <span class="el_source">JSONSegment.java</span></div><h1>JSONSegment.java</h1><pre class="source lang-java linenums">package qub;
 
-<span class="fc" id="L3">public abstract class JSONSegment</span>
+/**
+ * A segment within some JSON content.
+ */
+public interface JSONSegment
 {
-    public abstract String toString();
+    /**
+     * Write the String representation of this JSONSegment to the provided stream.
+     * @param stream The stream to write the String representation of this JSONSegment to.
+     * @return The number of characters that were written.
+     */
+    Result&lt;Integer&gt; toString(IndentedCharacterWriteStream stream);
 
-    public abstract int getStartIndex();
-
-    public abstract int getAfterEndIndex();
-
-    public int getLength()
+    /**
+     * Get the String representation of the provided JSONSegment.
+     * @param segment The JSONSegment to get the String representation of.
+     * @return The String representation of the provided JSONSegment.
+     */
+    static String toString(JSONSegment segment)
     {
-<span class="fc" id="L13">        return getAfterEndIndex() - getStartIndex();</span>
+<span class="fc" id="L22">        return JSONSegment.toString((Function1&lt;IndentedCharacterWriteStream,Result&lt;Integer&gt;&gt;)segment::toString);</span>
     }
 
-    public Span getSpan()
+    static String toString(Function1&lt;IndentedCharacterWriteStream,Result&lt;Integer&gt;&gt; toStringFunction)
     {
-<span class="fc" id="L18">        final int startIndex = getStartIndex();</span>
-<span class="fc" id="L19">        final int afterEndIndex = getAfterEndIndex();</span>
-<span class="fc" id="L20">        return new Span(startIndex, afterEndIndex - startIndex);</span>
-    }
+<span class="fc" id="L27">        PreCondition.assertNotNull(toStringFunction, &quot;toStringFunction&quot;);</span>
 
-    @Override
-    public abstract boolean equals(Object rhs);
+<span class="fc" id="L29">        final InMemoryCharacterStream characterStream = new InMemoryCharacterStream();</span>
+<span class="fc" id="L30">        toStringFunction.run(new IndentedCharacterWriteStream(characterStream)).await();</span>
+<span class="fc" id="L31">        final String result = characterStream.getText().await();</span>
 
-    protected static int getStartIndex(Iterable&lt;JSONSegment&gt; segments)
-    {
-<span class="fc" id="L28">        return segments.first().getStartIndex();</span>
-    }
+<span class="fc" id="L33">        PostCondition.assertNotNullAndNotEmpty(result, &quot;result&quot;);</span>
 
-    protected static int getAfterEndIndex(Iterable&lt;JSONSegment&gt; segments)
-    {
-<span class="fc bfc" id="L33" title="All 2 branches covered.">        return !segments.any() ? 0 : segments.last().getAfterEndIndex();</span>
-    }
-
-    protected static String getCombinedText(Iterable&lt;JSONSegment&gt; segments)
-    {
-<span class="fc" id="L38">        final StringBuilder builder = new StringBuilder();</span>
-<span class="fc bfc" id="L39" title="All 2 branches covered.">        for (final JSONSegment segment : segments)</span>
-        {
-<span class="fc" id="L41">            builder.append(segment.toString());</span>
-<span class="fc" id="L42">        }</span>
-<span class="fc" id="L43">        return builder.toString();</span>
+<span class="fc" id="L35">        return result;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

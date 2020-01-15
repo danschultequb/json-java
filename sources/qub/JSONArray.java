@@ -1,144 +1,118 @@
 package qub;
 
-public class JSONArray extends JSONSegment
+/**
+ * A JSON array.
+ */
+public class JSONArray implements JSONSegment, List<JSONSegment>
 {
-    private final Iterable<JSONSegment> segments;
+    private final List<JSONSegment> elements;
 
-    public JSONArray(Iterable<JSONSegment> segments)
+    private JSONArray(List<JSONSegment> elements)
     {
-        this.segments = segments;
+        PreCondition.assertNotNull(elements, "elements");
+
+        this.elements = elements;
     }
 
-    public JSONToken getLeftSquareBracket()
+    public static JSONArray create(JSONSegment... elements)
     {
-        return (JSONToken)segments.first();
+        PreCondition.assertNotNull(elements, "elements");
+
+        return JSONArray.create(Indexable.create(elements));
     }
 
-    public JSONToken getRightSquareBracket()
+    public static JSONArray create(Iterable<JSONSegment> elements)
     {
-        JSONToken result = null;
+        PreCondition.assertNotNull(elements, "elements");
 
-        final JSONSegment lastSegment = segments.last();
-        if (lastSegment instanceof JSONToken)
-        {
-            final JSONToken lastToken = (JSONToken)lastSegment;
-            if (lastToken.getType() == JSONTokenType.RightSquareBracket)
-            {
-                result = lastToken;
-            }
-        }
-
-        return result;
-    }
-
-    public Indexable<JSONSegment> getElements()
-    {
-        final List<JSONSegment> result = new ArrayList<>();
-
-        Iterable<JSONSegment> innerSegments = segments.skip(1);
-        if (getRightSquareBracket() != null)
-        {
-            innerSegments = innerSegments.skipLast(1);
-        }
-
-        boolean expectingElement = true;
-        for (final JSONSegment segment : innerSegments)
-        {
-            if (segment instanceof JSONToken)
-            {
-                final JSONToken token = (JSONToken)segment;
-                switch (token.getType())
-                {
-                    case Boolean:
-                    case Null:
-                    case Number:
-                    case QuotedString:
-                        result.add(token);
-                        expectingElement = false;
-                        break;
-
-                    case Comma:
-                        if (expectingElement)
-                        {
-                            result.add(null);
-                        }
-                        else
-                        {
-                            expectingElement = true;
-                        }
-                        break;
-                }
-            }
-            else
-            {
-                result.add(segment);
-                expectingElement = false;
-            }
-        }
-
-        if (result.any() && expectingElement)
-        {
-            result.add(null);
-        }
-
-        return result;
-    }
-
-    public int getElementCount()
-    {
-        return getElements().getCount();
-    }
-
-    /**
-     * Get the element at the provided index.
-     * @param index The index of the element to return.
-     * @return The element at the provided index.
-     */
-    public JSONSegment getElement(int index)
-    {
-        return getElements().get(index);
-    }
-
-    /**
-     * Get the object value of the element at the provided index.
-     * @param index The index of the element to return.
-     * @return The object value of the element at the provided index.
-     */
-    public Result<JSONObject> getObjectElement(int index)
-    {
-        final JSONSegment element = getElement(index);
-        return element instanceof JSONObject
-            ? Result.success((JSONObject)element)
-            : Result.error(new WrongTypeException("Expected the value of the element at index " + index + " to be an object."));
+        return new JSONArray(List.create(elements));
     }
 
     @Override
-    public boolean equals(Object rhs)
+    public JSONSegment get(int index)
     {
-        return rhs instanceof JSONArray && equals((JSONArray)rhs);
+        return this.elements.get(index);
     }
 
-    public boolean equals(JSONArray rhs)
+    @Override
+    public Iterator<JSONSegment> iterate()
     {
-        return rhs != null &&
-            segments.equals(rhs.segments);
+        return this.elements.iterate();
     }
 
     @Override
     public String toString()
     {
-        return JSONSegment.getCombinedText(segments);
+        return JSONSegment.toString(this);
     }
 
     @Override
-    public int getStartIndex()
+    public Result<Integer> toString(IndentedCharacterWriteStream stream)
     {
-        return JSONSegment.getStartIndex(segments);
+        PreCondition.assertNotNull(stream, "stream");
+
+        return Result.create(() ->
+        {
+            int result = 0;
+
+            result += stream.write('[').await();
+            boolean firstElement = true;
+            for (final JSONSegment element : this.elements)
+            {
+                if (firstElement)
+                {
+                    firstElement = false;
+                }
+                else
+                {
+                    result += stream.write(',').await();
+                }
+                result += element.toString(stream).await();
+            }
+            result += stream.write(']').await();
+
+            PostCondition.assertGreaterThanOrEqualTo(result, 2, "result");
+
+            return result;
+        });
     }
 
     @Override
-    public int getAfterEndIndex()
+    public boolean equals(Object rhs)
     {
-        return JSONSegment.getAfterEndIndex(segments);
+        return rhs instanceof JSONArray && this.equals((JSONArray)rhs);
+    }
+
+    public boolean equals(JSONArray rhs)
+    {
+        return rhs != null && this.elements.equals(rhs.elements);
+    }
+
+    @Override
+    public JSONArray insert(int insertIndex, JSONSegment value)
+    {
+        PreCondition.assertBetween(0, insertIndex, this.getCount(), "insertIndex");
+        PreCondition.assertNotNull(value, "value");
+
+        this.elements.insert(insertIndex, value);
+        return this;
+    }
+
+    @Override
+    public JSONSegment removeAt(int index)
+    {
+        PreCondition.assertIndexAccess(index, this.getCount(), "index");
+
+        return this.elements.removeAt(index);
+    }
+
+    @Override
+    public JSONArray set(int index, JSONSegment value)
+    {
+        PreCondition.assertIndexAccess(index, this.getCount(), "index");
+        PreCondition.assertNotNull(value, "value");
+
+        this.elements.set(index, value);
+        return this;
     }
 }
