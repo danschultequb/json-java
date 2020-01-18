@@ -47,27 +47,49 @@ public class JSONArray implements JSONSegment, List<JSONSegment>
     }
 
     @Override
-    public Result<Integer> toString(IndentedCharacterWriteStream stream)
+    public Result<Integer> toString(IndentedCharacterWriteStream stream, JSONFormat format)
     {
         PreCondition.assertNotNull(stream, "stream");
+        PreCondition.assertNotNull(format, "format");
+
+        stream.setSingleIndent(format.getSingleIndent());
+
+        final String newLine = format.getNewLine();
+        final boolean hasNewLine = !Strings.isNullOrEmpty(newLine);
 
         return Result.create(() ->
         {
             int result = 0;
 
             result += stream.write('[').await();
-            boolean firstElement = true;
-            for (final JSONSegment element : this.elements)
+            stream.increaseIndent();
+            try
             {
-                if (firstElement)
+                boolean wroteElement = false;
+                for (final JSONSegment element : this.elements)
                 {
-                    firstElement = false;
+                    if (!wroteElement)
+                    {
+                        wroteElement = true;
+                    }
+                    else
+                    {
+                        result += stream.write(',').await();
+                    }
+                    if (hasNewLine)
+                    {
+                        result += stream.write(newLine).await();
+                    }
+                    result += element.toString(stream, format).await();
                 }
-                else
+                if (hasNewLine && wroteElement)
                 {
-                    result += stream.write(',').await();
+                    result += stream.write(newLine).await();
                 }
-                result += element.toString(stream).await();
+            }
+            finally
+            {
+                stream.decreaseIndent();
             }
             result += stream.write(']').await();
 

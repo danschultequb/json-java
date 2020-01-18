@@ -80,9 +80,9 @@ public class JSONProperty implements MapEntry&lt;String,JSONSegment&gt;
      */
     public &lt;T extends JSONSegment&gt; Result&lt;T&gt; getValueAs(java.lang.Class&lt;T&gt; type)
     {
-<span class="nc" id="L83">        PreCondition.assertNotNull(type, &quot;type&quot;);</span>
+<span class="fc" id="L83">        PreCondition.assertNotNull(type, &quot;type&quot;);</span>
 
-<span class="nc" id="L85">        return JSON.as(this.value, type, JSON.thePropertyNamed(this.name));</span>
+<span class="fc" id="L85">        return JSON.as(this.value, type, JSON.thePropertyNamed(this.name));</span>
     }
 
     public Result&lt;JSONNull&gt; getNullValueSegment()
@@ -143,7 +143,7 @@ public class JSONProperty implements MapEntry&lt;String,JSONSegment&gt;
 
     public Result&lt;JSONObject&gt; getObjectValue()
     {
-<span class="nc" id="L146">        return this.getValueAs(JSONObject.class);</span>
+<span class="fc" id="L146">        return this.getValueAs(JSONObject.class);</span>
     }
 
     public Result&lt;JSONObject&gt; getObjectOrNullValue()
@@ -164,39 +164,45 @@ public class JSONProperty implements MapEntry&lt;String,JSONSegment&gt;
     @Override
     public String toString()
     {
-<span class="fc" id="L167">        return JSONSegment.toString((Function1&lt;IndentedCharacterWriteStream,Result&lt;Integer&gt;&gt;)this::toString);</span>
+<span class="fc" id="L167">        return JSONSegment.toString((Function2&lt;IndentedCharacterWriteStream,JSONFormat,Result&lt;Integer&gt;&gt;)this::toString);</span>
     }
 
-    public Result&lt;Integer&gt; toString(IndentedCharacterWriteStream stream)
+    public Result&lt;Integer&gt; toString(IndentedCharacterWriteStream stream, JSONFormat format)
     {
 <span class="fc" id="L172">        PreCondition.assertNotNull(stream, &quot;stream&quot;);</span>
 <span class="fc" id="L173">        PreCondition.assertNotDisposed(stream, &quot;stream&quot;);</span>
+<span class="fc" id="L174">        PreCondition.assertNotNull(format, &quot;format&quot;);</span>
 
-<span class="fc" id="L175">        return Result.create(() -&gt;</span>
+<span class="fc" id="L176">        return Result.create(() -&gt;</span>
         {
-<span class="fc" id="L177">            int result = 0;</span>
+<span class="fc" id="L178">            int result = 0;</span>
 
-<span class="fc" id="L179">            result += stream.write(Strings.quote(this.name)).await();</span>
-<span class="fc" id="L180">            result += stream.write(':').await();</span>
-<span class="fc" id="L181">            result += this.value.toString(stream).await();</span>
+<span class="fc" id="L180">            result += stream.write(Strings.quote(this.name)).await();</span>
+<span class="fc" id="L181">            result += stream.write(':').await();</span>
+<span class="fc" id="L182">            final String afterPropertySeparator = format.getAfterPropertySeparator();</span>
+<span class="fc bfc" id="L183" title="All 2 branches covered.">            if (!Strings.isNullOrEmpty(afterPropertySeparator))</span>
+            {
+<span class="fc" id="L185">                result += stream.write(afterPropertySeparator).await();</span>
+            }
+<span class="fc" id="L187">            result += this.value.toString(stream, format).await();</span>
 
-<span class="fc" id="L183">            PostCondition.assertGreaterThanOrEqualTo(result, 5, &quot;result&quot;);</span>
+<span class="fc" id="L189">            PostCondition.assertGreaterThanOrEqualTo(result, 5, &quot;result&quot;);</span>
 
-<span class="fc" id="L185">            return result;</span>
+<span class="fc" id="L191">            return result;</span>
         });
     }
 
     @Override
     public boolean equals(Object rhs)
     {
-<span class="fc bfc" id="L192" title="All 4 branches covered.">        return rhs instanceof JSONProperty &amp;&amp; this.equals((JSONProperty)rhs);</span>
+<span class="fc bfc" id="L198" title="All 4 branches covered.">        return rhs instanceof JSONProperty &amp;&amp; this.equals((JSONProperty)rhs);</span>
     }
 
     public boolean equals(JSONProperty rhs)
     {
-<span class="fc bfc" id="L197" title="All 2 branches covered.">        return rhs != null &amp;&amp;</span>
-<span class="fc bfc" id="L198" title="All 2 branches covered.">            this.name.equals(rhs.name) &amp;&amp;</span>
-<span class="fc bfc" id="L199" title="All 2 branches covered.">            this.value.equals(rhs.value);</span>
+<span class="fc bfc" id="L203" title="All 2 branches covered.">        return rhs != null &amp;&amp;</span>
+<span class="fc bfc" id="L204" title="All 2 branches covered.">            this.name.equals(rhs.name) &amp;&amp;</span>
+<span class="fc bfc" id="L205" title="All 2 branches covered.">            this.value.equals(rhs.value);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

@@ -348,28 +348,50 @@ public class JSONObject implements JSONSegment, MutableMap<String,JSONSegment>
     }
 
     @Override
-    public Result<Integer> toString(IndentedCharacterWriteStream stream)
+    public Result<Integer> toString(IndentedCharacterWriteStream stream, JSONFormat format)
     {
         PreCondition.assertNotNull(stream, "stream");
         PreCondition.assertNotDisposed(stream, "stream");
+        PreCondition.assertNotNull(format, "format");
+
+        stream.setSingleIndent(format.getSingleIndent());
+
+        final String newLine = format.getNewLine();
+        final boolean hasNewLine = !Strings.isNullOrEmpty(newLine);
 
         return Result.create(() ->
         {
             int result = 0;
 
             result += stream.write('{').await();
-            boolean firstProperty = true;
-            for (final JSONProperty property : this.getProperties())
+            stream.increaseIndent();
+            try
             {
-                if (firstProperty)
+                boolean wroteProperty = false;
+                for (final JSONProperty property : this.getProperties())
                 {
-                    firstProperty = false;
+                    if (!wroteProperty)
+                    {
+                        wroteProperty = true;
+                    }
+                    else
+                    {
+                        result += stream.write(',').await();
+                    }
+                    if (hasNewLine)
+                    {
+                        result += stream.write(newLine).await();
+                    }
+                    result += property.toString(stream, format).await();
                 }
-                else
+                if (hasNewLine && wroteProperty)
                 {
-                    result += stream.write(',').await();
+                    result += stream.write(newLine).await();
                 }
-                result += property.toString(stream).await();
+            }
+            finally
+            {
+                stream.decreaseIndent();
             }
             result += stream.write('}').await();
 

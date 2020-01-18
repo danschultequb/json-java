@@ -15,15 +15,18 @@ public class JSONNull implements JSONSegment
     }
 
     @Override
-    public Result&lt;Integer&gt; toString(IndentedCharacterWriteStream stream)
+    public Result&lt;Integer&gt; toString(IndentedCharacterWriteStream stream, JSONFormat format)
     {
-<span class="fc" id="L20">        return stream.write(&quot;null&quot;);</span>
+<span class="fc" id="L20">        PreCondition.assertNotNull(stream, &quot;stream&quot;);</span>
+<span class="fc" id="L21">        PreCondition.assertNotNull(format, &quot;format&quot;);</span>
+
+<span class="fc" id="L23">        return stream.write(&quot;null&quot;);</span>
     }
 
     @Override
     public boolean equals(Object rhs)
     {
-<span class="fc" id="L26">        return rhs instanceof JSONNull;</span>
+<span class="fc" id="L29">        return rhs instanceof JSONNull;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

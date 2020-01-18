@@ -8,6 +8,7 @@ public class JSONString implements JSONSegment
     private JSONString(String text, char quote)
     {
         PreCondition.assertNotNull(text, "text");
+        PreCondition.assertFalse(text.contains("\n"), "text.contains(\"\\n\")");
 
         this.text = text;
         this.quote = quote;
@@ -32,7 +33,7 @@ public class JSONString implements JSONSegment
 
     public static JSONString get(String text, char quote)
     {
-        PreCondition.assertNotNull(text, "unquotedText");
+        PreCondition.assertNotNull(text, "text");
 
         return new JSONString(text, quote);
     }
@@ -54,14 +55,38 @@ public class JSONString implements JSONSegment
     }
 
     @Override
-    public Result<Integer> toString(IndentedCharacterWriteStream stream)
+    public Result<Integer> toString(IndentedCharacterWriteStream stream, JSONFormat format)
     {
+        PreCondition.assertNotNull(stream, "stream");
+        PreCondition.assertNotNull(format, "format");
+
         return Result.create(() ->
         {
             int result = 0;
 
             result += stream.write(this.quote).await();
-            result += stream.write(this.text).await();
+
+            final int textLength = this.text.length();
+            int startIndex = 0;
+            int quoteIndex = this.text.indexOf(this.quote);
+            while (startIndex < textLength)
+            {
+                if (quoteIndex == -1)
+                {
+                    result += stream.write(this.text.substring(startIndex)).await();
+                    startIndex = textLength;
+                }
+                else
+                {
+                    result += stream.write(this.text.substring(startIndex, quoteIndex)).await();
+                    result += stream.write('\\').await();
+                    result += stream.write(this.quote).await();
+
+                    startIndex = quoteIndex + 1;
+                    quoteIndex = this.text.indexOf(this.quote, startIndex);
+                }
+            }
+
             result += stream.write(this.quote).await();
 
             return result;

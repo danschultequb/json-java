@@ -114,6 +114,30 @@ public interface JSONArrayTests
                 toStringTest.run(Indexable.create(JSONBoolean.trueSegment, JSONNumber.get(50)), "[true,50]");
             });
 
+            runner.testGroup("toString(JSONFormat)", () ->
+            {
+                final Action3<Indexable<JSONSegment>,JSONFormat,String> toStringTest = (Indexable<JSONSegment> elements, JSONFormat format, String expected) ->
+                {
+                    runner.test("with " + elements, (Test test) ->
+                    {
+                        final JSONArray array = JSONArray.create(elements);
+                        test.assertEqual(expected, array.toString(format));
+                    });
+                };
+
+                toStringTest.run(Indexable.create(), JSONFormat.consise, "[]");
+                toStringTest.run(Indexable.create(JSONNull.segment), JSONFormat.consise, "[null]");
+                toStringTest.run(Indexable.create(JSONBoolean.trueSegment, JSONNumber.get(50)), JSONFormat.consise, "[true,50]");
+                toStringTest.run(Indexable.create(JSONObject.create()), JSONFormat.consise, "[{}]");
+                toStringTest.run(Indexable.create(JSONObject.create(), JSONObject.create()), JSONFormat.consise, "[{},{}]");
+
+                toStringTest.run(Indexable.create(), JSONFormat.pretty, "[]");
+                toStringTest.run(Indexable.create(JSONNull.segment), JSONFormat.pretty, "[\n  null\n]");
+                toStringTest.run(Indexable.create(JSONBoolean.trueSegment, JSONNumber.get(50)), JSONFormat.pretty, "[\n  true,\n  50\n]");
+                toStringTest.run(Indexable.create(JSONObject.create()), JSONFormat.pretty, "[\n  {}\n]");
+                toStringTest.run(Indexable.create(JSONObject.create(), JSONObject.create()), JSONFormat.pretty, "[\n  {},\n  {}\n]");
+            });
+
             runner.testGroup("equals(Object)", () ->
             {
                 final Action3<Indexable<JSONSegment>,Object,Boolean> equalsTest = (Indexable<JSONSegment> elements, Object rhs, Boolean expected) ->

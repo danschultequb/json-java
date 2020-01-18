@@ -42,22 +42,25 @@ public class JSONNumber implements JSONSegment
     }
 
     @Override
-    public Result&lt;Integer&gt; toString(IndentedCharacterWriteStream stream)
+    public Result&lt;Integer&gt; toString(IndentedCharacterWriteStream stream, JSONFormat format)
     {
-<span class="fc" id="L47">        return stream.write(this.text);</span>
+<span class="fc" id="L47">        PreCondition.assertNotNull(stream, &quot;stream&quot;);</span>
+<span class="fc" id="L48">        PreCondition.assertNotNull(format, &quot;format&quot;);</span>
+
+<span class="fc" id="L50">        return stream.write(this.text);</span>
     }
 
     @Override
     public boolean equals(Object rhs)
     {
-<span class="fc bfc" id="L53" title="All 4 branches covered.">        return rhs instanceof JSONNumber &amp;&amp; this.equals((JSONNumber)rhs);</span>
+<span class="fc bfc" id="L56" title="All 4 branches covered.">        return rhs instanceof JSONNumber &amp;&amp; this.equals((JSONNumber)rhs);</span>
     }
 
     public boolean equals(JSONNumber rhs)
     {
-<span class="fc bfc" id="L58" title="All 4 branches covered.">        return rhs != null &amp;&amp;</span>
+<span class="fc bfc" id="L61" title="All 4 branches covered.">        return rhs != null &amp;&amp;</span>
             this.value == rhs.value &amp;&amp;
-<span class="fc bfc" id="L60" title="All 2 branches covered.">            this.text.equals(rhs.text);</span>
+<span class="fc bfc" id="L63" title="All 2 branches covered.">            this.text.equals(rhs.text);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

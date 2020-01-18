@@ -348,47 +348,69 @@ public class JSONObject implements JSONSegment, MutableMap&lt;String,JSONSegment
     }
 
     @Override
-    public Result&lt;Integer&gt; toString(IndentedCharacterWriteStream stream)
+    public Result&lt;Integer&gt; toString(IndentedCharacterWriteStream stream, JSONFormat format)
     {
 <span class="fc" id="L353">        PreCondition.assertNotNull(stream, &quot;stream&quot;);</span>
 <span class="fc" id="L354">        PreCondition.assertNotDisposed(stream, &quot;stream&quot;);</span>
+<span class="fc" id="L355">        PreCondition.assertNotNull(format, &quot;format&quot;);</span>
 
-<span class="fc" id="L356">        return Result.create(() -&gt;</span>
+<span class="fc" id="L357">        stream.setSingleIndent(format.getSingleIndent());</span>
+
+<span class="fc" id="L359">        final String newLine = format.getNewLine();</span>
+<span class="fc bfc" id="L360" title="All 2 branches covered.">        final boolean hasNewLine = !Strings.isNullOrEmpty(newLine);</span>
+
+<span class="fc" id="L362">        return Result.create(() -&gt;</span>
         {
-<span class="fc" id="L358">            int result = 0;</span>
+<span class="fc" id="L364">            int result = 0;</span>
 
-<span class="fc" id="L360">            result += stream.write('{').await();</span>
-<span class="fc" id="L361">            boolean firstProperty = true;</span>
-<span class="fc bfc" id="L362" title="All 2 branches covered.">            for (final JSONProperty property : this.getProperties())</span>
+<span class="fc" id="L366">            result += stream.write('{').await();</span>
+<span class="fc" id="L367">            stream.increaseIndent();</span>
+            try
             {
-<span class="fc bfc" id="L364" title="All 2 branches covered.">                if (firstProperty)</span>
+<span class="fc" id="L370">                boolean wroteProperty = false;</span>
+<span class="fc bfc" id="L371" title="All 2 branches covered.">                for (final JSONProperty property : this.getProperties())</span>
                 {
-<span class="fc" id="L366">                    firstProperty = false;</span>
-                }
-                else
+<span class="fc bfc" id="L373" title="All 2 branches covered.">                    if (!wroteProperty)</span>
+                    {
+<span class="fc" id="L375">                        wroteProperty = true;</span>
+                    }
+                    else
+                    {
+<span class="fc" id="L379">                        result += stream.write(',').await();</span>
+                    }
+<span class="fc bfc" id="L381" title="All 2 branches covered.">                    if (hasNewLine)</span>
+                    {
+<span class="fc" id="L383">                        result += stream.write(newLine).await();</span>
+                    }
+<span class="fc" id="L385">                    result += property.toString(stream, format).await();</span>
+<span class="fc" id="L386">                }</span>
+<span class="fc bfc" id="L387" title="All 4 branches covered.">                if (hasNewLine &amp;&amp; wroteProperty)</span>
                 {
-<span class="fc" id="L370">                    result += stream.write(',').await();</span>
+<span class="fc" id="L389">                    result += stream.write(newLine).await();</span>
                 }
-<span class="fc" id="L372">                result += property.toString(stream).await();</span>
-<span class="fc" id="L373">            }</span>
-<span class="fc" id="L374">            result += stream.write('}').await();</span>
+            }
+            finally
+            {
+<span class="fc" id="L394">                stream.decreaseIndent();</span>
+            }
+<span class="fc" id="L396">            result += stream.write('}').await();</span>
 
-<span class="fc" id="L376">            PostCondition.assertGreaterThanOrEqualTo(result, 2, &quot;result&quot;);</span>
+<span class="fc" id="L398">            PostCondition.assertGreaterThanOrEqualTo(result, 2, &quot;result&quot;);</span>
 
-<span class="fc" id="L378">            return result;</span>
+<span class="fc" id="L400">            return result;</span>
         });
     }
 
     @Override
     public boolean equals(Object rhs)
     {
-<span class="fc bfc" id="L385" title="All 4 branches covered.">        return rhs instanceof JSONObject &amp;&amp; this.equals((JSONObject)rhs);</span>
+<span class="fc bfc" id="L407" title="All 4 branches covered.">        return rhs instanceof JSONObject &amp;&amp; this.equals((JSONObject)rhs);</span>
     }
 
     public boolean equals(JSONObject rhs)
     {
-<span class="fc bfc" id="L390" title="All 2 branches covered.">        return rhs != null &amp;&amp;</span>
-<span class="fc bfc" id="L391" title="All 2 branches covered.">            this.properties.equals(rhs.properties);</span>
+<span class="fc bfc" id="L412" title="All 2 branches covered.">        return rhs != null &amp;&amp;</span>
+<span class="fc bfc" id="L413" title="All 2 branches covered.">            this.properties.equals(rhs.properties);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

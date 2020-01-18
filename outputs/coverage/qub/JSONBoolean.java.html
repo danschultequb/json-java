@@ -41,20 +41,23 @@ public class JSONBoolean implements JSONSegment
     }
 
     @Override
-    public Result&lt;Integer&gt; toString(IndentedCharacterWriteStream stream)
+    public Result&lt;Integer&gt; toString(IndentedCharacterWriteStream stream, JSONFormat format)
     {
-<span class="fc" id="L46">        return stream.write(Booleans.toString(this.value));</span>
+<span class="fc" id="L46">        PreCondition.assertNotNull(stream, &quot;stream&quot;);</span>
+<span class="fc" id="L47">        PreCondition.assertNotNull(format, &quot;format&quot;);</span>
+
+<span class="fc" id="L49">        return stream.write(Booleans.toString(this.value));</span>
     }
 
     @Override
     public boolean equals(Object rhs)
     {
-<span class="fc bfc" id="L52" title="All 4 branches covered.">        return rhs instanceof JSONBoolean &amp;&amp; this.equals((JSONBoolean)rhs);</span>
+<span class="fc bfc" id="L55" title="All 4 branches covered.">        return rhs instanceof JSONBoolean &amp;&amp; this.equals((JSONBoolean)rhs);</span>
     }
 
     public boolean equals(JSONBoolean rhs)
     {
-<span class="fc bfc" id="L57" title="All 4 branches covered.">        return rhs != null &amp;&amp; this.value == rhs.value;</span>
+<span class="fc bfc" id="L60" title="All 4 branches covered.">        return rhs != null &amp;&amp; this.value == rhs.value;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

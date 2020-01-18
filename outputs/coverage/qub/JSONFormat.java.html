@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JSONFormat.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCo Coverage Report</a> &gt; <a href="index.source.html" class="el_package">qub</a> &gt; <span class="el_source">JSONFormat.java</span></div><h1>JSONFormat.java</h1><pre class="source lang-java linenums">package qub;
+
+/**
+ * Options that can be set when creating a formatted JSON string.
+ */
+public class JSONFormat
+{
+<span class="fc" id="L8">    private static final char[] whitespaceCharacters = new char[] { ' ', '\t', '\r', '\n' };</span>
+
+    private static final String newLinePropertyName = &quot;newLine&quot;;
+    private static final String singleIndentPropertyName = &quot;singleIndent&quot;;
+    private static final String afterPropertySeparatorPropertyName = &quot;afterPropertySeparator&quot;;
+
+    /**
+     * A consise JSON format that removes all unnecessary whitespace.
+     */
+<span class="fc" id="L17">    public static final JSONFormat consise = JSONFormat.create()</span>
+<span class="fc" id="L18">        .setNewLine(&quot;&quot;)</span>
+<span class="fc" id="L19">        .setSingleIndent(&quot;&quot;)</span>
+<span class="fc" id="L20">        .setAfterPropertySeparator(&quot;&quot;);</span>
+
+    /**
+     * A prettier JSON format that uses a 2-space indentation and a &quot;\n&quot; newline.
+     */
+<span class="fc" id="L25">    public static final JSONFormat pretty = JSONFormat.create()</span>
+<span class="fc" id="L26">        .setNewLine(&quot;\n&quot;)</span>
+<span class="fc" id="L27">        .setSingleIndent(&quot;  &quot;)</span>
+<span class="fc" id="L28">        .setAfterPropertySeparator(&quot; &quot;);</span>
+
+    private String newLine;
+    private String singleIndent;
+    private String afterPropertySeparator;
+
+    private JSONFormat()
+<span class="fc" id="L35">    {</span>
+<span class="fc" id="L36">        this.newLine = &quot;&quot;;</span>
+<span class="fc" id="L37">        this.singleIndent = &quot;&quot;;</span>
+<span class="fc" id="L38">        this.afterPropertySeparator = &quot;&quot;;</span>
+<span class="fc" id="L39">    }</span>
+
+    /**
+     * Create a new JSONFormat object.
+     * @return A new JSONFormat object.
+     */
+    public static JSONFormat create()
+    {
+<span class="fc" id="L47">        return new JSONFormat();</span>
+    }
+
+    /**
+     * Get the string that will be used to mark a new line.
+     * @return The string that will be used to mark a new line.
+     */
+    public String getNewLine()
+    {
+<span class="fc" id="L56">        return this.newLine;</span>
+    }
+
+    /**
+     * Set the string that will be used to mark a new line.
+     * @param newLine The string that will be used to mark a new line.
+     * @return This object for method chaining.
+     */
+    public JSONFormat setNewLine(String newLine)
+    {
+<span class="fc" id="L66">        PreCondition.assertNotNull(newLine, &quot;newLine&quot;);</span>
+<span class="fc" id="L67">        PreCondition.assertContainsOnly(newLine, JSONFormat.whitespaceCharacters, &quot;newLine&quot;);</span>
+
+<span class="fc" id="L69">        this.newLine = newLine;</span>
+<span class="fc" id="L70">        return this;</span>
+    }
+
+    /**
+     * Get a single indentation string.
+     * @return A single indentation string.
+     */
+    public String getSingleIndent()
+    {
+<span class="fc" id="L79">        return this.singleIndent;</span>
+    }
+
+    /**
+     * Set the string that will be used as a single indentation.
+     * @param singleIndent The string that will be used as a single indentation.
+     * @return This object for method chaining.
+     */
+    public JSONFormat setSingleIndent(String singleIndent)
+    {
+<span class="fc" id="L89">        PreCondition.assertNotNull(singleIndent, &quot;singleIndent&quot;);</span>
+<span class="fc" id="L90">        PreCondition.assertContainsOnly(singleIndent, JSONFormat.whitespaceCharacters, &quot;singleIndent&quot;);</span>
+
+<span class="fc" id="L92">        this.singleIndent = singleIndent;</span>
+<span class="fc" id="L93">        return this;</span>
+    }
+
+    /**
+     * Get the string that will be inserted between a property's seprator and value.
+     * @return The string that will be inserted between a property's seprator and value.
+     */
+    public String getAfterPropertySeparator()
+    {
+<span class="fc" id="L102">        return this.afterPropertySeparator;</span>
+    }
+
+    /**
+     * Set the string that will be inserted between a property's seprator and value.
+     * @param afterPropertySeparator The string that will be inserted between a property's
+     *                               separator and value.
+     * @return This object for method chaining.
+     */
+    public JSONFormat setAfterPropertySeparator(String afterPropertySeparator)
+    {
+<span class="fc" id="L113">        PreCondition.assertNotNull(afterPropertySeparator, &quot;afterPropertySeparator&quot;);</span>
+<span class="fc" id="L114">        PreCondition.assertContainsOnly(afterPropertySeparator, JSONFormat.whitespaceCharacters, &quot;afterPropertySeparator&quot;);</span>
+
+<span class="fc" id="L116">        this.afterPropertySeparator = afterPropertySeparator;</span>
+<span class="fc" id="L117">        return this;</span>
+    }
+
+    @Override
+    public boolean equals(Object rhs)
+    {
+<span class="fc bfc" id="L123" title="All 4 branches covered.">        return rhs instanceof JSONFormat &amp;&amp; this.equals((JSONFormat)rhs);</span>
+    }
+
+    public boolean equals(JSONFormat rhs)
+    {
+<span class="fc bfc" id="L128" title="All 2 branches covered.">        return rhs != null &amp;&amp;</span>
+<span class="fc bfc" id="L129" title="All 2 branches covered.">            this.newLine.equals(rhs.newLine) &amp;&amp;</span>
+<span class="fc bfc" id="L130" title="All 2 branches covered.">            this.singleIndent.equals(rhs.singleIndent) &amp;&amp;</span>
+<span class="fc bfc" id="L131" title="All 2 branches covered.">            this.afterPropertySeparator.equals(rhs.afterPropertySeparator);</span>
+    }
+
+    /**
+     * Convert this object to a JSONObject.
+     * @return The JSONObject that represents this object.
+     */
+    public JSONObject toJson()
+    {
+<span class="fc" id="L140">        return JSONObject.create()</span>
+<span class="fc" id="L141">            .setString(JSONFormat.newLinePropertyName, Strings.escape(this.newLine))</span>
+<span class="fc" id="L142">            .setString(JSONFormat.singleIndentPropertyName, Strings.escape(this.singleIndent))</span>
+<span class="fc" id="L143">            .setString(JSONFormat.afterPropertySeparatorPropertyName, Strings.escape(this.afterPropertySeparator));</span>
+    }
+
+    @Override
+    public String toString()
+    {
+<span class="fc" id="L149">        return toJson().toString();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

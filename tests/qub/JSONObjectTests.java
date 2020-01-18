@@ -706,6 +706,104 @@ public interface JSONObjectTests
                 setNumberTest.run(JSONObject.create().setNumber("b", 1), "a", 11.12, JSONObject.create().setNumber("a", 11.12).setNumber("b", 1));
             });
 
+            runner.testGroup("toString()", () ->
+            {
+                final Action2<JSONObject,String> toStringTest = (JSONObject object, String expected) ->
+                {
+                    runner.test("with " + object, (Test test) ->
+                    {
+                        test.assertEqual(expected, object.toString());
+                    });
+                };
+
+                toStringTest.run(JSONObject.create(), "{}");
+                toStringTest.run(
+                    JSONObject.create()
+                        .setNumber("a", 5),
+                    "{\"a\":5}");
+                toStringTest.run(
+                    JSONObject.create()
+                        .setNumber("a", 5.000),
+                    "{\"a\":5.0}");
+                toStringTest.run(
+                    JSONObject.create()
+                        .setString("a", "hello"),
+                    "{\"a\":\"hello\"}");
+                toStringTest.run(
+                    JSONObject.create()
+                        .setObject("a", JSONObject.create()),
+                    "{\"a\":{}}");
+                toStringTest.run(
+                    JSONObject.create()
+                        .setArray("a", JSONArray.create()),
+                    "{\"a\":[]}");
+            });
+
+            runner.testGroup("toString(JSONFormat)", () ->
+            {
+                final Action3<JSONObject,JSONFormat,String> toStringTest = (JSONObject object, JSONFormat format, String expected) ->
+                {
+                    runner.test("with " + object, (Test test) ->
+                    {
+                        test.assertEqual(expected, object.toString(format));
+                    });
+                };
+
+                toStringTest.run(JSONObject.create(), JSONFormat.consise, "{}");
+                toStringTest.run(
+                    JSONObject.create()
+                        .setNumber("a", 5),
+                    JSONFormat.consise,
+                    "{\"a\":5}");
+                toStringTest.run(
+                    JSONObject.create()
+                        .setNumber("a", 5.000),
+                    JSONFormat.consise,
+                    "{\"a\":5.0}");
+                toStringTest.run(
+                    JSONObject.create()
+                        .setString("a", "hello"),
+                    JSONFormat.consise,
+                    "{\"a\":\"hello\"}");
+                toStringTest.run(
+                    JSONObject.create()
+                        .setObject("a", JSONObject.create()),
+                    JSONFormat.consise,
+                    "{\"a\":{}}");
+                toStringTest.run(
+                    JSONObject.create()
+                        .setArray("a", JSONArray.create()),
+                    JSONFormat.consise,
+                    "{\"a\":[]}");
+
+                toStringTest.run(JSONObject.create(), JSONFormat.pretty, "{}");
+                toStringTest.run(
+                    JSONObject.create()
+                        .setNumber("a", 5),
+                    JSONFormat.pretty,
+                    "{\n  \"a\": 5\n}");
+                toStringTest.run(
+                    JSONObject.create()
+                        .setNumber("a", 5.000),
+                    JSONFormat.pretty,
+                    "{\n  \"a\": 5.0\n}");
+                toStringTest.run(
+                    JSONObject.create()
+                        .setString("a", "hello"),
+                    JSONFormat.pretty,
+                    "{\n  \"a\": \"hello\"\n}");
+                toStringTest.run(
+                    JSONObject.create()
+                        .setObject("a", JSONObject.create()),
+                    JSONFormat.pretty,
+                    "{\n  \"a\": {}\n}");
+                toStringTest.run(
+                    JSONObject.create()
+                        .setArray("a", JSONArray.create()),
+                    JSONFormat.pretty,
+                    "{\n  \"a\": []\n}");
+            });
+
             runner.testGroup("equals(Object)", () ->
             {
                 final Action3<JSONObject,Object,Boolean> equalsTest = (JSONObject object, Object rhs, Boolean expected) ->

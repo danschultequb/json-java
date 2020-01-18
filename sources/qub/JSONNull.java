@@ -15,8 +15,11 @@ public class JSONNull implements JSONSegment
     }
 
     @Override
-    public Result<Integer> toString(IndentedCharacterWriteStream stream)
+    public Result<Integer> toString(IndentedCharacterWriteStream stream, JSONFormat format)
     {
+        PreCondition.assertNotNull(stream, "stream");
+        PreCondition.assertNotNull(format, "format");
+
         return stream.write("null");
     }
 

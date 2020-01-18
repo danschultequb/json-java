@@ -47,73 +47,95 @@ public class JSONArray implements JSONSegment, List&lt;JSONSegment&gt;
     }
 
     @Override
-    public Result&lt;Integer&gt; toString(IndentedCharacterWriteStream stream)
+    public Result&lt;Integer&gt; toString(IndentedCharacterWriteStream stream, JSONFormat format)
     {
 <span class="fc" id="L52">        PreCondition.assertNotNull(stream, &quot;stream&quot;);</span>
+<span class="fc" id="L53">        PreCondition.assertNotNull(format, &quot;format&quot;);</span>
 
-<span class="fc" id="L54">        return Result.create(() -&gt;</span>
+<span class="fc" id="L55">        stream.setSingleIndent(format.getSingleIndent());</span>
+
+<span class="fc" id="L57">        final String newLine = format.getNewLine();</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">        final boolean hasNewLine = !Strings.isNullOrEmpty(newLine);</span>
+
+<span class="fc" id="L60">        return Result.create(() -&gt;</span>
         {
-<span class="fc" id="L56">            int result = 0;</span>
+<span class="fc" id="L62">            int result = 0;</span>
 
-<span class="fc" id="L58">            result += stream.write('[').await();</span>
-<span class="fc" id="L59">            boolean firstElement = true;</span>
-<span class="fc bfc" id="L60" title="All 2 branches covered.">            for (final JSONSegment element : this.elements)</span>
+<span class="fc" id="L64">            result += stream.write('[').await();</span>
+<span class="fc" id="L65">            stream.increaseIndent();</span>
+            try
             {
-<span class="fc bfc" id="L62" title="All 2 branches covered.">                if (firstElement)</span>
+<span class="fc" id="L68">                boolean wroteElement = false;</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">                for (final JSONSegment element : this.elements)</span>
                 {
-<span class="fc" id="L64">                    firstElement = false;</span>
-                }
-                else
+<span class="fc bfc" id="L71" title="All 2 branches covered.">                    if (!wroteElement)</span>
+                    {
+<span class="fc" id="L73">                        wroteElement = true;</span>
+                    }
+                    else
+                    {
+<span class="fc" id="L77">                        result += stream.write(',').await();</span>
+                    }
+<span class="fc bfc" id="L79" title="All 2 branches covered.">                    if (hasNewLine)</span>
+                    {
+<span class="fc" id="L81">                        result += stream.write(newLine).await();</span>
+                    }
+<span class="fc" id="L83">                    result += element.toString(stream, format).await();</span>
+<span class="fc" id="L84">                }</span>
+<span class="fc bfc" id="L85" title="All 4 branches covered.">                if (hasNewLine &amp;&amp; wroteElement)</span>
                 {
-<span class="fc" id="L68">                    result += stream.write(',').await();</span>
+<span class="fc" id="L87">                    result += stream.write(newLine).await();</span>
                 }
-<span class="fc" id="L70">                result += element.toString(stream).await();</span>
-<span class="fc" id="L71">            }</span>
-<span class="fc" id="L72">            result += stream.write(']').await();</span>
+            }
+            finally
+            {
+<span class="fc" id="L92">                stream.decreaseIndent();</span>
+            }
+<span class="fc" id="L94">            result += stream.write(']').await();</span>
 
-<span class="fc" id="L74">            PostCondition.assertGreaterThanOrEqualTo(result, 2, &quot;result&quot;);</span>
+<span class="fc" id="L96">            PostCondition.assertGreaterThanOrEqualTo(result, 2, &quot;result&quot;);</span>
 
-<span class="fc" id="L76">            return result;</span>
+<span class="fc" id="L98">            return result;</span>
         });
     }
 
     @Override
     public boolean equals(Object rhs)
     {
-<span class="fc bfc" id="L83" title="All 4 branches covered.">        return rhs instanceof JSONArray &amp;&amp; this.equals((JSONArray)rhs);</span>
+<span class="fc bfc" id="L105" title="All 4 branches covered.">        return rhs instanceof JSONArray &amp;&amp; this.equals((JSONArray)rhs);</span>
     }
 
     public boolean equals(JSONArray rhs)
     {
-<span class="fc bfc" id="L88" title="All 4 branches covered.">        return rhs != null &amp;&amp; this.elements.equals(rhs.elements);</span>
+<span class="fc bfc" id="L110" title="All 4 branches covered.">        return rhs != null &amp;&amp; this.elements.equals(rhs.elements);</span>
     }
 
     @Override
     public JSONArray insert(int insertIndex, JSONSegment value)
     {
-<span class="fc" id="L94">        PreCondition.assertBetween(0, insertIndex, this.getCount(), &quot;insertIndex&quot;);</span>
-<span class="fc" id="L95">        PreCondition.assertNotNull(value, &quot;value&quot;);</span>
+<span class="fc" id="L116">        PreCondition.assertBetween(0, insertIndex, this.getCount(), &quot;insertIndex&quot;);</span>
+<span class="fc" id="L117">        PreCondition.assertNotNull(value, &quot;value&quot;);</span>
 
-<span class="fc" id="L97">        this.elements.insert(insertIndex, value);</span>
-<span class="fc" id="L98">        return this;</span>
+<span class="fc" id="L119">        this.elements.insert(insertIndex, value);</span>
+<span class="fc" id="L120">        return this;</span>
     }
 
     @Override
     public JSONSegment removeAt(int index)
     {
-<span class="fc" id="L104">        PreCondition.assertIndexAccess(index, this.getCount(), &quot;index&quot;);</span>
+<span class="fc" id="L126">        PreCondition.assertIndexAccess(index, this.getCount(), &quot;index&quot;);</span>
 
-<span class="fc" id="L106">        return this.elements.removeAt(index);</span>
+<span class="fc" id="L128">        return this.elements.removeAt(index);</span>
     }
 
     @Override
     public JSONArray set(int index, JSONSegment value)
     {
-<span class="fc" id="L112">        PreCondition.assertIndexAccess(index, this.getCount(), &quot;index&quot;);</span>
-<span class="fc" id="L113">        PreCondition.assertNotNull(value, &quot;value&quot;);</span>
+<span class="fc" id="L134">        PreCondition.assertIndexAccess(index, this.getCount(), &quot;index&quot;);</span>
+<span class="fc" id="L135">        PreCondition.assertNotNull(value, &quot;value&quot;);</span>
 
-<span class="fc" id="L115">        this.elements.set(index, value);</span>
-<span class="fc" id="L116">        return this;</span>
+<span class="fc" id="L137">        this.elements.set(index, value);</span>
+<span class="fc" id="L138">        return this;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

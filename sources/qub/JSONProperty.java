@@ -164,13 +164,14 @@ public class JSONProperty implements MapEntry<String,JSONSegment>
     @Override
     public String toString()
     {
-        return JSONSegment.toString((Function1<IndentedCharacterWriteStream,Result<Integer>>)this::toString);
+        return JSONSegment.toString((Function2<IndentedCharacterWriteStream,JSONFormat,Result<Integer>>)this::toString);
     }
 
-    public Result<Integer> toString(IndentedCharacterWriteStream stream)
+    public Result<Integer> toString(IndentedCharacterWriteStream stream, JSONFormat format)
     {
         PreCondition.assertNotNull(stream, "stream");
         PreCondition.assertNotDisposed(stream, "stream");
+        PreCondition.assertNotNull(format, "format");
 
         return Result.create(() ->
         {
@@ -178,7 +179,12 @@ public class JSONProperty implements MapEntry<String,JSONSegment>
 
             result += stream.write(Strings.quote(this.name)).await();
             result += stream.write(':').await();
-            result += this.value.toString(stream).await();
+            final String afterPropertySeparator = format.getAfterPropertySeparator();
+            if (!Strings.isNullOrEmpty(afterPropertySeparator))
+            {
+                result += stream.write(afterPropertySeparator).await();
+            }
+            result += this.value.toString(stream, format).await();
 
             PostCondition.assertGreaterThanOrEqualTo(result, 5, "result");
 
