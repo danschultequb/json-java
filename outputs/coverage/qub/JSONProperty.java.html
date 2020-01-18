@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JSONProperty.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCo Coverage Report</a> &gt; <a href="index.source.html" class="el_package">qub</a> &gt; <span class="el_source">JSONProperty.java</span></div><h1>JSONProperty.java</h1><pre class="source lang-java linenums">package qub;
+
+/**
+ * A property within a JSON object.
+ */
+public class JSONProperty implements MapEntry&lt;String,JSONSegment&gt;
+{
+    private final String name;
+    private final JSONSegment value;
+
+    private JSONProperty(String name, JSONSegment value)
+<span class="fc" id="L12">    {</span>
+<span class="fc" id="L13">        PreCondition.assertNotNullAndNotEmpty(name, &quot;name&quot;);</span>
+<span class="fc" id="L14">        PreCondition.assertNotNull(value, &quot;value&quot;);</span>
+
+<span class="fc" id="L16">        this.name = name;</span>
+<span class="fc" id="L17">        this.value = value;</span>
+<span class="fc" id="L18">    }</span>
+
+    public static JSONProperty create(String name, boolean value)
+    {
+<span class="fc" id="L22">        return JSONProperty.create(name, JSONBoolean.get(value));</span>
+    }
+
+    public static JSONProperty create(String name, long value)
+    {
+<span class="fc" id="L27">        return JSONProperty.create(name, JSONNumber.get(value));</span>
+    }
+
+    public static JSONProperty create(String name, double value)
+    {
+<span class="fc" id="L32">        return JSONProperty.create(name, JSONNumber.get(value));</span>
+    }
+
+    public static JSONProperty create(String name, String value)
+    {
+<span class="fc" id="L37">        PreCondition.assertNotNull(value, &quot;value&quot;);</span>
+
+<span class="fc" id="L39">        return JSONProperty.create(name, JSONString.get(value));</span>
+    }
+
+    public static JSONProperty create(String name, JSONSegment value)
+    {
+<span class="fc" id="L44">        return new JSONProperty(name, value);</span>
+    }
+
+    /**
+     * Get the name of this property.
+     * @return The name of this property.
+     */
+    public String getName()
+    {
+<span class="fc" id="L53">        return this.name;</span>
+    }
+
+    @Override
+    public String getKey()
+    {
+<span class="fc" id="L59">        return this.getName();</span>
+    }
+
+    @Override
+    public JSONSegment getValue()
+    {
+<span class="fc" id="L65">        return this.value;</span>
+    }
+
+    public &lt;T extends JSONSegment&gt; Result&lt;T&gt; getValueAsOrNull(java.lang.Class&lt;T&gt; type)
+    {
+<span class="nc" id="L70">        PreCondition.assertNotNull(type, &quot;type&quot;);</span>
+
+<span class="nc" id="L72">        return JSON.asOrNull(this.value, type, JSON.thePropertyNamed(this.name));</span>
+    }
+
+    /**
+     * Get this property's value as the provided JSONSegment type.
+     * @param type The JSONSegment type to get this property's value as.
+     * @param &lt;T&gt; The JSONSegment type to get this property's value as.
+     * @return This property's value as the provided JSONSegment type.
+     */
+    public &lt;T extends JSONSegment&gt; Result&lt;T&gt; getValueAs(java.lang.Class&lt;T&gt; type)
+    {
+<span class="nc" id="L83">        PreCondition.assertNotNull(type, &quot;type&quot;);</span>
+
+<span class="nc" id="L85">        return JSON.as(this.value, type, JSON.thePropertyNamed(this.name));</span>
+    }
+
+    public Result&lt;JSONNull&gt; getNullValueSegment()
+    {
+<span class="nc" id="L90">        return this.getValueAs(JSONNull.class);</span>
+    }
+
+    public Result&lt;Void&gt; getNullValue()
+    {
+<span class="nc" id="L95">        return this.getNullValueSegment()</span>
+<span class="nc" id="L96">            .then(() -&gt; {});</span>
+    }
+
+    public Result&lt;JSONBoolean&gt; getBooleanValueSegment()
+    {
+<span class="nc" id="L101">        return this.getValueAs(JSONBoolean.class);</span>
+    }
+
+    public Result&lt;Boolean&gt; getBooleanValue()
+    {
+<span class="nc" id="L106">        return this.getBooleanValueSegment().then(JSONBoolean::getValue);</span>
+    }
+
+    public Result&lt;Boolean&gt; getBooleanOrNullValue()
+    {
+<span class="nc" id="L111">        return this.getValueAsOrNull(JSONBoolean.class).then(JSON::toBooleanOrNull);</span>
+    }
+
+    public Result&lt;JSONNumber&gt; getNumberValueSegment()
+    {
+<span class="nc" id="L116">        return this.getValueAs(JSONNumber.class);</span>
+    }
+
+    public Result&lt;Double&gt; getNumberValue()
+    {
+<span class="nc" id="L121">        return this.getNumberValueSegment().then(JSONNumber::getValue);</span>
+    }
+
+    public Result&lt;Double&gt; getNumberOrNullValue()
+    {
+<span class="nc" id="L126">        return this.getValueAsOrNull(JSONNumber.class).then(JSON::toNumberOrNull);</span>
+    }
+
+    public Result&lt;JSONString&gt; getStringValueSegment()
+    {
+<span class="nc" id="L131">        return this.getValueAs(JSONString.class);</span>
+    }
+
+    public Result&lt;String&gt; getStringValue()
+    {
+<span class="nc" id="L136">        return this.getStringValueSegment().then(JSONString::getValue);</span>
+    }
+
+    public Result&lt;String&gt; getStringOrNullValue()
+    {
+<span class="nc" id="L141">        return this.getValueAsOrNull(JSONString.class).then(JSON::toStringOrNull);</span>
+    }
+
+    public Result&lt;JSONObject&gt; getObjectValue()
+    {
+<span class="nc" id="L146">        return this.getValueAs(JSONObject.class);</span>
+    }
+
+    public Result&lt;JSONObject&gt; getObjectOrNullValue()
+    {
+<span class="nc" id="L151">        return this.getValueAsOrNull(JSONObject.class);</span>
+    }
+
+    public Result&lt;JSONArray&gt; getArrayValue()
+    {
+<span class="nc" id="L156">        return this.getValueAs(JSONArray.class);</span>
+    }
+
+    public Result&lt;JSONArray&gt; getArrayOrNullValue()
+    {
+<span class="nc" id="L161">        return this.getValueAsOrNull(JSONArray.class);</span>
+    }
+
+    @Override
+    public String toString()
+    {
+<span class="fc" id="L167">        return JSONSegment.toString((Function1&lt;IndentedCharacterWriteStream,Result&lt;Integer&gt;&gt;)this::toString);</span>
+    }
+
+    public Result&lt;Integer&gt; toString(IndentedCharacterWriteStream stream)
+    {
+<span class="fc" id="L172">        PreCondition.assertNotNull(stream, &quot;stream&quot;);</span>
+<span class="fc" id="L173">        PreCondition.assertNotDisposed(stream, &quot;stream&quot;);</span>
+
+<span class="fc" id="L175">        return Result.create(() -&gt;</span>
+        {
+<span class="fc" id="L177">            int result = 0;</span>
+
+<span class="fc" id="L179">            result += stream.write(Strings.quote(this.name)).await();</span>
+<span class="fc" id="L180">            result += stream.write(':').await();</span>
+<span class="fc" id="L181">            result += this.value.toString(stream).await();</span>
+
+<span class="fc" id="L183">            PostCondition.assertGreaterThanOrEqualTo(result, 5, &quot;result&quot;);</span>
+
+<span class="fc" id="L185">            return result;</span>
+        });
+    }
+
+    @Override
+    public boolean equals(Object rhs)
+    {
+<span class="fc bfc" id="L192" title="All 4 branches covered.">        return rhs instanceof JSONProperty &amp;&amp; this.equals((JSONProperty)rhs);</span>
+    }
+
+    public boolean equals(JSONProperty rhs)
+    {
+<span class="fc bfc" id="L197" title="All 2 branches covered.">        return rhs != null &amp;&amp;</span>
+<span class="fc bfc" id="L198" title="All 2 branches covered.">            this.name.equals(rhs.name) &amp;&amp;</span>
+<span class="fc bfc" id="L199" title="All 2 branches covered.">            this.value.equals(rhs.value);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

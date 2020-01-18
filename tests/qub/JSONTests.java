@@ -8,11 +8,6 @@ public interface JSONTests
 
         runner.testGroup(JSON.class, () ->
         {
-            runner.test("defaultSingleIndent", (Test test) ->
-            {
-                test.assertEqual("  ", JSON.defaultSingleIndent);
-            });
-
             runner.testGroup("parse(String)", () ->
             {
                 final Action2<String,Throwable> parseErrorTest = (String text, Throwable expected) ->
@@ -153,24 +148,24 @@ public interface JSONTests
                 parseObjectTest.run("{}", JSONObject.create());
                 parseObjectTest.run("{\"b\":null}",
                     JSONObject.create(
-                        JSONObjectProperty.create("b", JSONNull.segment)));
+                        JSONProperty.create("b", JSONNull.segment)));
                 parseObjectTest.run("{\"b\":\"c\"}",
                     JSONObject.create(
-                        JSONObjectProperty.create("b", "c")));
+                        JSONProperty.create("b", "c")));
                 parseObjectTest.run("{\"b\":[1, 2, 3]}",
                     JSONObject.create(
-                        JSONObjectProperty.create("b",
+                        JSONProperty.create("b",
                             JSONArray.create(
                                 JSONNumber.get(1),
                                 JSONNumber.get(2),
                                 JSONNumber.get(3)))));
                 parseObjectTest.run("{\"c\":{}}",
                     JSONObject.create(
-                        JSONObjectProperty.create("c", JSONObject.create())));
+                        JSONProperty.create("c", JSONObject.create())));
                 parseObjectTest.run("{\"c\":{},\"d\":50.2}",
                     JSONObject.create(
-                        JSONObjectProperty.create("c", JSONObject.create()),
-                        JSONObjectProperty.create("d", JSONNumber.get(50.2))));
+                        JSONProperty.create("c", JSONObject.create()),
+                        JSONProperty.create("d", JSONNumber.get(50.2))));
             });
 
             runner.testGroup("parseObject(Iterable<Character>)", () ->
@@ -228,7 +223,7 @@ public interface JSONTests
                 parseObjectPropertyErrorTest.run("\"hello\":}", new ParseException("Unexpected object property value token: \"}\""));
                 parseObjectPropertyErrorTest.run("\"hello\":]", new ParseException("Unexpected object property value token: \"]\""));
 
-                final Action2<String,JSONObjectProperty> parseObjectPropertyTest = (String text, JSONObjectProperty expected) ->
+                final Action2<String,JSONProperty> parseObjectPropertyTest = (String text, JSONProperty expected) ->
                 {
                     runner.test("with " + Strings.escapeAndQuote(text), (Test test) ->
                     {
@@ -236,15 +231,15 @@ public interface JSONTests
                     });
                 };
 
-                parseObjectPropertyTest.run("\"a\":false", JSONObjectProperty.create("a", false));
-                parseObjectPropertyTest.run("\"a\":true", JSONObjectProperty.create("a", true));
-                parseObjectPropertyTest.run("\"a\":null", JSONObjectProperty.create("a", JSONNull.segment));
-                parseObjectPropertyTest.run("\"b\" : 123", JSONObjectProperty.create("b", 123));
-                parseObjectPropertyTest.run("\"b\" : 123.4", JSONObjectProperty.create("b", 123.4));
-                parseObjectPropertyTest.run("\"c\"\n:\n\"hello\"", JSONObjectProperty.create("c", "hello"));
-                parseObjectPropertyTest.run("\"hello\":{}", JSONObjectProperty.create("hello", JSONObject.create()));
-                parseObjectPropertyTest.run("\"d\":[]", JSONObjectProperty.create("d", JSONArray.create()));
-                parseObjectPropertyTest.run("\"d\":[true]", JSONObjectProperty.create("d", JSONArray.create(JSONBoolean.trueSegment)));
+                parseObjectPropertyTest.run("\"a\":false", JSONProperty.create("a", false));
+                parseObjectPropertyTest.run("\"a\":true", JSONProperty.create("a", true));
+                parseObjectPropertyTest.run("\"a\":null", JSONProperty.create("a", JSONNull.segment));
+                parseObjectPropertyTest.run("\"b\" : 123", JSONProperty.create("b", 123));
+                parseObjectPropertyTest.run("\"b\" : 123.4", JSONProperty.create("b", 123.4));
+                parseObjectPropertyTest.run("\"c\"\n:\n\"hello\"", JSONProperty.create("c", "hello"));
+                parseObjectPropertyTest.run("\"hello\":{}", JSONProperty.create("hello", JSONObject.create()));
+                parseObjectPropertyTest.run("\"d\":[]", JSONProperty.create("d", JSONArray.create()));
+                parseObjectPropertyTest.run("\"d\":[true]", JSONProperty.create("d", JSONArray.create(JSONBoolean.trueSegment)));
             });
 
             runner.testGroup("parseObjectProperty(Iterable<Character>)", () ->

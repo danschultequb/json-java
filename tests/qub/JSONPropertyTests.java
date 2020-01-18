@@ -1,12 +1,12 @@
 package qub;
 
-public interface JSONObjectPropertyTests
+public interface JSONPropertyTests
 {
     static void test(TestRunner runner)
     {
         PreCondition.assertNotNull(runner, "runner");
 
-        runner.testGroup(JSONObjectProperty.class, () ->
+        runner.testGroup(JSONProperty.class, () ->
         {
             runner.testGroup("create(String,boolean)", () ->
             {
@@ -14,7 +14,7 @@ public interface JSONObjectPropertyTests
                 {
                     runner.test("with " + Strings.escapeAndQuote(propertyName) + " and " + propertyValue, (Test test) ->
                     {
-                        test.assertThrows(() -> JSONObjectProperty.create(propertyName, propertyValue),
+                        test.assertThrows(() -> JSONProperty.create(propertyName, propertyValue),
                             expectedError);
                     });
                 };
@@ -26,7 +26,7 @@ public interface JSONObjectPropertyTests
                 {
                     runner.test("with " + Strings.escapeAndQuote(propertyName) + " and " + propertyValue, (Test test) ->
                     {
-                        final JSONObjectProperty property = JSONObjectProperty.create(propertyName, propertyValue);
+                        final JSONProperty property = JSONProperty.create(propertyName, propertyValue);
                         test.assertEqual(propertyName, property.getName());
                         test.assertEqual(propertyName, property.getKey());
                         test.assertEqual(JSONBoolean.get(propertyValue), property.getValue());
@@ -44,7 +44,7 @@ public interface JSONObjectPropertyTests
                 {
                     runner.test("with " + Strings.escapeAndQuote(propertyName) + " and " + propertyValue, (Test test) ->
                     {
-                        test.assertThrows(() -> JSONObjectProperty.create(propertyName, propertyValue),
+                        test.assertThrows(() -> JSONProperty.create(propertyName, propertyValue),
                             expectedError);
                     });
                 };
@@ -56,7 +56,7 @@ public interface JSONObjectPropertyTests
                 {
                     runner.test("with " + Strings.escapeAndQuote(propertyName) + " and " + propertyValue, (Test test) ->
                     {
-                        final JSONObjectProperty property = JSONObjectProperty.create(propertyName, propertyValue);
+                        final JSONProperty property = JSONProperty.create(propertyName, propertyValue);
                         test.assertEqual(propertyName, property.getName());
                         test.assertEqual(propertyName, property.getKey());
                         test.assertEqual(JSONNumber.get(propertyValue), property.getValue());
@@ -74,7 +74,7 @@ public interface JSONObjectPropertyTests
                 {
                     runner.test("with " + Strings.escapeAndQuote(propertyName) + " and " + propertyValue, (Test test) ->
                     {
-                        test.assertThrows(() -> JSONObjectProperty.create(propertyName, propertyValue),
+                        test.assertThrows(() -> JSONProperty.create(propertyName, propertyValue),
                             expectedError);
                     });
                 };
@@ -86,7 +86,7 @@ public interface JSONObjectPropertyTests
                 {
                     runner.test("with " + Strings.escapeAndQuote(propertyName) + " and " + propertyValue, (Test test) ->
                     {
-                        final JSONObjectProperty property = JSONObjectProperty.create(propertyName, propertyValue);
+                        final JSONProperty property = JSONProperty.create(propertyName, propertyValue);
                         test.assertEqual(propertyName, property.getName());
                         test.assertEqual(propertyName, property.getKey());
                         test.assertEqual(JSONNumber.get(propertyValue), property.getValue());
@@ -98,9 +98,40 @@ public interface JSONObjectPropertyTests
                 createTest.run("bats", 0.0);
             });
 
+            runner.testGroup("create(String,String)", () ->
+            {
+                final Action3<String,String,Throwable> createErrorTest = (String propertyName, String propertyValue, Throwable expectedError) ->
+                {
+                    runner.test("with " + English.andList(Iterable.create(propertyName, propertyValue).map(Strings::escapeAndQuote)), (Test test) ->
+                    {
+                        test.assertThrows(() -> JSONProperty.create(propertyName, propertyValue),
+                            expectedError);
+                    });
+                };
+
+                createErrorTest.run(null, "b", new PreConditionFailure("name cannot be null."));
+                createErrorTest.run("", "b", new PreConditionFailure("name cannot be empty."));
+                createErrorTest.run("a", null, new PreConditionFailure("value cannot be null."));
+
+                final Action2<String,String> createTest = (String propertyName, String propertyValue) ->
+                {
+                    runner.test("with " + English.andList(Iterable.create(propertyName, propertyValue).map(Strings::escapeAndQuote)), (Test test) ->
+                    {
+                        final JSONProperty property = JSONProperty.create(propertyName, propertyValue);
+                        test.assertEqual(propertyName, property.getName());
+                        test.assertEqual(propertyName, property.getKey());
+                        test.assertEqual(JSONString.get(propertyValue), property.getValue());
+                        test.assertEqual(Strings.quote(propertyName) + ":" + Strings.quote(propertyValue), property.toString());
+                    });
+                };
+
+                createTest.run("a", "");
+                createTest.run("bats", "yup");
+            });
+
             runner.testGroup("equals(Object)", () ->
             {
-                final Action3<JSONObjectProperty,Object,Boolean> equalsTest = (JSONObjectProperty property, Object rhs, Boolean expected) ->
+                final Action3<JSONProperty,Object,Boolean> equalsTest = (JSONProperty property, Object rhs, Boolean expected) ->
                 {
                     runner.test("with " + property + " and " + rhs, (Test test) ->
                     {
@@ -108,16 +139,16 @@ public interface JSONObjectPropertyTests
                     });
                 };
 
-                equalsTest.run(JSONObjectProperty.create("a", "b"), null, false);
-                equalsTest.run(JSONObjectProperty.create("a", "b"), "hello", false);
-                equalsTest.run(JSONObjectProperty.create("a", "b"), JSONObjectProperty.create("c", "b"), false);
-                equalsTest.run(JSONObjectProperty.create("a", "b"), JSONObjectProperty.create("a", "c"), false);
-                equalsTest.run(JSONObjectProperty.create("a", "b"), JSONObjectProperty.create("a", "b"), true);
+                equalsTest.run(JSONProperty.create("a", "b"), null, false);
+                equalsTest.run(JSONProperty.create("a", "b"), "hello", false);
+                equalsTest.run(JSONProperty.create("a", "b"), JSONProperty.create("c", "b"), false);
+                equalsTest.run(JSONProperty.create("a", "b"), JSONProperty.create("a", "c"), false);
+                equalsTest.run(JSONProperty.create("a", "b"), JSONProperty.create("a", "b"), true);
             });
 
             runner.testGroup("equals(JSONObjectProperty)", () ->
             {
-                final Action3<JSONObjectProperty,JSONObjectProperty,Boolean> equalsTest = (JSONObjectProperty property, JSONObjectProperty rhs, Boolean expected) ->
+                final Action3<JSONProperty,JSONProperty,Boolean> equalsTest = (JSONProperty property, JSONProperty rhs, Boolean expected) ->
                 {
                     runner.test("with " + property + " and " + rhs, (Test test) ->
                     {
@@ -125,10 +156,10 @@ public interface JSONObjectPropertyTests
                     });
                 };
 
-                equalsTest.run(JSONObjectProperty.create("a", "b"), null, false);
-                equalsTest.run(JSONObjectProperty.create("a", "b"), JSONObjectProperty.create("c", "b"), false);
-                equalsTest.run(JSONObjectProperty.create("a", "b"), JSONObjectProperty.create("a", "c"), false);
-                equalsTest.run(JSONObjectProperty.create("a", "b"), JSONObjectProperty.create("a", "b"), true);
+                equalsTest.run(JSONProperty.create("a", "b"), null, false);
+                equalsTest.run(JSONProperty.create("a", "b"), JSONProperty.create("c", "b"), false);
+                equalsTest.run(JSONProperty.create("a", "b"), JSONProperty.create("a", "c"), false);
+                equalsTest.run(JSONProperty.create("a", "b"), JSONProperty.create("a", "b"), true);
             });
         });
     }

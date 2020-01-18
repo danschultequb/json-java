@@ -5,10 +5,73 @@ package qub;
  */
 public interface JSON
 {
-    /**
-     * The default indentation String when formatting a JSON document.
-     */
-    String defaultSingleIndent = "  ";
+    static String thePropertyNamed(String propertyName)
+    {
+        return "the property named " + Strings.escapeAndQuote(propertyName);
+    }
+
+    static String getWrongTypeExceptionMessage(JSONSegment value, Iterable<java.lang.Class<? extends JSONSegment>> expectedTypes, String valueName)
+    {
+        PreCondition.assertNotNull(value, "value");
+        PreCondition.assertNotNullAndNotEmpty(expectedTypes, "expectedTypes");
+        PreCondition.assertNotNullAndNotEmpty(valueName, "valueName");
+
+        return "Expected " + valueName + " to be a " + English.orList(expectedTypes.map(Types::getTypeName)) + ", but was a " + Types.getTypeName(value) + " instead.";
+    }
+
+    static <T extends JSONSegment> Result<T> as(JSONSegment value, java.lang.Class<T> type, String valueName)
+    {
+        PreCondition.assertNotNull(value, "value");
+        PreCondition.assertNotNull(type, "type");
+        PreCondition.assertNotNullAndNotEmpty(valueName, "valueName");
+
+        final T typedValue = Types.as(value, type);
+        return typedValue == null
+            ? Result.error(new WrongTypeException(JSON.getWrongTypeExceptionMessage(value, Iterable.create(type), valueName)))
+            : Result.success(typedValue);
+    }
+
+    static <T extends JSONSegment> Result<T> as(JSONSegment value, java.lang.Class<T> type)
+    {
+        PreCondition.assertNotNull(value, "value");
+        PreCondition.assertNotNull(type, "type");
+
+        return JSON.as(value, type, "value");
+    }
+
+    static <T extends JSONSegment> Result<T> asOrNull(JSONSegment value, java.lang.Class<T> type, String valueName)
+    {
+        PreCondition.assertNotNull(value, "value");
+        PreCondition.assertNotNull(type, "type");
+        PreCondition.assertNotNullAndNotEmpty(valueName, "valueName");
+
+        return JSON.as(value, type)
+            .catchError(WrongTypeException.class, () -> JSON.as(value, JSONNull.class).await())
+            .convertError(WrongTypeException.class, () -> new WrongTypeException(JSON.getWrongTypeExceptionMessage(value, Iterable.create(type, JSONNull.class), valueName)));
+    }
+
+    static <T extends JSONSegment> Result<T> asOrNull(JSONSegment value, java.lang.Class<T> type)
+    {
+        PreCondition.assertNotNull(value, "value");
+        PreCondition.assertNotNull(type, "type");
+
+        return JSON.asOrNull(value, type, "value");
+    }
+
+    static Boolean toBooleanOrNull(JSONBoolean segment)
+    {
+        return segment == null ? null : segment.getValue();
+    }
+
+    static Double toNumberOrNull(JSONNumber segment)
+    {
+        return segment == null ? null : segment.getValue();
+    }
+
+    static String toStringOrNull(JSONString segment)
+    {
+        return segment == null ? null : segment.getValue();
+    }
 
     /**
      * Parse a JSONSegment from the provided text.
@@ -153,7 +216,7 @@ public interface JSON
         {
             final JSONToken leftCurlyBracket = JSON.takeCurrent(tokenizer);
 
-            final List<JSONObjectProperty> properties = List.create();
+            final List<JSONProperty> properties = List.create();
             JSONToken rightCurlyBracket = null;
             boolean expectProperty = true;
             while (tokenizer.hasCurrent() && rightCurlyBracket == null)
@@ -230,7 +293,7 @@ public interface JSON
      * @param text The text to parse into a JSONObjectProperty.
      * @return The parsed JSONObjectProperty.
      */
-    static Result<JSONObjectProperty> parseObjectProperty(String text)
+    static Result<JSONProperty> parseObjectProperty(String text)
     {
         PreCondition.assertNotNullAndNotEmpty(text, "text");
 
@@ -242,7 +305,7 @@ public interface JSON
      * @param characters The characters to parse into a JSONObjectProperty.
      * @return The parsed JSONObjectProperty.
      */
-    static Result<JSONObjectProperty> parseObjectProperty(Iterable<Character> characters)
+    static Result<JSONProperty> parseObjectProperty(Iterable<Character> characters)
     {
         PreCondition.assertNotNullAndNotEmpty(characters, "characters");
 
@@ -254,7 +317,7 @@ public interface JSON
      * @param characters The characters to parse into a JSONObjectProperty.
      * @return The parsed JSONObjectProperty.
      */
-    static Result<JSONObjectProperty> parseObjectProperty(Iterator<Character> characters)
+    static Result<JSONProperty> parseObjectProperty(Iterator<Character> characters)
     {
         PreCondition.assertNotNull(characters, "characters");
 
@@ -266,7 +329,7 @@ public interface JSON
      * @param tokenizer The tokenizer that produces JSONTokens.
      * @return The parsed JSONObjectProperty.
      */
-    static Result<JSONObjectProperty> parseObjectProperty(JSONTokenizer tokenizer)
+    static Result<JSONProperty> parseObjectProperty(JSONTokenizer tokenizer)
     {
         PreCondition.assertNotNull(tokenizer, "tokenizer");
         PreCondition.assertTrue(tokenizer.hasCurrent(), "tokenizer.hasCurrent()");
@@ -312,7 +375,7 @@ public interface JSON
                 }
             }
 
-            return JSONObjectProperty.create(propertyName, propertyValue);
+            return JSONProperty.create(propertyName, propertyValue);
         });
     }
 

@@ -14,28 +14,28 @@ public class JSONObject implements JSONSegment, MutableMap<String,JSONSegment>
         this.properties = properties;
     }
 
-    public static JSONObject create(JSONObjectProperty... properties)
+    public static JSONObject create(JSONProperty... properties)
     {
         PreCondition.assertNotNull(properties, "properties");
 
         return JSONObject.create(Iterable.create(properties));
     }
 
-    public static JSONObject create(Iterable<JSONObjectProperty> properties)
+    public static JSONObject create(Iterable<JSONProperty> properties)
     {
         PreCondition.assertNotNull(properties, "properties");
 
         return JSONObject.create(properties.iterate());
     }
 
-    public static JSONObject create(Iterator<JSONObjectProperty> properties)
+    public static JSONObject create(Iterator<JSONProperty> properties)
     {
         PreCondition.assertNotNull(properties, "properties");
 
         return JSONObject.create(
             properties.toMap(
-                JSONObjectProperty::getName,
-                JSONObjectProperty::getValue));
+                JSONProperty::getName,
+                JSONProperty::getValue));
     }
 
     public static JSONObject create(Map<String,JSONSegment> properties)
@@ -50,7 +50,7 @@ public class JSONObject implements JSONSegment, MutableMap<String,JSONSegment>
      * @param propertyName The name of the property to look for.
      * @return Whether or not this JSONObject contains a property with the provided name.
      */
-    public boolean containsProperty(String propertyName)
+    public boolean contains(String propertyName)
     {
         PreCondition.assertNotNullAndNotEmpty(propertyName, "propertyName");
 
@@ -60,25 +60,7 @@ public class JSONObject implements JSONSegment, MutableMap<String,JSONSegment>
     @Override
     public boolean containsKey(String propertyName)
     {
-        return this.containsProperty(propertyName);
-    }
-
-    private static String getWrongTypeExceptionMessage(String propertyName, String expectedTypeName, JSONSegment actualObject)
-    {
-        PreCondition.assertNotNullAndNotEmpty(propertyName, "propertyName");
-        PreCondition.assertNotNullAndNotEmpty(expectedTypeName, "expectedTypeName");
-        PreCondition.assertNotNull(actualObject, "actualObject");
-
-        return "Expected the property named " + Strings.escapeAndQuote(propertyName) + " to be a " + expectedTypeName + ", but was a " + Types.getTypeName(actualObject) + " instead.";
-    }
-
-    private static <T extends JSONSegment> String getWrongTypeExceptionMessage(String propertyName, java.lang.Class<T> expectedType, JSONSegment actualObject)
-    {
-        PreCondition.assertNotNullAndNotEmpty(propertyName, "propertyName");
-        PreCondition.assertNotNull(expectedType, "expectedType");
-        PreCondition.assertNotNull(actualObject, "actualObject");
-
-        return JSONObject.getWrongTypeExceptionMessage(propertyName, Types.getTypeName(expectedType), actualObject);
+        return this.contains(propertyName);
     }
 
     @Override
@@ -94,31 +76,16 @@ public class JSONObject implements JSONSegment, MutableMap<String,JSONSegment>
     {
         PreCondition.assertNotNullAndNotEmpty(propertyName, "propertyName");
 
-        return Result.create(() ->
-        {
-            final JSONSegment propertyValueSegment = this.get(propertyName).await();
-            final T result = Types.as(propertyValueSegment, propertyValueType);
-            if (result == null)
-            {
-                throw new WrongTypeException(JSONObject.getWrongTypeExceptionMessage(propertyName, propertyValueType, propertyValueSegment));
-            }
-            return result;
-        });
+        return this.get(propertyName)
+            .then((JSONSegment propertyValue) -> JSON.as(propertyValue, propertyValueType, JSON.thePropertyNamed(propertyName)).await());
     }
 
-    private <T extends JSONSegment> Result<T> getTypedOrNull(String propertyName, java.lang.Class<T> propertyValueType)
+    private <T extends JSONSegment> Result<T> getOrNull(String propertyName, java.lang.Class<T> propertyValueType)
     {
         PreCondition.assertNotNullAndNotEmpty(propertyName, "propertyName");
-        PreCondition.assertNotNull(propertyValueType, "propertyValueType");
 
-        return this.get(propertyName, propertyValueType)
-            .catchError(WrongTypeException.class, () -> this.getNull(propertyName).await())
-            .convertError(WrongTypeException.class, () ->
-                new WrongTypeException(
-                    JSONObject.getWrongTypeExceptionMessage(
-                        propertyName,
-                        Types.getTypeName(propertyValueType) + " or " + Types.getTypeName(JSONNull.class),
-                        this.get(propertyName).await())));
+        return this.get(propertyName)
+            .then((JSONSegment propertyValue) -> JSON.asOrNull(propertyValue, propertyValueType, JSON.thePropertyNamed(propertyName)).await());
     }
 
     public Result<JSONObject> getObject(String propertyName)
@@ -128,7 +95,7 @@ public class JSONObject implements JSONSegment, MutableMap<String,JSONSegment>
 
     public Result<JSONObject> getObjectOrNull(String propertyName)
     {
-        return this.getTypedOrNull(propertyName, JSONObject.class);
+        return this.getOrNull(propertyName, JSONObject.class);
     }
 
     public Result<JSONArray> getArray(String propertyName)
@@ -138,37 +105,41 @@ public class JSONObject implements JSONSegment, MutableMap<String,JSONSegment>
 
     public Result<JSONArray> getArrayOrNull(String propertyName)
     {
-        return this.getTypedOrNull(propertyName, JSONArray.class);
+        return this.getOrNull(propertyName, JSONArray.class);
+    }
+
+    public Result<JSONBoolean> getBooleanSegment(String propertyName)
+    {
+        return this.get(propertyName, JSONBoolean.class);
     }
 
     public Result<Boolean> getBoolean(String propertyName)
     {
-        return this.get(propertyName, JSONBoolean.class)
+        return this.getBooleanSegment(propertyName)
             .then(JSONBoolean::getValue);
     }
 
     public Result<Boolean> getBooleanOrNull(String propertyName)
     {
-        return this.getTypedOrNull(propertyName, JSONBoolean.class)
-            .then((JSONBoolean value) -> value == null ? null : value.getValue());
+        return this.getOrNull(propertyName, JSONBoolean.class)
+            .then(JSON::toBooleanOrNull);
     }
 
-    public Result<String> getString(String propertyName)
+    public Result<JSONNumber> getNumberSegment(String propertyName)
     {
-        return this.get(propertyName, JSONString.class)
-            .then(JSONString::getValue);
-    }
-
-    public Result<String> getStringOrNull(String propertyName)
-    {
-        return this.getTypedOrNull(propertyName, JSONString.class)
-            .then((JSONString string) -> string == null ? null : string.getValue());
+        return this.get(propertyName, JSONNumber.class);
     }
 
     public Result<Double> getNumber(String propertyName)
     {
-        return this.get(propertyName, JSONNumber.class)
+        return this.getNumberSegment(propertyName)
             .then(JSONNumber::getValue);
+    }
+
+    public Result<Double> getNumberOrNull(String propertyName)
+    {
+        return this.getOrNull(propertyName, JSONNumber.class)
+            .then(JSON::toNumberOrNull);
     }
 
     public Result<Void> getNull(String propertyName)
@@ -177,12 +148,29 @@ public class JSONObject implements JSONSegment, MutableMap<String,JSONSegment>
             .then(() -> null);
     }
 
-    public Result<JSONObjectProperty> getProperty(String propertyName)
+    public Result<JSONString> getStringSegment(String propertyName)
+    {
+        return this.get(propertyName, JSONString.class);
+    }
+
+    public Result<String> getString(String propertyName)
+    {
+        return this.getStringSegment(propertyName)
+            .then(JSONString::getValue);
+    }
+
+    public Result<String> getStringOrNull(String propertyName)
+    {
+        return this.getOrNull(propertyName, JSONString.class)
+            .then(JSON::toStringOrNull);
+    }
+
+    public Result<JSONProperty> getProperty(String propertyName)
     {
         PreCondition.assertNotNullAndNotEmpty(propertyName, "propertyName");
 
         return this.get(propertyName)
-            .then((JSONSegment propertyValue) -> JSONObjectProperty.create(propertyName, propertyValue));
+            .then((JSONSegment propertyValue) -> JSONProperty.create(propertyName, propertyValue));
     }
 
     /**
@@ -219,9 +207,9 @@ public class JSONObject implements JSONSegment, MutableMap<String,JSONSegment>
      * Get the properties in this JSONObject.
      * @return The properties in this JSONObject.
      */
-    public Iterable<JSONObjectProperty> getProperties()
+    public Iterable<JSONProperty> getProperties()
     {
-        return this.properties.map((MapEntry<String,JSONSegment> entry) -> JSONObjectProperty.create(entry.getKey(), entry.getValue()));
+        return this.properties.map((MapEntry<String,JSONSegment> entry) -> JSONProperty.create(entry.getKey(), entry.getValue()));
     }
 
     @Override
@@ -237,11 +225,56 @@ public class JSONObject implements JSONSegment, MutableMap<String,JSONSegment>
         return this;
     }
 
-    public JSONObject setProperty(JSONObjectProperty property)
+    @Override
+    public JSONObject set(String propertyName, JSONSegment propertyValue)
+    {
+        PreCondition.assertNotNullAndNotEmpty(propertyName, "propertyName");
+        PreCondition.assertNotNull(propertyValue, "propertyValue");
+
+        this.properties.set(propertyName, propertyValue);
+
+        return this;
+    }
+
+    @Override
+    public JSONObject setAll(Iterable<MapEntry<String,JSONSegment>> properties)
+    {
+        PreCondition.assertNotNull(properties, "properties");
+
+        MutableMap.super.setAll(properties);
+
+        return this;
+    }
+
+    public JSONObject set(MapEntry<String,JSONSegment> property)
     {
         PreCondition.assertNotNull(property, "property");
 
-        return this.set(property.getName(), property.getValue());
+        return this.set(property.getKey(), property.getValue());
+    }
+
+    public JSONObject setObject(String propertyName, JSONObject propertyValue)
+    {
+        PreCondition.assertNotNull(propertyValue, "propertyValue");
+
+        return this.set(propertyName, propertyValue);
+    }
+
+    public JSONObject setObjectOrNull(String propertyName, JSONObject propertyValue)
+    {
+        return this.set(propertyName, propertyValue == null ? JSONNull.segment : propertyValue);
+    }
+
+    public JSONObject setArray(String propertyName, JSONArray propertyValue)
+    {
+        PreCondition.assertNotNull(propertyValue, "propertyValue");
+
+        return this.set(propertyName, propertyValue);
+    }
+
+    public JSONObject setArrayOrNull(String propertyName, JSONArray propertyValue)
+    {
+        return this.set(propertyName, propertyValue == null ? JSONNull.segment : propertyValue);
     }
 
     public JSONObject setBoolean(String propertyName, boolean propertyValue)
@@ -300,22 +333,12 @@ public class JSONObject implements JSONSegment, MutableMap<String,JSONSegment>
     }
 
     @Override
-    public JSONObject set(String propertyName, JSONSegment propertyValue)
-    {
-        PreCondition.assertNotNullAndNotEmpty(propertyName, "propertyName");
-        PreCondition.assertNotNull(propertyValue, "propertyValue");
-
-        this.properties.set(propertyName, propertyValue);
-
-        return this;
-    }
-
-    @Override
     public Result<JSONSegment> remove(String propertyName)
     {
         PreCondition.assertNotNullAndNotEmpty(propertyName, "propertyName");
 
-        return this.properties.remove(propertyName);
+        return this.properties.remove(propertyName)
+            .convertError(NotFoundException.class, () -> new NotFoundException("No property exists in this JSONObject with the name: " + Strings.escapeAndQuote(propertyName)));
     }
 
     @Override
@@ -336,7 +359,7 @@ public class JSONObject implements JSONSegment, MutableMap<String,JSONSegment>
 
             result += stream.write('{').await();
             boolean firstProperty = true;
-            for (final JSONObjectProperty property : this.getProperties())
+            for (final JSONProperty property : this.getProperties())
             {
                 if (firstProperty)
                 {
