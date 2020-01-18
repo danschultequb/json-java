@@ -19,7 +19,7 @@ public interface JSONTests
                 };
 
                 parseErrorTest.run(null, new PreConditionFailure("text cannot be null."));
-                parseErrorTest.run("", new PreConditionFailure("text cannot be empty."));
+                parseErrorTest.run("", new ParseException("No JSON tokens found."));
                 parseErrorTest.run("// hello", new ParseException("No JSON tokens found."));
                 parseErrorTest.run("/* hello */", new ParseException("No JSON tokens found."));
                 parseErrorTest.run(",", new ParseException("Unexpected JSON token: ,"));
@@ -113,14 +113,14 @@ public interface JSONTests
                 };
 
                 parseObjectErrorTest.run(null, new PreConditionFailure("text cannot be null."));
-                parseObjectErrorTest.run("", new PreConditionFailure("text cannot be empty."));
-                parseObjectErrorTest.run("null", new PreConditionFailure("tokenizer.getCurrent() (null) must be {."));
-                parseObjectErrorTest.run("false", new PreConditionFailure("tokenizer.getCurrent() (false) must be {."));
-                parseObjectErrorTest.run("true", new PreConditionFailure("tokenizer.getCurrent() (true) must be {."));
-                parseObjectErrorTest.run("// hello", new PreConditionFailure("tokenizer.hasCurrent() cannot be false."));
-                parseObjectErrorTest.run("/* hello */", new PreConditionFailure("tokenizer.hasCurrent() cannot be false."));
-                parseObjectErrorTest.run("123", new PreConditionFailure("tokenizer.getCurrent() (123) must be {."));
-                parseObjectErrorTest.run("\"hello\"", new PreConditionFailure("tokenizer.getCurrent() (\"hello\") must be {."));
+                parseObjectErrorTest.run("", new ParseException("Missing object left curly bracket ('{')."));
+                parseObjectErrorTest.run("null", new ParseException("Expected object left curly bracket ('{')."));
+                parseObjectErrorTest.run("false", new ParseException("Expected object left curly bracket ('{')."));
+                parseObjectErrorTest.run("true", new ParseException("Expected object left curly bracket ('{')."));
+                parseObjectErrorTest.run("// hello", new ParseException("Missing object left curly bracket ('{')."));
+                parseObjectErrorTest.run("/* hello */", new ParseException("Missing object left curly bracket ('{')."));
+                parseObjectErrorTest.run("123", new ParseException("Expected object left curly bracket ('{')."));
+                parseObjectErrorTest.run("\"hello\"", new ParseException("Expected object left curly bracket ('{')."));
                 parseObjectErrorTest.run("{", new ParseException("Missing object right curly bracket ('}')."));
                 parseObjectErrorTest.run("{   ", new ParseException("Missing object right curly bracket ('}')."));
                 parseObjectErrorTest.run("{,", new ParseException("Expected quoted-string object property name or right curly bracket ('}')."));
@@ -206,14 +206,14 @@ public interface JSONTests
                 };
 
                 parseObjectPropertyErrorTest.run(null, new PreConditionFailure("text cannot be null."));
-                parseObjectPropertyErrorTest.run("", new PreConditionFailure("text cannot be empty."));
-                parseObjectPropertyErrorTest.run("// hello", new PreConditionFailure("tokenizer.hasCurrent() cannot be false."));
-                parseObjectPropertyErrorTest.run("/* hello */", new PreConditionFailure("tokenizer.hasCurrent() cannot be false."));
-                parseObjectPropertyErrorTest.run("   ", new PreConditionFailure("tokenizer.hasCurrent() cannot be false."));
-                parseObjectPropertyErrorTest.run("null", new PreConditionFailure("tokenizer.getCurrent().getType() (Null) must be QuotedString."));
-                parseObjectPropertyErrorTest.run("false", new PreConditionFailure("tokenizer.getCurrent().getType() (Boolean) must be QuotedString."));
-                parseObjectPropertyErrorTest.run("true", new PreConditionFailure("tokenizer.getCurrent().getType() (Boolean) must be QuotedString."));
-                parseObjectPropertyErrorTest.run("123", new PreConditionFailure("tokenizer.getCurrent().getType() (Number) must be QuotedString."));
+                parseObjectPropertyErrorTest.run("", new ParseException("Missing object property name."));
+                parseObjectPropertyErrorTest.run("// hello", new ParseException("Missing object property name."));
+                parseObjectPropertyErrorTest.run("/* hello */", new ParseException("Missing object property name."));
+                parseObjectPropertyErrorTest.run("   ", new ParseException("Missing object property name."));
+                parseObjectPropertyErrorTest.run("null", new ParseException("Expected object property name."));
+                parseObjectPropertyErrorTest.run("false", new ParseException("Expected object property name."));
+                parseObjectPropertyErrorTest.run("true", new ParseException("Expected object property name."));
+                parseObjectPropertyErrorTest.run("123", new ParseException("Expected object property name."));
                 parseObjectPropertyErrorTest.run("\"hello\"", new ParseException("Missing object property name and value separator (':')."));
                 parseObjectPropertyErrorTest.run("\"hello\"   ", new ParseException("Missing object property name and value separator (':')."));
                 parseObjectPropertyErrorTest.run("\"hello\"null  ", new ParseException("Expected object property name and value separator (':')."));
@@ -280,15 +280,15 @@ public interface JSONTests
                 };
 
                 parseArrayErrorTest.run(null, new PreConditionFailure("text cannot be null."));
-                parseArrayErrorTest.run("", new PreConditionFailure("text cannot be empty."));
-                parseArrayErrorTest.run("null", new PreConditionFailure("tokenizer.getCurrent() (null) must be [."));
-                parseArrayErrorTest.run("false", new PreConditionFailure("tokenizer.getCurrent() (false) must be [."));
-                parseArrayErrorTest.run("true", new PreConditionFailure("tokenizer.getCurrent() (true) must be [."));
-                parseArrayErrorTest.run("// hello", new PreConditionFailure("tokenizer.hasCurrent() cannot be false."));
-                parseArrayErrorTest.run("/* hello */", new PreConditionFailure("tokenizer.hasCurrent() cannot be false."));
-                parseArrayErrorTest.run("  \t\n\r\n\r  ", new PreConditionFailure("tokenizer.hasCurrent() cannot be false."));
-                parseArrayErrorTest.run("123", new PreConditionFailure("tokenizer.getCurrent() (123) must be [."));
-                parseArrayErrorTest.run("\"hello\"", new PreConditionFailure("tokenizer.getCurrent() (\"hello\") must be [."));
+                parseArrayErrorTest.run("", new ParseException("Missing array left square bracket ('[')."));
+                parseArrayErrorTest.run("null", new ParseException("Expected array left square bracket ('[')."));
+                parseArrayErrorTest.run("false", new ParseException("Expected array left square bracket ('[')."));
+                parseArrayErrorTest.run("true", new ParseException("Expected array left square bracket ('[')."));
+                parseArrayErrorTest.run("// hello", new ParseException("Missing array left square bracket ('[')."));
+                parseArrayErrorTest.run("/* hello */", new ParseException("Missing array left square bracket ('[')."));
+                parseArrayErrorTest.run("  \t\n\r\n\r  ", new ParseException("Missing array left square bracket ('[')."));
+                parseArrayErrorTest.run("123", new ParseException("Expected array left square bracket ('[')."));
+                parseArrayErrorTest.run("\"hello\"", new ParseException("Expected array left square bracket ('[')."));
                 parseArrayErrorTest.run("[", new ParseException("Missing array right square bracket (']')."));
                 parseArrayErrorTest.run("[   ", new ParseException("Missing array right square bracket (']')."));
                 parseArrayErrorTest.run("[\n  \t", new ParseException("Missing array right square bracket (']')."));

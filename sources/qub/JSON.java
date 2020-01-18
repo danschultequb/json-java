@@ -50,14 +50,6 @@ public interface JSON
             .convertError(WrongTypeException.class, () -> new WrongTypeException(JSON.getWrongTypeExceptionMessage(value, Iterable.create(type, JSONNull.class), valueName)));
     }
 
-    static <T extends JSONSegment> Result<T> asOrNull(JSONSegment value, java.lang.Class<T> type)
-    {
-        PreCondition.assertNotNull(value, "value");
-        PreCondition.assertNotNull(type, "type");
-
-        return JSON.asOrNull(value, type, "value");
-    }
-
     static Boolean toBooleanOrNull(JSONBoolean segment)
     {
         return segment == null ? null : segment.getValue();
@@ -80,7 +72,7 @@ public interface JSON
      */
     static Result<JSONSegment> parse(String text)
     {
-        PreCondition.assertNotNullAndNotEmpty(text, "text");
+        PreCondition.assertNotNull(text, "text");
 
         return JSON.parse(Strings.iterable(text));
     }
@@ -92,7 +84,7 @@ public interface JSON
      */
     static Result<JSONSegment> parse(Iterable<Character> characters)
     {
-        PreCondition.assertNotNullAndNotEmpty(characters, "characters");
+        PreCondition.assertNotNull(characters, "characters");
 
         return JSON.parse(characters.iterate());
     }
@@ -172,7 +164,7 @@ public interface JSON
      */
     static Result<JSONObject> parseObject(String text)
     {
-        PreCondition.assertNotNullAndNotEmpty(text, "text");
+        PreCondition.assertNotNull(text, "text");
 
         return JSON.parseObject(Strings.iterable(text));
     }
@@ -184,7 +176,7 @@ public interface JSON
      */
     static Result<JSONObject> parseObject(Iterable<Character> characters)
     {
-        PreCondition.assertNotNullAndNotEmpty(characters, "characters");
+        PreCondition.assertNotNull(characters, "characters");
 
         return JSON.parseObject(characters.iterate());
     }
@@ -209,12 +201,19 @@ public interface JSON
     static Result<JSONObject> parseObject(JSONTokenizer tokenizer)
     {
         PreCondition.assertNotNull(tokenizer, "tokenizer");
-        PreCondition.assertTrue(tokenizer.hasCurrent(), "tokenizer.hasCurrent()");
-        PreCondition.assertEqual(JSONToken.leftCurlyBracket, tokenizer.getCurrent(), "tokenizer.getCurrent()");
 
         return Result.create(() ->
         {
-            final JSONToken leftCurlyBracket = JSON.takeCurrent(tokenizer);
+            if (!tokenizer.hasCurrent())
+            {
+                throw new ParseException("Missing object left curly bracket ('{').");
+            }
+            else if (tokenizer.getCurrent().getType() != JSONTokenType.LeftCurlyBracket)
+            {
+                throw new ParseException("Expected object left curly bracket ('{').");
+            }
+
+            JSON.takeCurrent(tokenizer);
 
             final List<JSONProperty> properties = List.create();
             JSONToken rightCurlyBracket = null;
@@ -295,7 +294,7 @@ public interface JSON
      */
     static Result<JSONProperty> parseObjectProperty(String text)
     {
-        PreCondition.assertNotNullAndNotEmpty(text, "text");
+        PreCondition.assertNotNull(text, "text");
 
         return JSON.parseObjectProperty(Strings.iterable(text));
     }
@@ -307,7 +306,7 @@ public interface JSON
      */
     static Result<JSONProperty> parseObjectProperty(Iterable<Character> characters)
     {
-        PreCondition.assertNotNullAndNotEmpty(characters, "characters");
+        PreCondition.assertNotNull(characters, "characters");
 
         return JSON.parseObjectProperty(characters.iterate());
     }
@@ -332,13 +331,20 @@ public interface JSON
     static Result<JSONProperty> parseObjectProperty(JSONTokenizer tokenizer)
     {
         PreCondition.assertNotNull(tokenizer, "tokenizer");
-        PreCondition.assertTrue(tokenizer.hasCurrent(), "tokenizer.hasCurrent()");
-        PreCondition.assertEqual(JSONTokenType.QuotedString, tokenizer.getCurrent().getType(), "tokenizer.getCurrent().getType()");
 
         return Result.create(() ->
         {
+            if (!tokenizer.hasCurrent())
+            {
+                throw new ParseException("Missing object property name.");
+            }
+            else if (tokenizer.getCurrent().getType() != JSONTokenType.QuotedString)
+            {
+                throw new ParseException("Expected object property name.");
+            }
+
             final String quotedPropertyName = JSON.takeCurrent(tokenizer).getText();
-            final String propertyName = quotedPropertyName.substring(1, quotedPropertyName.length() - 1);
+            final String propertyName = Strings.unquote(quotedPropertyName);
 
             if (!tokenizer.hasCurrent())
             {
@@ -386,7 +392,7 @@ public interface JSON
      */
     static Result<JSONArray> parseArray(String text)
     {
-        PreCondition.assertNotNullAndNotEmpty(text, "text");
+        PreCondition.assertNotNull(text, "text");
 
         return JSON.parseArray(Strings.iterable(text));
     }
@@ -398,7 +404,7 @@ public interface JSON
      */
     static Result<JSONArray> parseArray(Iterable<Character> characters)
     {
-        PreCondition.assertNotNullAndNotEmpty(characters, "characters");
+        PreCondition.assertNotNull(characters, "characters");
 
         return JSON.parseArray(characters.iterate());
     }
@@ -423,12 +429,19 @@ public interface JSON
     static Result<JSONArray> parseArray(JSONTokenizer tokenizer)
     {
         PreCondition.assertNotNull(tokenizer, "tokenizer");
-        PreCondition.assertTrue(tokenizer.hasCurrent(), "tokenizer.hasCurrent()");
-        PreCondition.assertEqual(JSONToken.leftSquareBracket, tokenizer.getCurrent(), "tokenizer.getCurrent()");
 
         return Result.create(() ->
         {
-            final JSONToken leftSquareBracket = JSON.takeCurrent(tokenizer);
+            if (!tokenizer.hasCurrent())
+            {
+                throw new ParseException("Missing array left square bracket ('[').");
+            }
+            else if (tokenizer.getCurrent().getType() != JSONTokenType.LeftSquareBracket)
+            {
+                throw new ParseException("Expected array left square bracket ('[').");
+            }
+
+            JSON.takeCurrent(tokenizer);
 
             final List<JSONSegment> elements = List.create();
 

@@ -4,37 +4,12 @@
     <list default="true" id="d9a231a2-cc01-44c9-be51-82cf0ffde018" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/outputs/build.json" beforeDir="false" afterPath="$PROJECT_DIR$/outputs/build.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/outputs/coverage.exec" beforeDir="false" afterPath="$PROJECT_DIR$/outputs/coverage.exec" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/outputs/coverage/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/outputs/coverage/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/outputs/coverage/jacoco-sessions.html" beforeDir="false" afterPath="$PROJECT_DIR$/outputs/coverage/jacoco-sessions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/outputs/coverage/qub/JSONProperty.html" beforeDir="false" afterPath="$PROJECT_DIR$/outputs/coverage/qub/JSONProperty.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/outputs/coverage/qub/JSONProperty.java.html" beforeDir="false" afterPath="$PROJECT_DIR$/outputs/coverage/qub/JSONProperty.java.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/outputs/coverage/qub/JSONString.html" beforeDir="false" afterPath="$PROJECT_DIR$/outputs/coverage/qub/JSONString.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/outputs/coverage/qub/JSONString.java.html" beforeDir="false" afterPath="$PROJECT_DIR$/outputs/coverage/qub/JSONString.java.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/outputs/coverage/qub/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/outputs/coverage/qub/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/outputs/coverage/qub/index.source.html" beforeDir="false" afterPath="$PROJECT_DIR$/outputs/coverage/qub/index.source.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/outputs/qub/JSONArray.class" beforeDir="false" afterPath="$PROJECT_DIR$/outputs/qub/JSONArray.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/outputs/qub/JSONArrayTests.class" beforeDir="false" afterPath="$PROJECT_DIR$/outputs/qub/JSONArrayTests.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/outputs/qub/JSONBoolean.class" beforeDir="false" afterPath="$PROJECT_DIR$/outputs/qub/JSONBoolean.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/outputs/qub/JSONFormat.class" beforeDir="false" afterPath="$PROJECT_DIR$/outputs/qub/JSONFormat.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/outputs/qub/JSONNull.class" beforeDir="false" afterPath="$PROJECT_DIR$/outputs/qub/JSONNull.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/outputs/qub/JSONNumber.class" beforeDir="false" afterPath="$PROJECT_DIR$/outputs/qub/JSONNumber.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/outputs/qub/JSONObject.class" beforeDir="false" afterPath="$PROJECT_DIR$/outputs/qub/JSONObject.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/outputs/qub/JSONObjectTests.class" beforeDir="false" afterPath="$PROJECT_DIR$/outputs/qub/JSONObjectTests.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/outputs/qub/JSONProperty.class" beforeDir="false" afterPath="$PROJECT_DIR$/outputs/qub/JSONProperty.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/outputs/qub/JSONSegment.class" beforeDir="false" afterPath="$PROJECT_DIR$/outputs/qub/JSONSegment.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/outputs/qub/JSONString.class" beforeDir="false" afterPath="$PROJECT_DIR$/outputs/qub/JSONString.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sources/qub/JSONArray.java" beforeDir="false" afterPath="$PROJECT_DIR$/sources/qub/JSONArray.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sources/qub/JSONBoolean.java" beforeDir="false" afterPath="$PROJECT_DIR$/sources/qub/JSONBoolean.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sources/qub/JSONFormat.java" beforeDir="false" afterPath="$PROJECT_DIR$/sources/qub/JSONFormat.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sources/qub/JSONNull.java" beforeDir="false" afterPath="$PROJECT_DIR$/sources/qub/JSONNull.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sources/qub/JSONNumber.java" beforeDir="false" afterPath="$PROJECT_DIR$/sources/qub/JSONNumber.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sources/qub/JSONObject.java" beforeDir="false" afterPath="$PROJECT_DIR$/sources/qub/JSONObject.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sources/qub/JSONProperty.java" beforeDir="false" afterPath="$PROJECT_DIR$/sources/qub/JSONProperty.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sources/qub/JSONSegment.java" beforeDir="false" afterPath="$PROJECT_DIR$/sources/qub/JSONSegment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sources/qub/JSONString.java" beforeDir="false" afterPath="$PROJECT_DIR$/sources/qub/JSONString.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/qub/JSONArrayTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/tests/qub/JSONArrayTests.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/qub/JSONObjectTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/tests/qub/JSONObjectTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/qub/JSON$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/outputs/qub/JSON$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/qub/JSON.class" beforeDir="false" afterPath="$PROJECT_DIR$/outputs/qub/JSON.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/qub/JSONTests.class" beforeDir="false" afterPath="$PROJECT_DIR$/outputs/qub/JSONTests.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/test.json" beforeDir="false" afterPath="$PROJECT_DIR$/outputs/test.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sources/qub/JSON.java" beforeDir="false" afterPath="$PROJECT_DIR$/sources/qub/JSON.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/qub/JSONTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/tests/qub/JSONTests.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
