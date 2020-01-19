@@ -1033,6 +1033,32 @@ public interface JSONObjectTests
                 setArrayOrNullTest.run(JSONObject.create(), "a", null, JSONObject.create(JSONProperty.create("a", JSONNull.segment)));
             });
 
+            runner.testGroup("setNull(String)", () ->
+            {
+                final Action3<JSONObject,String,Throwable> setNullErrorTest = (JSONObject object, String propertyName, Throwable expected) ->
+                {
+                    runner.test("with " + English.andList(object, Strings.escapeAndQuote(propertyName)), (Test test) ->
+                    {
+                        test.assertThrows(() -> object.setNull(propertyName), expected);
+                    });
+                };
+
+                setNullErrorTest.run(JSONObject.create(), null, new PreConditionFailure("propertyName cannot be null."));
+                setNullErrorTest.run(JSONObject.create(), "", new PreConditionFailure("propertyName cannot be empty."));
+
+                final Action2<JSONObject,String> setNullTest = (JSONObject object, String propertyName) ->
+                {
+                    runner.test("with " + English.andList(object, Strings.escapeAndQuote(propertyName)), (Test test) ->
+                    {
+                        final JSONObject setNullResult = object.setNull(propertyName);
+                        test.assertSame(object, setNullResult);
+                        test.assertNull(object.getNull(propertyName).await());
+                    });
+                };
+
+                setNullTest.run(JSONObject.create(), "hello");
+            });
+
             runner.testGroup("setBoolean(String,boolean)", () ->
             {
                 final Action4<JSONObject,String,Boolean,Throwable> setBooleanErrorTest = (JSONObject object, String propertyName, Boolean propertyValue, Throwable expected) ->

@@ -2,7 +2,7 @@
   "project.json": {
     "publisher": "qub",
     "project": "json-java",
-    "version": "6",
+    "version": "7",
     "java": {
       "version": "1.8",
       "dependencies": [
@@ -68,7 +68,7 @@
     ]
   },
   "sources/qub/JSONObject.java": {
-    "lastModified": "2020-01-18T19:07:52.529071092Z",
+    "lastModified": "2020-01-19T03:55:34.579845905Z",
     "dependencies": [
       "sources/qub/JSON.java",
       "sources/qub/JSONArray.java",
@@ -169,7 +169,7 @@
     ]
   },
   "tests/qub/JSONObjectTests.java": {
-    "lastModified": "2020-01-18T19:22:22.954946041Z",
+    "lastModified": "2020-01-19T04:00:27.169994115Z",
     "dependencies": [
       "sources/qub/JSONArray.java",
       "sources/qub/JSONBoolean.java",

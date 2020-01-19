@@ -277,6 +277,23 @@ public class JSONObject implements JSONSegment, MutableMap<String,JSONSegment>
         return this.set(propertyName, propertyValue == null ? JSONNull.segment : propertyValue);
     }
 
+    public JSONObject setArray(String propertyName, Iterable<JSONSegment> arrayElements)
+    {
+        PreCondition.assertNotNull(arrayElements, "arrayElements");
+
+        return this.setArray(propertyName, JSONArray.create(arrayElements));
+    }
+
+    public JSONObject setArrayOrNull(String propertyName, Iterable<JSONSegment> arrayElements)
+    {
+        return this.set(propertyName, arrayElements == null ? JSONNull.segment : JSONArray.create(arrayElements));
+    }
+
+    public JSONObject setNull(String propertyName)
+    {
+        return this.set(propertyName, JSONNull.segment);
+    }
+
     public JSONObject setBoolean(String propertyName, boolean propertyValue)
     {
         return this.set(propertyName, JSONBoolean.get(propertyValue));
