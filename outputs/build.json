@@ -1,1 +1,229 @@
-{"project.json":{"publisher":"qub","project":"json-java","version":"5","java":{"version":"1.8","dependencies":[{"publisher":"qub","project":"qub-java","version":"162"}]}},"sources/qub/JSON.java":{"lastModified":"2020-01-18T19:51:29.909989118Z","dependencies":["sources/qub/JSONArray.java","sources/qub/JSONBoolean.java","sources/qub/JSONNull.java","sources/qub/JSONNumber.java","sources/qub/JSONObject.java","sources/qub/JSONProperty.java","sources/qub/JSONSegment.java","sources/qub/JSONString.java","sources/qub/JSONToken.java","sources/qub/JSONTokenizer.java","sources/qub/JSONTokenType.java"]},"sources/qub/JSONArray.java":{"lastModified":"2020-01-18T18:58:08.922949075Z","dependencies":["sources/qub/JSON.java","sources/qub/JSONFormat.java","sources/qub/JSONSegment.java"]},"sources/qub/JSONBoolean.java":{"lastModified":"2020-01-18T18:42:00.123892068Z","dependencies":["sources/qub/JSON.java","sources/qub/JSONFormat.java","sources/qub/JSONSegment.java"]},"sources/qub/JSONFormat.java":{"lastModified":"2020-01-18T19:23:03.730552911Z","dependencies":["sources/qub/JSON.java","sources/qub/JSONObject.java"]},"sources/qub/JSONNull.java":{"lastModified":"2020-01-18T18:42:00.133821964Z","dependencies":["sources/qub/JSONFormat.java","sources/qub/JSONSegment.java"]},"sources/qub/JSONNumber.java":{"lastModified":"2020-01-18T18:42:00.174154043Z","dependencies":["sources/qub/JSONFormat.java","sources/qub/JSONSegment.java"]},"sources/qub/JSONObject.java":{"lastModified":"2020-01-18T19:07:52.529071092Z","dependencies":["sources/qub/JSON.java","sources/qub/JSONArray.java","sources/qub/JSONBoolean.java","sources/qub/JSONFormat.java","sources/qub/JSONNull.java","sources/qub/JSONNumber.java","sources/qub/JSONProperty.java","sources/qub/JSONSegment.java","sources/qub/JSONString.java"]},"sources/qub/JSONProperty.java":{"lastModified":"2020-01-18T19:19:20.878947973Z","dependencies":["sources/qub/JSON.java","sources/qub/JSONArray.java","sources/qub/JSONBoolean.java","sources/qub/JSONFormat.java","sources/qub/JSONNull.java","sources/qub/JSONNumber.java","sources/qub/JSONObject.java","sources/qub/JSONSegment.java","sources/qub/JSONString.java"]},"sources/qub/JSONSegment.java":{"lastModified":"2020-01-18T18:51:15.880237102Z","dependencies":["sources/qub/JSON.java","sources/qub/JSONFormat.java"]},"sources/qub/JSONString.java":{"lastModified":"2020-01-18T18:42:00.146403074Z","dependencies":["sources/qub/JSONFormat.java","sources/qub/JSONSegment.java"]},"sources/qub/JSONToken.java":{"lastModified":"2020-01-14T17:49:58.485450029Z","dependencies":["sources/qub/JSON.java","sources/qub/JSONTokenType.java"]},"sources/qub/JSONTokenizer.java":{"lastModified":"2020-01-10T16:52:01.233742952Z","dependencies":["sources/qub/JSON.java","sources/qub/JSONToken.java","sources/qub/JSONTokenType.java"]},"sources/qub/JSONTokenType.java":{"lastModified":"2020-01-04T05:39:32.604621887Z","dependencies":["sources/qub/JSONToken.java"]},"tests/qub/JSONArrayTests.java":{"lastModified":"2020-01-18T18:59:40.639084100Z","dependencies":["sources/qub/JSONArray.java","sources/qub/JSONBoolean.java","sources/qub/JSONFormat.java","sources/qub/JSONNull.java","sources/qub/JSONNumber.java","sources/qub/JSONObject.java","sources/qub/JSONSegment.java","sources/qub/JSONString.java"]},"tests/qub/JSONBooleanTests.java":{"lastModified":"2020-01-15T04:54:50.088262081Z","dependencies":["sources/qub/JSONBoolean.java"]},"tests/qub/JSONFormatTests.java":{"lastModified":"2020-01-18T19:20:44.308125972Z","dependencies":["sources/qub/JSONFormat.java","sources/qub/JSONObject.java"]},"tests/qub/JSONNullTests.java":{"lastModified":"2020-01-15T04:58:59.393887042Z","dependencies":["sources/qub/JSONNull.java"]},"tests/qub/JSONNumberTests.java":{"lastModified":"2020-01-15T05:13:40.781908035Z","dependencies":["sources/qub/JSONNumber.java"]},"tests/qub/JSONObjectTests.java":{"lastModified":"2020-01-18T19:22:22.954946041Z","dependencies":["sources/qub/JSONArray.java","sources/qub/JSONBoolean.java","sources/qub/JSONFormat.java","sources/qub/JSONNull.java","sources/qub/JSONNumber.java","sources/qub/JSONObject.java","sources/qub/JSONProperty.java","sources/qub/JSONSegment.java","sources/qub/JSONString.java"]},"tests/qub/JSONPropertyTests.java":{"lastModified":"2020-01-18T05:22:34.195605039Z","dependencies":["sources/qub/JSONBoolean.java","sources/qub/JSONNumber.java","sources/qub/JSONProperty.java","sources/qub/JSONString.java"]},"tests/qub/JSONStringTests.java":{"lastModified":"2020-01-18T18:30:15.094758987Z","dependencies":["sources/qub/JSONString.java"]},"tests/qub/JSONTests.java":{"lastModified":"2020-01-18T19:56:28.277149915Z","dependencies":["sources/qub/JSON.java","sources/qub/JSONArray.java","sources/qub/JSONBoolean.java","sources/qub/JSONNull.java","sources/qub/JSONNumber.java","sources/qub/JSONObject.java","sources/qub/JSONProperty.java","sources/qub/JSONSegment.java","sources/qub/JSONString.java","sources/qub/JSONTokenizer.java"]},"tests/qub/JSONTokenizerTests.java":{"lastModified":"2020-01-08T16:55:42.079169988Z","dependencies":["sources/qub/JSONToken.java","sources/qub/JSONTokenizer.java"]},"tests/qub/JSONTokenTests.java":{"lastModified":"2020-01-04T04:29:45.155441999Z","dependencies":["sources/qub/JSONToken.java","sources/qub/JSONTokenType.java"]}}
+{
+  "project.json": {
+    "publisher": "qub",
+    "project": "json-java",
+    "version": "6",
+    "java": {
+      "version": "1.8",
+      "dependencies": [
+        {
+          "publisher": "qub",
+          "project": "qub-java",
+          "version": "163"
+        }
+      ]
+    }
+  },
+  "sources/qub/JSON.java": {
+    "lastModified": "2020-01-18T19:51:29.909989118Z",
+    "dependencies": [
+      "sources/qub/JSONArray.java",
+      "sources/qub/JSONBoolean.java",
+      "sources/qub/JSONNull.java",
+      "sources/qub/JSONNumber.java",
+      "sources/qub/JSONObject.java",
+      "sources/qub/JSONProperty.java",
+      "sources/qub/JSONSegment.java",
+      "sources/qub/JSONString.java",
+      "sources/qub/JSONToken.java",
+      "sources/qub/JSONTokenizer.java",
+      "sources/qub/JSONTokenType.java"
+    ]
+  },
+  "sources/qub/JSONArray.java": {
+    "lastModified": "2020-01-18T18:58:08.922949075Z",
+    "dependencies": [
+      "sources/qub/JSON.java",
+      "sources/qub/JSONFormat.java",
+      "sources/qub/JSONSegment.java"
+    ]
+  },
+  "sources/qub/JSONBoolean.java": {
+    "lastModified": "2020-01-18T18:42:00.123892068Z",
+    "dependencies": [
+      "sources/qub/JSON.java",
+      "sources/qub/JSONFormat.java",
+      "sources/qub/JSONSegment.java"
+    ]
+  },
+  "sources/qub/JSONFormat.java": {
+    "lastModified": "2020-01-18T19:23:03.730552911Z",
+    "dependencies": [
+      "sources/qub/JSON.java",
+      "sources/qub/JSONObject.java"
+    ]
+  },
+  "sources/qub/JSONNull.java": {
+    "lastModified": "2020-01-18T18:42:00.133821964Z",
+    "dependencies": [
+      "sources/qub/JSONFormat.java",
+      "sources/qub/JSONSegment.java"
+    ]
+  },
+  "sources/qub/JSONNumber.java": {
+    "lastModified": "2020-01-18T18:42:00.174154043Z",
+    "dependencies": [
+      "sources/qub/JSONFormat.java",
+      "sources/qub/JSONSegment.java"
+    ]
+  },
+  "sources/qub/JSONObject.java": {
+    "lastModified": "2020-01-18T19:07:52.529071092Z",
+    "dependencies": [
+      "sources/qub/JSON.java",
+      "sources/qub/JSONArray.java",
+      "sources/qub/JSONBoolean.java",
+      "sources/qub/JSONFormat.java",
+      "sources/qub/JSONNull.java",
+      "sources/qub/JSONNumber.java",
+      "sources/qub/JSONProperty.java",
+      "sources/qub/JSONSegment.java",
+      "sources/qub/JSONString.java"
+    ]
+  },
+  "sources/qub/JSONProperty.java": {
+    "lastModified": "2020-01-18T19:19:20.878947973Z",
+    "dependencies": [
+      "sources/qub/JSON.java",
+      "sources/qub/JSONArray.java",
+      "sources/qub/JSONBoolean.java",
+      "sources/qub/JSONFormat.java",
+      "sources/qub/JSONNull.java",
+      "sources/qub/JSONNumber.java",
+      "sources/qub/JSONObject.java",
+      "sources/qub/JSONSegment.java",
+      "sources/qub/JSONString.java"
+    ]
+  },
+  "sources/qub/JSONSegment.java": {
+    "lastModified": "2020-01-18T18:51:15.880237102Z",
+    "dependencies": [
+      "sources/qub/JSON.java",
+      "sources/qub/JSONFormat.java"
+    ]
+  },
+  "sources/qub/JSONString.java": {
+    "lastModified": "2020-01-18T18:42:00.146403074Z",
+    "dependencies": [
+      "sources/qub/JSONFormat.java",
+      "sources/qub/JSONSegment.java"
+    ]
+  },
+  "sources/qub/JSONToken.java": {
+    "lastModified": "2020-01-14T17:49:58.485450029Z",
+    "dependencies": [
+      "sources/qub/JSON.java",
+      "sources/qub/JSONTokenType.java"
+    ]
+  },
+  "sources/qub/JSONTokenizer.java": {
+    "lastModified": "2020-01-10T16:52:01.233742952Z",
+    "dependencies": [
+      "sources/qub/JSON.java",
+      "sources/qub/JSONToken.java",
+      "sources/qub/JSONTokenType.java"
+    ]
+  },
+  "sources/qub/JSONTokenType.java": {
+    "lastModified": "2020-01-04T05:39:32.604621887Z",
+    "dependencies": [
+      "sources/qub/JSONToken.java"
+    ]
+  },
+  "tests/qub/JSONArrayTests.java": {
+    "lastModified": "2020-01-18T18:59:40.639084100Z",
+    "dependencies": [
+      "sources/qub/JSONArray.java",
+      "sources/qub/JSONBoolean.java",
+      "sources/qub/JSONFormat.java",
+      "sources/qub/JSONNull.java",
+      "sources/qub/JSONNumber.java",
+      "sources/qub/JSONObject.java",
+      "sources/qub/JSONSegment.java",
+      "sources/qub/JSONString.java"
+    ]
+  },
+  "tests/qub/JSONBooleanTests.java": {
+    "lastModified": "2020-01-15T04:54:50.088262081Z",
+    "dependencies": [
+      "sources/qub/JSONBoolean.java"
+    ]
+  },
+  "tests/qub/JSONFormatTests.java": {
+    "lastModified": "2020-01-18T19:20:44.308125972Z",
+    "dependencies": [
+      "sources/qub/JSONFormat.java",
+      "sources/qub/JSONObject.java"
+    ]
+  },
+  "tests/qub/JSONNullTests.java": {
+    "lastModified": "2020-01-15T04:58:59.393887042Z",
+    "dependencies": [
+      "sources/qub/JSONNull.java"
+    ]
+  },
+  "tests/qub/JSONNumberTests.java": {
+    "lastModified": "2020-01-15T05:13:40.781908035Z",
+    "dependencies": [
+      "sources/qub/JSONNumber.java"
+    ]
+  },
+  "tests/qub/JSONObjectTests.java": {
+    "lastModified": "2020-01-18T19:22:22.954946041Z",
+    "dependencies": [
+      "sources/qub/JSONArray.java",
+      "sources/qub/JSONBoolean.java",
+      "sources/qub/JSONFormat.java",
+      "sources/qub/JSONNull.java",
+      "sources/qub/JSONNumber.java",
+      "sources/qub/JSONObject.java",
+      "sources/qub/JSONProperty.java",
+      "sources/qub/JSONSegment.java",
+      "sources/qub/JSONString.java"
+    ]
+  },
+  "tests/qub/JSONPropertyTests.java": {
+    "lastModified": "2020-01-18T05:22:34.195605039Z",
+    "dependencies": [
+      "sources/qub/JSONBoolean.java",
+      "sources/qub/JSONNumber.java",
+      "sources/qub/JSONProperty.java",
+      "sources/qub/JSONString.java"
+    ]
+  },
+  "tests/qub/JSONStringTests.java": {
+    "lastModified": "2020-01-18T18:30:15.094758987Z",
+    "dependencies": [
+      "sources/qub/JSONString.java"
+    ]
+  },
+  "tests/qub/JSONTests.java": {
+    "lastModified": "2020-01-18T19:56:28.277149915Z",
+    "dependencies": [
+      "sources/qub/JSON.java",
+      "sources/qub/JSONArray.java",
+      "sources/qub/JSONBoolean.java",
+      "sources/qub/JSONNull.java",
+      "sources/qub/JSONNumber.java",
+      "sources/qub/JSONObject.java",
+      "sources/qub/JSONProperty.java",
+      "sources/qub/JSONSegment.java",
+      "sources/qub/JSONString.java",
+      "sources/qub/JSONTokenizer.java"
+    ]
+  },
+  "tests/qub/JSONTokenizerTests.java": {
+    "lastModified": "2020-01-08T16:55:42.079169988Z",
+    "dependencies": [
+      "sources/qub/JSONToken.java",
+      "sources/qub/JSONTokenizer.java"
+    ]
+  },
+  "tests/qub/JSONTokenTests.java": {
+    "lastModified": "2020-01-04T04:29:45.155441999Z",
+    "dependencies": [
+      "sources/qub/JSONToken.java",
+      "sources/qub/JSONTokenType.java"
+    ]
+  }
+}
