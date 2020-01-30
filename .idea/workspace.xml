@@ -3,8 +3,89 @@
   <component name="ChangeListManager">
     <list default="true" id="d9a231a2-cc01-44c9-be51-82cf0ffde018" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sources/qub/JSONObject.java" beforeDir="false" afterPath="$PROJECT_DIR$/sources/qub/JSONObject.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/qub/JSONObjectTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/tests/qub/JSONObjectTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/build.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage.exec" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/jacoco-resources/branchfc.gif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/jacoco-resources/branchnc.gif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/jacoco-resources/branchpc.gif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/jacoco-resources/bundle.gif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/jacoco-resources/class.gif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/jacoco-resources/down.gif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/jacoco-resources/greenbar.gif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/jacoco-resources/group.gif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/jacoco-resources/method.gif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/jacoco-resources/package.gif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/jacoco-resources/prettify.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/jacoco-resources/prettify.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/jacoco-resources/redbar.gif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/jacoco-resources/report.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/jacoco-resources/report.gif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/jacoco-resources/session.gif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/jacoco-resources/sort.gif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/jacoco-resources/sort.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/jacoco-resources/source.gif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/jacoco-resources/up.gif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/jacoco-sessions.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/qub/JSON.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/qub/JSON.java.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/qub/JSONArray.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/qub/JSONArray.java.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/qub/JSONBoolean.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/qub/JSONBoolean.java.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/qub/JSONFormat.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/qub/JSONFormat.java.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/qub/JSONNull.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/qub/JSONNull.java.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/qub/JSONNumber.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/qub/JSONNumber.java.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/qub/JSONObject.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/qub/JSONObject.java.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/qub/JSONProperty.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/qub/JSONProperty.java.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/qub/JSONSegment.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/qub/JSONSegment.java.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/qub/JSONString.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/qub/JSONString.java.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/qub/JSONToken.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/qub/JSONToken.java.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/qub/JSONTokenType.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/qub/JSONTokenType.java.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/qub/JSONTokenizer.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/qub/JSONTokenizer.java.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/qub/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/coverage/qub/index.source.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/json-java.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/json-java.sources.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/json-java.tests.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/pack.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/qub/JSON$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/qub/JSON.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/qub/JSONArray.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/qub/JSONArrayTests.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/qub/JSONBoolean.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/qub/JSONBooleanTests.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/qub/JSONFormat.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/qub/JSONFormatTests.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/qub/JSONNull.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/qub/JSONNullTests.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/qub/JSONNumber.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/qub/JSONNumberTests.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/qub/JSONObject.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/qub/JSONObjectTests.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/qub/JSONProperty.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/qub/JSONPropertyTests.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/qub/JSONSegment.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/qub/JSONString.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/qub/JSONStringTests.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/qub/JSONTests.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/qub/JSONToken.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/qub/JSONTokenTests.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/qub/JSONTokenType.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/qub/JSONTokenizer.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/qub/JSONTokenizerTests.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outputs/test.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project.json" beforeDir="false" afterPath="$PROJECT_DIR$/project.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,7 +116,7 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="C:/qub/qub/qub-java/162/qub-java.sources.jar!/" />
+    <property name="last_opened_file_path" value="C:/qub/qub/qub-java/164/qub-java.sources.jar!/" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
@@ -74,9 +155,10 @@
     <servers />
   </component>
   <component name="WindowStateProjectService">
-    <state x="309" y="120" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1578115234339">
-      <screen x="0" y="0" width="1707" height="920" />
+    <state x="194" y="0" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1579543495107">
+      <screen x="0" y="0" width="1280" height="680" />
     </state>
+    <state x="194" y="0" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1280.680@0.0.1280.680" timestamp="1579543495107" />
     <state x="309" y="120" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1707.920/0.1440.1280.680@0.0.1707.920" timestamp="1578115234339" />
     <state x="494" y="103" key="#com.intellij.ide.util.MemberChooser" timestamp="1579021859634">
       <screen x="0" y="0" width="1280" height="680" />
@@ -84,10 +166,10 @@
     <state x="494" y="103" key="#com.intellij.ide.util.MemberChooser/0.0.1280.680@0.0.1280.680" timestamp="1579021859634" />
     <state x="659" y="171" key="#com.intellij.ide.util.MemberChooser/0.0.1707.920/0.1440.1280.680@0.0.1707.920" timestamp="1578114061884" />
     <state x="659" y="171" key="#com.intellij.ide.util.MemberChooser/0.0.1707.920@0.0.1707.920" timestamp="1578934786983" />
-    <state x="513" y="118" key="#com.intellij.openapi.roots.ui.configuration.libraryEditor.LibraryEditorDialog" timestamp="1579321957817">
+    <state x="513" y="118" key="#com.intellij.openapi.roots.ui.configuration.libraryEditor.LibraryEditorDialog" timestamp="1580407169199">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state x="513" y="118" key="#com.intellij.openapi.roots.ui.configuration.libraryEditor.LibraryEditorDialog/0.0.1280.680@0.0.1280.680" timestamp="1579321957817" />
+    <state x="513" y="118" key="#com.intellij.openapi.roots.ui.configuration.libraryEditor.LibraryEditorDialog/0.0.1280.680@0.0.1280.680" timestamp="1580407169199" />
     <state x="684" y="178" key="#com.intellij.openapi.roots.ui.configuration.libraryEditor.LibraryEditorDialog/0.0.1707.920@0.0.1707.920" timestamp="1579108869048" />
     <state x="0" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1579063010881">
       <screen x="0" y="0" width="1707" height="920" />
@@ -98,10 +180,10 @@
       <screen x="0" y="0" width="1707" height="920" />
     </state>
     <state x="584" y="212" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1707.920@0.0.1707.920" timestamp="1578504139958" />
-    <state x="475" y="162" key="FileChooserDialogImpl" timestamp="1579321954506">
+    <state x="475" y="162" key="FileChooserDialogImpl" timestamp="1580407166007">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state x="475" y="162" key="FileChooserDialogImpl/0.0.1280.680@0.0.1280.680" timestamp="1579321954506" />
+    <state x="475" y="162" key="FileChooserDialogImpl/0.0.1280.680@0.0.1280.680" timestamp="1580407166007" />
     <state x="634" y="219" key="FileChooserDialogImpl/0.0.1707.920@0.0.1707.920" timestamp="1579108866330" />
     <state width="1685" height="242" key="GridCell.Tab.0.bottom" timestamp="1578118775917">
       <screen x="0" y="0" width="1707" height="920" />
@@ -119,10 +201,10 @@
       <screen x="0" y="0" width="1707" height="920" />
     </state>
     <state width="1685" height="242" key="GridCell.Tab.0.right/0.0.1707.920/0.1440.1280.680@0.0.1707.920" timestamp="1578118775916" />
-    <state x="244" y="0" key="SettingsEditor" timestamp="1579321960486">
+    <state x="244" y="0" key="SettingsEditor" timestamp="1580407171113">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state x="244" y="0" key="SettingsEditor/0.0.1280.680@0.0.1280.680" timestamp="1579321960486" />
+    <state x="244" y="0" key="SettingsEditor/0.0.1280.680@0.0.1280.680" timestamp="1580407171113" />
     <state x="334" y="39" key="SettingsEditor/0.0.1707.920@0.0.1707.920" timestamp="1579108870906" />
     <state x="343" y="95" width="717" height="546" key="find.popup" timestamp="1579405002334">
       <screen x="0" y="0" width="1280" height="680" />

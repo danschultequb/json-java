@@ -1,145 +1,145 @@
 {
   "classFiles": {
     "qub/JSON.class": {
-      "lastModified": "2020-01-19T04:00:05.583448886Z",
+      "lastModified": "2020-01-30T17:59:37.182240009Z",
       "passedTestCount": 0,
       "skippedTestCount": 0,
       "failedTestCount": 0
     },
     "qub/JSONArray.class": {
-      "lastModified": "2020-01-19T04:00:03.268771886Z",
+      "lastModified": "2020-01-30T17:59:37.582586050Z",
       "passedTestCount": 0,
       "skippedTestCount": 0,
       "failedTestCount": 0
     },
     "qub/JSONArrayTests.class": {
-      "lastModified": "2020-01-19T04:00:06.113915920Z",
+      "lastModified": "2020-01-30T17:59:37.934470891Z",
       "passedTestCount": 58,
       "skippedTestCount": 0,
       "failedTestCount": 0
     },
     "qub/JSONBoolean.class": {
-      "lastModified": "2020-01-19T04:00:03.298454999Z",
+      "lastModified": "2020-01-30T17:59:37.255440950Z",
       "passedTestCount": 0,
       "skippedTestCount": 0,
       "failedTestCount": 0
     },
     "qub/JSONBooleanTests.class": {
-      "lastModified": "2020-01-19T04:00:06.218552112Z",
+      "lastModified": "2020-01-30T17:59:37.974894046Z",
       "passedTestCount": 12,
       "skippedTestCount": 0,
       "failedTestCount": 0
     },
     "qub/JSONFormat.class": {
-      "lastModified": "2020-01-19T04:00:03.443402051Z",
+      "lastModified": "2020-01-30T17:59:37.611886024Z",
       "passedTestCount": 0,
       "skippedTestCount": 0,
       "failedTestCount": 0
     },
     "qub/JSONFormatTests.class": {
-      "lastModified": "2020-01-19T04:00:06.357218027Z",
+      "lastModified": "2020-01-30T17:59:38.136651992Z",
       "passedTestCount": 43,
       "skippedTestCount": 0,
       "failedTestCount": 0
     },
     "qub/JSONNull.class": {
-      "lastModified": "2020-01-19T04:00:03.458501100Z",
+      "lastModified": "2020-01-30T17:59:37.611886024Z",
       "passedTestCount": 0,
       "skippedTestCount": 0,
       "failedTestCount": 0
     },
     "qub/JSONNullTests.class": {
-      "lastModified": "2020-01-19T04:00:06.428744077Z",
+      "lastModified": "2020-01-30T17:59:38.177215099Z",
       "passedTestCount": 4,
       "skippedTestCount": 0,
       "failedTestCount": 0
     },
     "qub/JSONNumber.class": {
-      "lastModified": "2020-01-19T04:00:03.368801116Z",
+      "lastModified": "2020-01-30T17:59:37.271092891Z",
       "passedTestCount": 0,
       "skippedTestCount": 0,
       "failedTestCount": 0
     },
     "qub/JSONNumberTests.class": {
-      "lastModified": "2020-01-19T04:00:06.513664007Z",
+      "lastModified": "2020-01-30T17:59:38.237859010Z",
       "passedTestCount": 20,
       "skippedTestCount": 0,
       "failedTestCount": 0
     },
     "qub/JSONObject.class": {
-      "lastModified": "2020-01-19T04:00:03.083777904Z",
+      "lastModified": "2020-01-30T17:59:37.513534069Z",
       "passedTestCount": 0,
       "skippedTestCount": 0,
       "failedTestCount": 0
     },
     "qub/JSONObjectTests.class": {
-      "lastModified": "2020-01-19T04:00:33.607595920Z",
+      "lastModified": "2020-01-30T17:59:39.147838115Z",
       "passedTestCount": 259,
       "skippedTestCount": 0,
       "failedTestCount": 0
     },
     "qub/JSONProperty.class": {
-      "lastModified": "2020-01-19T04:00:03.203793048Z",
+      "lastModified": "2020-01-30T17:59:37.551311969Z",
       "passedTestCount": 0,
       "skippedTestCount": 0,
       "failedTestCount": 0
     },
     "qub/JSONPropertyTests.class": {
-      "lastModified": "2020-01-19T04:00:06.693454027Z",
+      "lastModified": "2020-01-30T17:59:39.307465076Z",
       "passedTestCount": 26,
       "skippedTestCount": 0,
       "failedTestCount": 0
     },
     "qub/JSONSegment.class": {
-      "lastModified": "2020-01-19T04:00:03.123528003Z",
+      "lastModified": "2020-01-30T17:59:37.229111909Z",
       "passedTestCount": 0,
       "skippedTestCount": 0,
       "failedTestCount": 0
     },
     "qub/JSONString.class": {
-      "lastModified": "2020-01-19T04:00:03.418776988Z",
+      "lastModified": "2020-01-30T17:59:37.302349090Z",
       "passedTestCount": 0,
       "skippedTestCount": 0,
       "failedTestCount": 0
     },
     "qub/JSONStringTests.class": {
-      "lastModified": "2020-01-19T04:00:06.798768997Z",
+      "lastModified": "2020-01-30T17:59:39.380229949Z",
       "passedTestCount": 53,
       "skippedTestCount": 0,
       "failedTestCount": 0
     },
     "qub/JSONTests.class": {
-      "lastModified": "2020-01-19T04:00:06.998670101Z",
+      "lastModified": "2020-01-30T17:59:39.552092075Z",
       "passedTestCount": 118,
       "skippedTestCount": 0,
       "failedTestCount": 0
     },
     "qub/JSONToken.class": {
-      "lastModified": "2020-01-19T04:00:05.671312093Z",
+      "lastModified": "2020-01-30T17:59:37.413247108Z",
       "passedTestCount": 0,
       "skippedTestCount": 0,
       "failedTestCount": 0
     },
     "qub/JSONTokenizer.class": {
-      "lastModified": "2020-01-19T04:00:05.638715028Z",
+      "lastModified": "2020-01-30T17:59:37.366368055Z",
       "passedTestCount": 0,
       "skippedTestCount": 0,
       "failedTestCount": 0
     },
     "qub/JSONTokenizerTests.class": {
-      "lastModified": "2020-01-19T04:00:07.203700065Z",
+      "lastModified": "2020-01-30T17:59:39.774291992Z",
       "passedTestCount": 134,
       "skippedTestCount": 0,
       "failedTestCount": 0
     },
     "qub/JSONTokenTests.class": {
-      "lastModified": "2020-01-19T04:00:07.258582115Z",
+      "lastModified": "2020-01-30T17:59:39.853261947Z",
       "passedTestCount": 13,
       "skippedTestCount": 0,
       "failedTestCount": 0
     },
     "qub/JSONTokenType.class": {
-      "lastModified": "2020-01-19T04:00:05.683748006Z",
+      "lastModified": "2020-01-30T17:59:37.627527952Z",
       "passedTestCount": 0,
       "skippedTestCount": 0,
       "failedTestCount": 0
