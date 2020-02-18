@@ -70,11 +70,12 @@
     <servers />
   </component>
   <component name="WindowStateProjectService">
-    <state x="194" y="0" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1579543495107">
-      <screen x="0" y="0" width="1280" height="680" />
+    <state x="259" y="0" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1581527306194">
+      <screen x="0" y="0" width="1707" height="920" />
     </state>
     <state x="194" y="0" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1280.680@0.0.1280.680" timestamp="1579543495107" />
     <state x="309" y="120" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1707.920/0.1440.1280.680@0.0.1707.920" timestamp="1578115234339" />
+    <state x="259" y="0" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1707.920@0.0.1707.920" timestamp="1581527306194" />
     <state x="494" y="103" key="#com.intellij.ide.util.MemberChooser" timestamp="1579021859634">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
