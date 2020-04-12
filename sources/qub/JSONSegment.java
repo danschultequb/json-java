@@ -49,7 +49,7 @@ public interface JSONSegment
     {
         PreCondition.assertNotNull(toStringFunction, "toStringFunction");
 
-        final InMemoryCharacterStream characterStream = new InMemoryCharacterStream();
+        final InMemoryCharacterToByteStream characterStream = new InMemoryCharacterToByteStream();
         final IndentedCharacterWriteStream indentedStream = new IndentedCharacterWriteStream(characterStream);
         toStringFunction.run(indentedStream).await();
         final String result = characterStream.getText().await();
