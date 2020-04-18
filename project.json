@@ -1,7 +1,7 @@
 {
   "publisher": "qub",
   "project": "json-java",
-  "version": "26",
+  "version": "27",
   "java": {
     "version": "1.8",
     "dependencies": [

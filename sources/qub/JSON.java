@@ -66,6 +66,20 @@ public interface JSON
     }
 
     /**
+     * Parse a JSONSegment from the provided File's content.
+     * @param file The file to parse.
+     * @return The JSONSegment parsed from the provided File's content.
+     */
+    static Result<JSONSegment> parse(File file)
+    {
+        PreCondition.assertNotNull(file, "file");
+
+        return Result.createUsing(
+            () -> new BufferedByteReadStream(file.getContentByteReadStream().await()),
+            (ByteReadStream byteReadStream) -> JSON.parse(byteReadStream).await());
+    }
+
+    /**
      * Parse a JSONSegment from the provided bytes.
      * @param bytes The bytes to parse into a JSONSegment.
      * @return The parsed JSONSegment.
