@@ -66,6 +66,30 @@ public interface JSON
     }
 
     /**
+     * Parse a JSONSegment from the provided bytes.
+     * @param bytes The bytes to parse into a JSONSegment.
+     * @return The parsed JSONSegment.
+     */
+    static Result<JSONSegment> parse(ByteReadStream bytes)
+    {
+        PreCondition.assertNotNull(bytes, "bytes");
+
+        return JSON.parse(CharacterReadStream.create(bytes));
+    }
+
+    /**
+     * Parse a JSONSegment from the provided characters.
+     * @param characters The characters to parse into a JSONSegment.
+     * @return The parsed JSONSegment.
+     */
+    static Result<JSONSegment> parse(CharacterReadStream characters)
+    {
+        PreCondition.assertNotNull(characters, "characters");
+
+        return JSON.parse(CharacterReadStreamIterator.create(characters));
+    }
+
+    /**
      * Parse a JSONSegment from the provided text.
      * @param text The text to parse into a JSONSegment.
      * @return The parsed JSONSegment.
