@@ -196,6 +196,44 @@ public interface JSON
     }
 
     /**
+     * Parse a JSONObject from the provided File's content.
+     * @param file The file to parse.
+     * @return The JSONObject parsed from the provided File's content.
+     */
+    static Result<JSONObject> parseObject(File file)
+    {
+        PreCondition.assertNotNull(file, "file");
+
+        return Result.createUsing(
+            () -> new BufferedByteReadStream(file.getContentByteReadStream().await()),
+            (ByteReadStream byteReadStream) -> JSON.parseObject(byteReadStream).await());
+    }
+
+    /**
+     * Parse a JSONSJSONObject the provided bytes.
+     * @param bytes The bytes to parse into a JSONObject.
+     * @return The parsed JSONObject.
+     */
+    static Result<JSONObject> parseObject(ByteReadStream bytes)
+    {
+        PreCondition.assertNotNull(bytes, "bytes");
+
+        return JSON.parseObject(CharacterReadStream.create(bytes));
+    }
+
+    /**
+     * Parse a JSONObject from the provided characters.
+     * @param characters The characters to parse into a JSONObject.
+     * @return The parsed JSONObject.
+     */
+    static Result<JSONObject> parseObject(CharacterReadStream characters)
+    {
+        PreCondition.assertNotNull(characters, "characters");
+
+        return JSON.parseObject(CharacterReadStreamIterator.create(characters));
+    }
+
+    /**
      * Parse a JSONObject from the provided text.
      * @param text The text to parse into a JSONObject.
      * @return The parsed JSONObject.
