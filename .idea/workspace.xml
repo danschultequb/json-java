@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d9a231a2-cc01-44c9-be51-82cf0ffde018" name="Default Changelist" comment="" />
+    <list default="true" id="d9a231a2-cc01-44c9-be51-82cf0ffde018" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/json-java.iml" beforeDir="false" afterPath="$PROJECT_DIR$/json-java.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project.json" beforeDir="false" afterPath="$PROJECT_DIR$/project.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sources/qub/JSON.java" beforeDir="false" afterPath="$PROJECT_DIR$/sources/qub/JSON.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -40,7 +45,7 @@
       <option name="MAIN_CLASS_NAME" value="qub.ConsoleTestRunner" />
       <module name="json-java" />
       <option name="PROGRAM_PARAMETERS" value="qub.JSONArrayTests" />
-      <option name="VM_PARAMETERS" value="-classpath $PROJECT_DIR$/outputs;$PROJECT_DIR$/../../../../qub/qub/test-java/versions/13/test-java.jar;$PROJECT_DIR$/../../../../qub/qub/charactertable-java/versions/8/charactertable-java.jar;$PROJECT_DIR$/../../../../qub/qub/jacococli-java/versions/10/jacococli-java.jar;$PROJECT_DIR$/../../../../qub/qub/javacli-java/versions/10/javacli-java.jar;$PROJECT_DIR$/../../../../qub/qub/build-java/versions/12/build-java.jar;$PROJECT_DIR$/../../../../qub/qub/projectjson-java/versions/26/projectjson-java.jar;$PROJECT_DIR$/../../../../qub/qub/json-java/versions/24/json-java.jar;$PROJECT_DIR$/../../../../qub/qub/lib-java/versions/26/lib-java.jar" />
+      <option name="VM_PARAMETERS" value="-classpath $PROJECT_DIR$/outputs;$PROJECT_DIR$/../../../../qub/qub/test-java/versions/15/test-java.jar;$PROJECT_DIR$/../../../../qub/qub/charactertable-java/versions/10/charactertable-java.jar;$PROJECT_DIR$/../../../../qub/qub/jacococli-java/versions/12/jacococli-java.jar;$PROJECT_DIR$/../../../../qub/qub/javacli-java/versions/12/javacli-java.jar;$PROJECT_DIR$/../../../../qub/qub/build-java/versions/15/build-java.jar;$PROJECT_DIR$/../../../../qub/qub/projectjson-java/versions/29/projectjson-java.jar;$PROJECT_DIR$/../../../../qub/qub/json-java/versions/29/json-java.jar;$PROJECT_DIR$/../../../../qub/qub/lib-java/versions/28/lib-java.jar" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -49,7 +54,7 @@
       <option name="MAIN_CLASS_NAME" value="qub.ConsoleTestRunner" />
       <module name="json-java" />
       <option name="PROGRAM_PARAMETERS" value="qub.JSONBooleanTests" />
-      <option name="VM_PARAMETERS" value="-classpath $PROJECT_DIR$/outputs;$PROJECT_DIR$/../../../../qub/qub/test-java/versions/13/test-java.jar;$PROJECT_DIR$/../../../../qub/qub/charactertable-java/versions/8/charactertable-java.jar;$PROJECT_DIR$/../../../../qub/qub/jacococli-java/versions/10/jacococli-java.jar;$PROJECT_DIR$/../../../../qub/qub/javacli-java/versions/10/javacli-java.jar;$PROJECT_DIR$/../../../../qub/qub/build-java/versions/12/build-java.jar;$PROJECT_DIR$/../../../../qub/qub/projectjson-java/versions/26/projectjson-java.jar;$PROJECT_DIR$/../../../../qub/qub/json-java/versions/24/json-java.jar;$PROJECT_DIR$/../../../../qub/qub/lib-java/versions/26/lib-java.jar" />
+      <option name="VM_PARAMETERS" value="-classpath $PROJECT_DIR$/outputs;$PROJECT_DIR$/../../../../qub/qub/test-java/versions/15/test-java.jar;$PROJECT_DIR$/../../../../qub/qub/charactertable-java/versions/10/charactertable-java.jar;$PROJECT_DIR$/../../../../qub/qub/jacococli-java/versions/12/jacococli-java.jar;$PROJECT_DIR$/../../../../qub/qub/javacli-java/versions/12/javacli-java.jar;$PROJECT_DIR$/../../../../qub/qub/build-java/versions/15/build-java.jar;$PROJECT_DIR$/../../../../qub/qub/projectjson-java/versions/29/projectjson-java.jar;$PROJECT_DIR$/../../../../qub/qub/json-java/versions/29/json-java.jar;$PROJECT_DIR$/../../../../qub/qub/lib-java/versions/28/lib-java.jar" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -58,7 +63,7 @@
       <option name="MAIN_CLASS_NAME" value="qub.ConsoleTestRunner" />
       <module name="json-java" />
       <option name="PROGRAM_PARAMETERS" value="qub.JSONFormatTests" />
-      <option name="VM_PARAMETERS" value="-classpath $PROJECT_DIR$/outputs;$PROJECT_DIR$/../../../../qub/qub/test-java/versions/13/test-java.jar;$PROJECT_DIR$/../../../../qub/qub/charactertable-java/versions/8/charactertable-java.jar;$PROJECT_DIR$/../../../../qub/qub/jacococli-java/versions/10/jacococli-java.jar;$PROJECT_DIR$/../../../../qub/qub/javacli-java/versions/10/javacli-java.jar;$PROJECT_DIR$/../../../../qub/qub/build-java/versions/12/build-java.jar;$PROJECT_DIR$/../../../../qub/qub/projectjson-java/versions/26/projectjson-java.jar;$PROJECT_DIR$/../../../../qub/qub/json-java/versions/24/json-java.jar;$PROJECT_DIR$/../../../../qub/qub/lib-java/versions/26/lib-java.jar" />
+      <option name="VM_PARAMETERS" value="-classpath $PROJECT_DIR$/outputs;$PROJECT_DIR$/../../../../qub/qub/test-java/versions/15/test-java.jar;$PROJECT_DIR$/../../../../qub/qub/charactertable-java/versions/10/charactertable-java.jar;$PROJECT_DIR$/../../../../qub/qub/jacococli-java/versions/12/jacococli-java.jar;$PROJECT_DIR$/../../../../qub/qub/javacli-java/versions/12/javacli-java.jar;$PROJECT_DIR$/../../../../qub/qub/build-java/versions/15/build-java.jar;$PROJECT_DIR$/../../../../qub/qub/projectjson-java/versions/29/projectjson-java.jar;$PROJECT_DIR$/../../../../qub/qub/json-java/versions/29/json-java.jar;$PROJECT_DIR$/../../../../qub/qub/lib-java/versions/28/lib-java.jar" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -67,7 +72,7 @@
       <option name="MAIN_CLASS_NAME" value="qub.ConsoleTestRunner" />
       <module name="json-java" />
       <option name="PROGRAM_PARAMETERS" value="qub.JSONNullTests" />
-      <option name="VM_PARAMETERS" value="-classpath $PROJECT_DIR$/outputs;$PROJECT_DIR$/../../../../qub/qub/test-java/versions/13/test-java.jar;$PROJECT_DIR$/../../../../qub/qub/charactertable-java/versions/8/charactertable-java.jar;$PROJECT_DIR$/../../../../qub/qub/jacococli-java/versions/10/jacococli-java.jar;$PROJECT_DIR$/../../../../qub/qub/javacli-java/versions/10/javacli-java.jar;$PROJECT_DIR$/../../../../qub/qub/build-java/versions/12/build-java.jar;$PROJECT_DIR$/../../../../qub/qub/projectjson-java/versions/26/projectjson-java.jar;$PROJECT_DIR$/../../../../qub/qub/json-java/versions/24/json-java.jar;$PROJECT_DIR$/../../../../qub/qub/lib-java/versions/26/lib-java.jar" />
+      <option name="VM_PARAMETERS" value="-classpath $PROJECT_DIR$/outputs;$PROJECT_DIR$/../../../../qub/qub/test-java/versions/15/test-java.jar;$PROJECT_DIR$/../../../../qub/qub/charactertable-java/versions/10/charactertable-java.jar;$PROJECT_DIR$/../../../../qub/qub/jacococli-java/versions/12/jacococli-java.jar;$PROJECT_DIR$/../../../../qub/qub/javacli-java/versions/12/javacli-java.jar;$PROJECT_DIR$/../../../../qub/qub/build-java/versions/15/build-java.jar;$PROJECT_DIR$/../../../../qub/qub/projectjson-java/versions/29/projectjson-java.jar;$PROJECT_DIR$/../../../../qub/qub/json-java/versions/29/json-java.jar;$PROJECT_DIR$/../../../../qub/qub/lib-java/versions/28/lib-java.jar" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -76,7 +81,7 @@
       <option name="MAIN_CLASS_NAME" value="qub.ConsoleTestRunner" />
       <module name="json-java" />
       <option name="PROGRAM_PARAMETERS" value="qub.JSONNumberTests" />
-      <option name="VM_PARAMETERS" value="-classpath $PROJECT_DIR$/outputs;$PROJECT_DIR$/../../../../qub/qub/test-java/versions/13/test-java.jar;$PROJECT_DIR$/../../../../qub/qub/charactertable-java/versions/8/charactertable-java.jar;$PROJECT_DIR$/../../../../qub/qub/jacococli-java/versions/10/jacococli-java.jar;$PROJECT_DIR$/../../../../qub/qub/javacli-java/versions/10/javacli-java.jar;$PROJECT_DIR$/../../../../qub/qub/build-java/versions/12/build-java.jar;$PROJECT_DIR$/../../../../qub/qub/projectjson-java/versions/26/projectjson-java.jar;$PROJECT_DIR$/../../../../qub/qub/json-java/versions/24/json-java.jar;$PROJECT_DIR$/../../../../qub/qub/lib-java/versions/26/lib-java.jar" />
+      <option name="VM_PARAMETERS" value="-classpath $PROJECT_DIR$/outputs;$PROJECT_DIR$/../../../../qub/qub/test-java/versions/15/test-java.jar;$PROJECT_DIR$/../../../../qub/qub/charactertable-java/versions/10/charactertable-java.jar;$PROJECT_DIR$/../../../../qub/qub/jacococli-java/versions/12/jacococli-java.jar;$PROJECT_DIR$/../../../../qub/qub/javacli-java/versions/12/javacli-java.jar;$PROJECT_DIR$/../../../../qub/qub/build-java/versions/15/build-java.jar;$PROJECT_DIR$/../../../../qub/qub/projectjson-java/versions/29/projectjson-java.jar;$PROJECT_DIR$/../../../../qub/qub/json-java/versions/29/json-java.jar;$PROJECT_DIR$/../../../../qub/qub/lib-java/versions/28/lib-java.jar" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -85,7 +90,7 @@
       <option name="MAIN_CLASS_NAME" value="qub.ConsoleTestRunner" />
       <module name="json-java" />
       <option name="PROGRAM_PARAMETERS" value="qub.JSONObjectTests" />
-      <option name="VM_PARAMETERS" value="-classpath $PROJECT_DIR$/outputs;$PROJECT_DIR$/../../../../qub/qub/test-java/versions/13/test-java.jar;$PROJECT_DIR$/../../../../qub/qub/charactertable-java/versions/8/charactertable-java.jar;$PROJECT_DIR$/../../../../qub/qub/jacococli-java/versions/10/jacococli-java.jar;$PROJECT_DIR$/../../../../qub/qub/javacli-java/versions/10/javacli-java.jar;$PROJECT_DIR$/../../../../qub/qub/build-java/versions/12/build-java.jar;$PROJECT_DIR$/../../../../qub/qub/projectjson-java/versions/26/projectjson-java.jar;$PROJECT_DIR$/../../../../qub/qub/json-java/versions/24/json-java.jar;$PROJECT_DIR$/../../../../qub/qub/lib-java/versions/26/lib-java.jar" />
+      <option name="VM_PARAMETERS" value="-classpath $PROJECT_DIR$/outputs;$PROJECT_DIR$/../../../../qub/qub/test-java/versions/15/test-java.jar;$PROJECT_DIR$/../../../../qub/qub/charactertable-java/versions/10/charactertable-java.jar;$PROJECT_DIR$/../../../../qub/qub/jacococli-java/versions/12/jacococli-java.jar;$PROJECT_DIR$/../../../../qub/qub/javacli-java/versions/12/javacli-java.jar;$PROJECT_DIR$/../../../../qub/qub/build-java/versions/15/build-java.jar;$PROJECT_DIR$/../../../../qub/qub/projectjson-java/versions/29/projectjson-java.jar;$PROJECT_DIR$/../../../../qub/qub/json-java/versions/29/json-java.jar;$PROJECT_DIR$/../../../../qub/qub/lib-java/versions/28/lib-java.jar" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -94,7 +99,7 @@
       <option name="MAIN_CLASS_NAME" value="qub.ConsoleTestRunner" />
       <module name="json-java" />
       <option name="PROGRAM_PARAMETERS" value="qub.JSONPropertyTests" />
-      <option name="VM_PARAMETERS" value="-classpath $PROJECT_DIR$/outputs;$PROJECT_DIR$/../../../../qub/qub/test-java/versions/13/test-java.jar;$PROJECT_DIR$/../../../../qub/qub/charactertable-java/versions/8/charactertable-java.jar;$PROJECT_DIR$/../../../../qub/qub/jacococli-java/versions/10/jacococli-java.jar;$PROJECT_DIR$/../../../../qub/qub/javacli-java/versions/10/javacli-java.jar;$PROJECT_DIR$/../../../../qub/qub/build-java/versions/12/build-java.jar;$PROJECT_DIR$/../../../../qub/qub/projectjson-java/versions/26/projectjson-java.jar;$PROJECT_DIR$/../../../../qub/qub/json-java/versions/24/json-java.jar;$PROJECT_DIR$/../../../../qub/qub/lib-java/versions/26/lib-java.jar" />
+      <option name="VM_PARAMETERS" value="-classpath $PROJECT_DIR$/outputs;$PROJECT_DIR$/../../../../qub/qub/test-java/versions/15/test-java.jar;$PROJECT_DIR$/../../../../qub/qub/charactertable-java/versions/10/charactertable-java.jar;$PROJECT_DIR$/../../../../qub/qub/jacococli-java/versions/12/jacococli-java.jar;$PROJECT_DIR$/../../../../qub/qub/javacli-java/versions/12/javacli-java.jar;$PROJECT_DIR$/../../../../qub/qub/build-java/versions/15/build-java.jar;$PROJECT_DIR$/../../../../qub/qub/projectjson-java/versions/29/projectjson-java.jar;$PROJECT_DIR$/../../../../qub/qub/json-java/versions/29/json-java.jar;$PROJECT_DIR$/../../../../qub/qub/lib-java/versions/28/lib-java.jar" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -103,7 +108,7 @@
       <option name="MAIN_CLASS_NAME" value="qub.ConsoleTestRunner" />
       <module name="json-java" />
       <option name="PROGRAM_PARAMETERS" value="qub.JSONStringTests" />
-      <option name="VM_PARAMETERS" value="-classpath $PROJECT_DIR$/outputs;$PROJECT_DIR$/../../../../qub/qub/test-java/versions/13/test-java.jar;$PROJECT_DIR$/../../../../qub/qub/charactertable-java/versions/8/charactertable-java.jar;$PROJECT_DIR$/../../../../qub/qub/jacococli-java/versions/10/jacococli-java.jar;$PROJECT_DIR$/../../../../qub/qub/javacli-java/versions/10/javacli-java.jar;$PROJECT_DIR$/../../../../qub/qub/build-java/versions/12/build-java.jar;$PROJECT_DIR$/../../../../qub/qub/projectjson-java/versions/26/projectjson-java.jar;$PROJECT_DIR$/../../../../qub/qub/json-java/versions/24/json-java.jar;$PROJECT_DIR$/../../../../qub/qub/lib-java/versions/26/lib-java.jar" />
+      <option name="VM_PARAMETERS" value="-classpath $PROJECT_DIR$/outputs;$PROJECT_DIR$/../../../../qub/qub/test-java/versions/15/test-java.jar;$PROJECT_DIR$/../../../../qub/qub/charactertable-java/versions/10/charactertable-java.jar;$PROJECT_DIR$/../../../../qub/qub/jacococli-java/versions/12/jacococli-java.jar;$PROJECT_DIR$/../../../../qub/qub/javacli-java/versions/12/javacli-java.jar;$PROJECT_DIR$/../../../../qub/qub/build-java/versions/15/build-java.jar;$PROJECT_DIR$/../../../../qub/qub/projectjson-java/versions/29/projectjson-java.jar;$PROJECT_DIR$/../../../../qub/qub/json-java/versions/29/json-java.jar;$PROJECT_DIR$/../../../../qub/qub/lib-java/versions/28/lib-java.jar" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -112,7 +117,7 @@
       <option name="MAIN_CLASS_NAME" value="qub.ConsoleTestRunner" />
       <module name="json-java" />
       <option name="PROGRAM_PARAMETERS" value="qub.JSONTests" />
-      <option name="VM_PARAMETERS" value="-classpath $PROJECT_DIR$/outputs;$PROJECT_DIR$/../../../../qub/qub/test-java/versions/13/test-java.jar;$PROJECT_DIR$/../../../../qub/qub/charactertable-java/versions/8/charactertable-java.jar;$PROJECT_DIR$/../../../../qub/qub/jacococli-java/versions/10/jacococli-java.jar;$PROJECT_DIR$/../../../../qub/qub/javacli-java/versions/10/javacli-java.jar;$PROJECT_DIR$/../../../../qub/qub/build-java/versions/12/build-java.jar;$PROJECT_DIR$/../../../../qub/qub/projectjson-java/versions/26/projectjson-java.jar;$PROJECT_DIR$/../../../../qub/qub/json-java/versions/24/json-java.jar;$PROJECT_DIR$/../../../../qub/qub/lib-java/versions/26/lib-java.jar" />
+      <option name="VM_PARAMETERS" value="-classpath $PROJECT_DIR$/outputs;$PROJECT_DIR$/../../../../qub/qub/test-java/versions/15/test-java.jar;$PROJECT_DIR$/../../../../qub/qub/charactertable-java/versions/10/charactertable-java.jar;$PROJECT_DIR$/../../../../qub/qub/jacococli-java/versions/12/jacococli-java.jar;$PROJECT_DIR$/../../../../qub/qub/javacli-java/versions/12/javacli-java.jar;$PROJECT_DIR$/../../../../qub/qub/build-java/versions/15/build-java.jar;$PROJECT_DIR$/../../../../qub/qub/projectjson-java/versions/29/projectjson-java.jar;$PROJECT_DIR$/../../../../qub/qub/json-java/versions/29/json-java.jar;$PROJECT_DIR$/../../../../qub/qub/lib-java/versions/28/lib-java.jar" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -121,7 +126,7 @@
       <option name="MAIN_CLASS_NAME" value="qub.ConsoleTestRunner" />
       <module name="json-java" />
       <option name="PROGRAM_PARAMETERS" value="qub.JSONTokenTests" />
-      <option name="VM_PARAMETERS" value="-classpath $PROJECT_DIR$/outputs;$PROJECT_DIR$/../../../../qub/qub/test-java/versions/13/test-java.jar;$PROJECT_DIR$/../../../../qub/qub/charactertable-java/versions/8/charactertable-java.jar;$PROJECT_DIR$/../../../../qub/qub/jacococli-java/versions/10/jacococli-java.jar;$PROJECT_DIR$/../../../../qub/qub/javacli-java/versions/10/javacli-java.jar;$PROJECT_DIR$/../../../../qub/qub/build-java/versions/12/build-java.jar;$PROJECT_DIR$/../../../../qub/qub/projectjson-java/versions/26/projectjson-java.jar;$PROJECT_DIR$/../../../../qub/qub/json-java/versions/24/json-java.jar;$PROJECT_DIR$/../../../../qub/qub/lib-java/versions/26/lib-java.jar" />
+      <option name="VM_PARAMETERS" value="-classpath $PROJECT_DIR$/outputs;$PROJECT_DIR$/../../../../qub/qub/test-java/versions/15/test-java.jar;$PROJECT_DIR$/../../../../qub/qub/charactertable-java/versions/10/charactertable-java.jar;$PROJECT_DIR$/../../../../qub/qub/jacococli-java/versions/12/jacococli-java.jar;$PROJECT_DIR$/../../../../qub/qub/javacli-java/versions/12/javacli-java.jar;$PROJECT_DIR$/../../../../qub/qub/build-java/versions/15/build-java.jar;$PROJECT_DIR$/../../../../qub/qub/projectjson-java/versions/29/projectjson-java.jar;$PROJECT_DIR$/../../../../qub/qub/json-java/versions/29/json-java.jar;$PROJECT_DIR$/../../../../qub/qub/lib-java/versions/28/lib-java.jar" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -130,7 +135,7 @@
       <option name="MAIN_CLASS_NAME" value="qub.ConsoleTestRunner" />
       <module name="json-java" />
       <option name="PROGRAM_PARAMETERS" value="qub.JSONTokenizerTests" />
-      <option name="VM_PARAMETERS" value="-classpath $PROJECT_DIR$/outputs;$PROJECT_DIR$/../../../../qub/qub/test-java/versions/13/test-java.jar;$PROJECT_DIR$/../../../../qub/qub/charactertable-java/versions/8/charactertable-java.jar;$PROJECT_DIR$/../../../../qub/qub/jacococli-java/versions/10/jacococli-java.jar;$PROJECT_DIR$/../../../../qub/qub/javacli-java/versions/10/javacli-java.jar;$PROJECT_DIR$/../../../../qub/qub/build-java/versions/12/build-java.jar;$PROJECT_DIR$/../../../../qub/qub/projectjson-java/versions/26/projectjson-java.jar;$PROJECT_DIR$/../../../../qub/qub/json-java/versions/24/json-java.jar;$PROJECT_DIR$/../../../../qub/qub/lib-java/versions/26/lib-java.jar" />
+      <option name="VM_PARAMETERS" value="-classpath $PROJECT_DIR$/outputs;$PROJECT_DIR$/../../../../qub/qub/test-java/versions/15/test-java.jar;$PROJECT_DIR$/../../../../qub/qub/charactertable-java/versions/10/charactertable-java.jar;$PROJECT_DIR$/../../../../qub/qub/jacococli-java/versions/12/jacococli-java.jar;$PROJECT_DIR$/../../../../qub/qub/javacli-java/versions/12/javacli-java.jar;$PROJECT_DIR$/../../../../qub/qub/build-java/versions/15/build-java.jar;$PROJECT_DIR$/../../../../qub/qub/projectjson-java/versions/29/projectjson-java.jar;$PROJECT_DIR$/../../../../qub/qub/json-java/versions/29/json-java.jar;$PROJECT_DIR$/../../../../qub/qub/lib-java/versions/28/lib-java.jar" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>

@@ -75,7 +75,7 @@ public interface JSON
         PreCondition.assertNotNull(file, "file");
 
         return Result.createUsing(
-            () -> new BufferedByteReadStream(file.getContentByteReadStream().await()),
+            () -> ByteReadStream.buffer(file.getContentReadStream().await()),
             (ByteReadStream byteReadStream) -> JSON.parse(byteReadStream).await());
     }
 
@@ -88,7 +88,7 @@ public interface JSON
     {
         PreCondition.assertNotNull(bytes, "bytes");
 
-        return JSON.parse(CharacterReadStream.create(bytes));
+        return JSON.parse((CharacterReadStream)CharacterReadStream.create(bytes));
     }
 
     /**
@@ -205,7 +205,7 @@ public interface JSON
         PreCondition.assertNotNull(file, "file");
 
         return Result.createUsing(
-            () -> new BufferedByteReadStream(file.getContentByteReadStream().await()),
+            () -> ByteReadStream.buffer(file.getContentReadStream().await()),
             (ByteReadStream byteReadStream) -> JSON.parseObject(byteReadStream).await());
     }
 
@@ -218,7 +218,7 @@ public interface JSON
     {
         PreCondition.assertNotNull(bytes, "bytes");
 
-        return JSON.parseObject(CharacterReadStream.create(bytes));
+        return JSON.parseObject((CharacterReadStream)CharacterReadStream.create(bytes));
     }
 
     /**
