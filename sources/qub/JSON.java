@@ -88,7 +88,7 @@ public interface JSON
     {
         PreCondition.assertNotNull(bytes, "bytes");
 
-        return JSON.parse((CharacterReadStream)CharacterReadStream.create(bytes));
+        return JSON.parse(CharacterReadStream.create(bytes));
     }
 
     /**
@@ -218,7 +218,7 @@ public interface JSON
     {
         PreCondition.assertNotNull(bytes, "bytes");
 
-        return JSON.parseObject((CharacterReadStream)CharacterReadStream.create(bytes));
+        return JSON.parseObject(CharacterReadStream.create(bytes));
     }
 
     /**

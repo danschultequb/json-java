@@ -22,9 +22,34 @@ public interface JSONSegment
      * @param stream The stream to write the String representation of this JSONSegment to.
      * @return The number of characters that were written.
      */
+    default Result<Integer> toString(CharacterWriteStream stream)
+    {
+        PreCondition.assertNotNull(stream, "stream");
+
+        return this.toString(IndentedCharacterWriteStream.create(stream));
+    }
+
+    /**
+     * Write the String representation of this JSONSegment to the provided stream.
+     * @param stream The stream to write the String representation of this JSONSegment to.
+     * @return The number of characters that were written.
+     */
     default Result<Integer> toString(IndentedCharacterWriteStream stream)
     {
         return this.toString(stream, JSONFormat.consise);
+    }
+
+    /**
+     * Write the String representation of this JSONSegment to the provided stream.
+     * @param stream The stream to write the String representation of this JSONSegment to.
+     * @param format The format to use when converting this JSONSegment to a string.
+     * @return The number of characters that were written.
+     */
+    default Result<Integer> toString(CharacterWriteStream stream, JSONFormat format)
+    {
+        PreCondition.assertNotNull(stream, "stream");
+
+        return this.toString(IndentedCharacterWriteStream.create(stream), format);
     }
 
     /**
