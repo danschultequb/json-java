@@ -75,6 +75,7 @@ public class JSONObject implements JSONSegment, MutableMap<String,JSONSegment>
     public <T extends JSONSegment> Result<T> get(String propertyName, java.lang.Class<T> propertyValueType)
     {
         PreCondition.assertNotNullAndNotEmpty(propertyName, "propertyName");
+        PreCondition.assertNotNull(propertyValueType, "propertyValueType");
 
         return this.get(propertyName)
             .then((JSONSegment propertyValue) -> JSON.as(propertyValue, propertyValueType, JSON.thePropertyNamed(propertyName)).await());
@@ -83,14 +84,35 @@ public class JSONObject implements JSONSegment, MutableMap<String,JSONSegment>
     private <T extends JSONSegment> Result<T> getOrNull(String propertyName, java.lang.Class<T> propertyValueType)
     {
         PreCondition.assertNotNullAndNotEmpty(propertyName, "propertyName");
+        PreCondition.assertNotNull(propertyValueType, "propertyValueType");
 
         return this.get(propertyName)
             .then((JSONSegment propertyValue) -> JSON.asOrNull(propertyValue, propertyValueType, JSON.thePropertyNamed(propertyName)).await());
     }
 
+    private <T extends JSONSegment> Result<T> getOrCreate(String propertyName, java.lang.Class<T> propertyValueType, Function0<T> creator)
+    {
+        PreCondition.assertNotNullAndNotEmpty(propertyName, "propertyName");
+        PreCondition.assertNotNull(propertyValueType, "propertyValueType");
+        PreCondition.assertNotNull(creator, "creator");
+
+        return this.get(propertyName, propertyValueType)
+            .catchError(NotFoundException.class, () ->
+            {
+                final T propertyValue = creator.run();
+                this.set(propertyName, propertyValue);
+                return propertyValue;
+            });
+    }
+
     public Result<JSONObject> getObject(String propertyName)
     {
         return this.get(propertyName, JSONObject.class);
+    }
+
+    public Result<JSONObject> getOrCreateObject(String propertyName)
+    {
+        return this.getOrCreate(propertyName, JSONObject.class, JSONObject::create);
     }
 
     public Result<JSONObject> getObjectOrNull(String propertyName)
@@ -106,6 +128,11 @@ public class JSONObject implements JSONSegment, MutableMap<String,JSONSegment>
     public Result<JSONArray> getArrayOrNull(String propertyName)
     {
         return this.getOrNull(propertyName, JSONArray.class);
+    }
+
+    public Result<JSONArray> getOrCreateArray(String propertyName)
+    {
+        return this.getOrCreate(propertyName, JSONArray.class, JSONArray::create);
     }
 
     public Result<JSONBoolean> getBooleanSegment(String propertyName)
