@@ -303,7 +303,7 @@ public interface JSON
                         {
                             throw new ParseException("Expected object property separator (',') or right curly bracket ('}').");
                         }
-                        properties.add(JSON.parseObjectProperty(tokenizer).await());
+                        properties.addAll(JSON.parseObjectProperty(tokenizer).await());
                         expectProperty = false;
                         break;
 
@@ -537,7 +537,7 @@ public interface JSON
                         {
                             throw new ParseException("Expected array element separator (',') or right square bracket (']').");
                         }
-                        elements.add(JSON.parse(tokenizer).await());
+                        elements.addAll(JSON.parse(tokenizer).await());
                         expectElement = false;
                         break;
 

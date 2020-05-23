@@ -215,10 +215,10 @@ public class JSONTokenizer implements Iterator<JSONToken>
         PreCondition.assertTrue(this.characters.hasCurrent(), "characters.hasCurrent()");
         PreCondition.assertTrue(JSONTokenizer.isLetter(this.characters.getCurrent()), "JSONTokenizer.isLetter(this.characters.getCurrent())");
 
-        this.builder.add(this.characters.takeCurrent());
+        this.builder.add(this.characters.takeCurrent().charValue());
         while (this.characters.hasCurrent() && JSONTokenizer.isLetter(this.characters.getCurrent()))
         {
-            this.builder.add(this.characters.takeCurrent());
+            this.builder.add(this.characters.takeCurrent().charValue());
         }
 
         final String result = this.builder.toString(true);
@@ -277,7 +277,7 @@ public class JSONTokenizer implements Iterator<JSONToken>
 
         if (this.characters.getCurrent() == '-')
         {
-            this.builder.add(this.characters.takeCurrent());
+            this.builder.add(this.characters.takeCurrent().charValue());
 
             if (!this.characters.hasCurrent() || !JSONTokenizer.isDigit(this.characters.getCurrent()))
             {
@@ -287,12 +287,12 @@ public class JSONTokenizer implements Iterator<JSONToken>
 
         while (this.characters.hasCurrent() && JSONTokenizer.isDigit(this.characters.getCurrent()))
         {
-            this.builder.add(this.characters.takeCurrent());
+            this.builder.add(this.characters.takeCurrent().charValue());
         }
 
         if (this.characters.hasCurrent() && this.characters.getCurrent() == '.')
         {
-            this.builder.add(this.characters.takeCurrent());
+            this.builder.add(this.characters.takeCurrent().charValue());
             if (!this.characters.hasCurrent() || !JSONTokenizer.isDigit(this.characters.getCurrent()))
             {
                 throw new ParseException("Missing digits after number's decimal point: " + Strings.escapeAndQuote(this.builder.toString(true)));
@@ -300,14 +300,14 @@ public class JSONTokenizer implements Iterator<JSONToken>
 
             do
             {
-                this.builder.add(this.characters.takeCurrent());
+                this.builder.add(this.characters.takeCurrent().charValue());
             }
             while (this.characters.hasCurrent() && JSONTokenizer.isDigit(this.characters.getCurrent()));
         }
 
         if (this.characters.hasCurrent() && (this.characters.getCurrent().equals('e') || this.characters.getCurrent().equals('E')))
         {
-            this.builder.add(this.characters.takeCurrent());
+            this.builder.add(this.characters.takeCurrent().charValue());
 
             if (!this.characters.hasCurrent() || !(this.characters.getCurrent().equals('-') || this.characters.getCurrent().equals('+') || JSONTokenizer.isDigit(this.characters.getCurrent())))
             {
@@ -315,7 +315,7 @@ public class JSONTokenizer implements Iterator<JSONToken>
             }
             else
             {
-                this.builder.add(this.characters.takeCurrent());
+                this.builder.add(this.characters.takeCurrent().charValue());
                 if ((this.builder.endsWith('-') || this.builder.endsWith('+')) &&
                     (!this.characters.hasCurrent() || !JSONTokenizer.isDigit(this.characters.getCurrent())))
                 {
@@ -324,7 +324,7 @@ public class JSONTokenizer implements Iterator<JSONToken>
 
                 while (this.characters.hasCurrent() && JSONTokenizer.isDigit(this.characters.getCurrent()))
                 {
-                    this.builder.add(this.characters.takeCurrent());
+                    this.builder.add(this.characters.takeCurrent().charValue());
                 }
             }
         }
@@ -371,16 +371,16 @@ public class JSONTokenizer implements Iterator<JSONToken>
         if (this.characters.getCurrent() == '/')
         {
             resultType = JSONTokenType.LineComment;
-            this.builder.add(this.characters.takeCurrent());
+            this.builder.add(this.characters.takeCurrent().charValue());
             while (this.characters.hasCurrent() && this.characters.getCurrent() != '\r' && this.characters.getCurrent() != '\n')
             {
-                this.builder.add(this.characters.takeCurrent());
+                this.builder.add(this.characters.takeCurrent().charValue());
             }
         }
         else if (this.characters.getCurrent() == '*')
         {
             resultType = JSONTokenType.BlockComment;
-            this.builder.add(this.characters.takeCurrent());
+            this.builder.add(this.characters.takeCurrent().charValue());
             boolean endSequenceStarted = false;
             boolean ended = false;
             while (this.characters.hasCurrent())
