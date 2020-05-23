@@ -344,7 +344,7 @@ public class JSONTokenizer implements Iterator<JSONToken>
 
         do
         {
-            builder.add(this.characters.takeCurrent());
+            builder.add(this.characters.takeCurrent().charValue());
         }
         while (this.characters.hasCurrent() && JSONTokenizer.isWhitespace(this.characters.getCurrent()));
 
