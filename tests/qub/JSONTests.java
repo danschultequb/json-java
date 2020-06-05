@@ -222,6 +222,7 @@ public interface JSONTests
                 parseObjectPropertyErrorTest.run("\"hello\":,", new ParseException("Expected object property value."));
                 parseObjectPropertyErrorTest.run("\"hello\":}", new ParseException("Unexpected object property value token: \"}\""));
                 parseObjectPropertyErrorTest.run("\"hello\":]", new ParseException("Unexpected object property value token: \"]\""));
+                parseObjectPropertyErrorTest.run("\"\":true", new ParseException("Expected object property name to be not empty."));
 
                 final Action2<String,JSONProperty> parseObjectPropertyTest = (String text, JSONProperty expected) ->
                 {

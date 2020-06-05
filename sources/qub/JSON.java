@@ -421,6 +421,10 @@ public interface JSON
 
             final String quotedPropertyName = JSON.takeCurrent(tokenizer).getText();
             final String propertyName = Strings.unquote(quotedPropertyName);
+            if (Strings.isNullOrEmpty(propertyName))
+            {
+                throw new ParseException("Expected object property name to be not empty.");
+            }
 
             if (!tokenizer.hasCurrent())
             {
